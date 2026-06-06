@@ -1,0 +1,19 @@
+# Backups e compactados
+*.zip
+*.rar
+*.7z
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# VS Code local
+.vscode/
+
+# Arquivos temporários
+*.tmp
+*.bak
+*.log
+
+# RARS / Java
+*.class
