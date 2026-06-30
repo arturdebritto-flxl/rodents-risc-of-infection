@@ -52,6 +52,23 @@ create_powerup_here:
     li t5, 1
     sw t5, 0(t4)
 
+    li t5, POWERUP_MIN_X
+    bge a0, t5, powerup_x_min_ok
+    mv a0, t5
+powerup_x_min_ok:
+    li t5, POWERUP_MAX_X
+    ble a0, t5, powerup_x_ok
+    mv a0, t5
+powerup_x_ok:
+    li t5, POWERUP_MIN_Y
+    bge a1, t5, powerup_y_min_ok
+    mv a1, t5
+powerup_y_min_ok:
+    li t5, POWERUP_MAX_Y
+    ble a1, t5, powerup_y_ok
+    mv a1, t5
+powerup_y_ok:
+
     la t0, powerup_x
     add t4, t0, t3
     sw a0, 0(t4)
@@ -251,6 +268,10 @@ finish_collect_heal:
     j next_powerup_collision
 
 collect_boss_weapon:
+    la t0, boss_weapon_owned
+    li t5, 1
+    sw t5, 0(t0)
+
     la t0, weapon_type
     li t5, WEAPON_BOSS
     sw t5, 0(t0)
@@ -387,7 +408,7 @@ draw_powerup_fallback_rect:
     lw a1, 16(sp)
     li a2, POWERUP_SIZE
     li a3, POWERUP_SIZE
-    li a4, 0xE7
+    li a4, PAL_POWERUP_FALLBACK
     lw a5, 4(sp)
     call draw_rect
 

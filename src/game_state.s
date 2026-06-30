@@ -40,6 +40,23 @@ init_game:
     la t0, animation_frame
     sw zero, 0(t0)
 
+    la t0, draw_frame
+    li t1, 1
+    sw t1, 0(t0)
+
+    la t0, screen_dirty
+    li t1, 1
+    sw t1, 0(t0)
+
+    la t0, music_next_time
+    sw zero, 0(t0)
+
+    la t0, music_index
+    sw zero, 0(t0)
+
+    la t0, noise_timer
+    sw zero, 0(t0)
+
     la t0, debug_mode
     li t1, 1
     sw t1, 0(t0)
@@ -73,6 +90,7 @@ set_state_level1:
     li t1, LEVEL_TOWN
     sw t1, 0(t0)
 
+    call reset_level_runtime
     call init_level1
 
     lw ra,0(sp)
@@ -101,6 +119,7 @@ set_state_level2:
     li t1, LEVEL_SEWER
     sw t1, 0(t0)
 
+    call reset_level_runtime
     call init_level2
 
     lw ra, 0(sp)
@@ -130,6 +149,7 @@ set_state_level3:
     li t1, LEVEL_LABORATORY
     sw t1, 0(t0)
 
+    call reset_level_runtime
     call init_level3
 
     lw ra, 0(sp)
@@ -145,6 +165,10 @@ set_state_level3:
 set_state_victory:
     la t0, game_state
     li t1, STATE_VICTORY
+    sw t1, 0(t0)
+
+    la t0, screen_dirty
+    li t1, 1
     sw t1, 0(t0)
 
     li a0, 88
@@ -166,6 +190,10 @@ set_state_game_over:
     li t1, STATE_GAME_OVER
     sw t1, 0(t0)
 
+    la t0, screen_dirty
+    li t1, 1
+    sw t1, 0(t0)
+
     li a0, 38
     li a1, 180
     li a2, 9
@@ -183,6 +211,10 @@ set_state_game_over:
 set_state_menu:
     la t0, game_state
     li t1, STATE_MENU
+    sw t1, 0(t0)
+
+    la t0, screen_dirty
+    li t1, 1
     sw t1, 0(t0)
 
     la t0, current_level
@@ -204,4 +236,53 @@ set_state_menu:
     la t0, boss_active
     sw zero, 0(t0)
 
+    ret
+
+# Limpa apenas o estado temporario de uma fase, preservando progresso,
+# vidas, armas, municao, carregadores e curas.
+reset_level_runtime:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    call init_bullets
+    call init_enemy_bullets
+    call init_enemies
+    call init_powerups
+    call init_boss
+
+    la t0, player_x
+    li t1, PLAYER_START_X
+    sw t1, 0(t0)
+    la t0, player_y
+    li t1, PLAYER_START_Y
+    sw t1, 0(t0)
+    la t0, player_moved
+    sw zero, 0(t0)
+    la t0, player_move_hold_timer
+    sw zero, 0(t0)
+    la t0, shoot_hold_timer
+    sw zero, 0(t0)
+
+    la t0, last_key
+    sw zero, 0(t0)
+    la t0, key_pressed
+    sw zero, 0(t0)
+    la t0, noise_timer
+    sw zero, 0(t0)
+    la t0, animation_tick
+    sw zero, 0(t0)
+    la t0, animation_frame
+    sw zero, 0(t0)
+
+    la t0, rifle_reload_timer
+    sw zero, 0(t0)
+    la t0, rifle_fire_cooldown
+    sw zero, 0(t0)
+    la t0, shotgun_reload_timer
+    sw zero, 0(t0)
+    la t0, inventory_visible
+    sw zero, 0(t0)
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
     ret

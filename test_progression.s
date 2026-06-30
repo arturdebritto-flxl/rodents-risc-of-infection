@@ -6,7 +6,13 @@
 .include "src/constants.s"
 
 .include "data/game_data.s"
+.include "data/player_data.s"
+.include "data/bullet_data.s"
+.include "data/enemy_data.s"
+.include "data/enemy_bullet_data.s"
 .include "data/boss_data.s"
+.include "data/powerup_data.s"
+.include "data/inventory_data.s"
 
 .text
 .globl main
@@ -34,7 +40,7 @@ main:
     call simulate_wave_clear
     call simulate_wave_clear
 
-# Simula a derrota do boss
+    # Simula a derrota do boss
     call set_state_victory
 
     # Limpa a tela uma unica vez
@@ -43,7 +49,7 @@ main:
     li a7, 148
     ecall
 
-    # Imprime game_state: esperado 5
+    # Imprime game_state: esperado STATE_VICTORY (6)
     la t0, game_state
     lw a0, 0(t0)
     li a1, 8
@@ -93,7 +99,7 @@ main:
     li a7, 101
     ecall
 
-# Imprime boss_active: esperado 1
+    # Imprime boss_active: esperado 1
     la t0, boss_active
     lw a0, 0(t0)
     li a1, 8
@@ -130,6 +136,15 @@ simulate_wave_clear:
     lw ra, 0(sp)
     addi sp, sp, 4
 
+    ret
+
+# Stubs dos inicializadores: este teste cobre progressao e preservacao de
+# estado; os modulos completos sao validados pela montagem de main.s.
+init_bullets:
+init_enemy_bullets:
+init_enemies:
+init_powerups:
+init_boss:
     ret
 
 .include "src/game_state.s"

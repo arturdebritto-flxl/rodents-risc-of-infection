@@ -432,7 +432,7 @@ enemy_bullet_damage_ok:
     # Se vidas <= 0, GAME OVER
     blez t5, enemy_bullet_player_game_over
 
-    j next_enemy_bullet_player
+    j end_enemy_bullet_player_collisions
 
 enemy_bullet_player_game_over:
     call set_state_game_over

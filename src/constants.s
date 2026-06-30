@@ -39,6 +39,25 @@
 .eqv SCREEN_WIDTH                 320
 .eqv SCREEN_HEIGHT                240
 
+# Bitmap Display: framebuffer 8bpp (um indice de paleta por byte).
+# 0x00 e transparencia de sprite; contornos visiveis usam outro indice.
+.eqv PAL_TRANSPARENT              0x00
+.eqv PAL_DARK_OUTLINE             0x01
+.eqv PAL_ARENA_BORDER             0x24
+.eqv PAL_TOWN_PLATFORM            0x89
+.eqv PAL_SEWER_WALL               0x1C
+.eqv PAL_LAB_BLOCK                0x6D
+.eqv PAL_LAB_PLATFORM             0x92
+.eqv PAL_TEXT                     0xFF
+.eqv PAL_PLAYER_FALLBACK          0xF6
+.eqv PAL_ENEMY_FALLBACK           0x49
+.eqv PAL_BOSS_FALLBACK            0x6D
+.eqv PAL_POWERUP_FALLBACK         0xE7
+
+# Somente para ecalls graficas que recebem RGB de 32 bits.
+.eqv RGB_BLACK                    0x000000
+.eqv RGB_WHITE                    0xFFFFFF
+
 # ------------------------------------------------------------
 # Limites iniciais de entidades simultâneas
 # ------------------------------------------------------------
@@ -67,6 +86,10 @@
 .eqv POWERUP_BOSS_AMMO         4
 .eqv MAX_POWERUPS              8
 .eqv POWERUP_SIZE              16
+.eqv POWERUP_MIN_X             0
+.eqv POWERUP_MAX_X             304
+.eqv POWERUP_MIN_Y             20
+.eqv POWERUP_MAX_Y             200
 
 .eqv WEAPON_NORMAL             1
 .eqv WEAPON_BOSS               2
@@ -182,6 +205,8 @@
 .eqv BULLET_SIZE                3
 .eqv BULLET_CENTER_OFFSET       6
 .eqv BULLET_EDGE_OFFSET         13
+.eqv PLAYER_PROJECTILE_CENTER_OFFSET 6
+.eqv PLAYER_PROJECTILE_EDGE_OFFSET   13
 .eqv BULLET_INACTIVE            0
 .eqv BULLET_ACTIVE              1
 
@@ -239,12 +264,18 @@
 .eqv SPITTER_STRAFE_SPEED       1
 .eqv SPITTER_PROJECTILE_RANGE   90
 .eqv SPITTER_PROJECTILE_LIFE    45
+.eqv SPITTER_MIN_X              0
+.eqv SPITTER_MAX_X              304
+.eqv SPITTER_MIN_Y              20
+.eqv SPITTER_MAX_Y              200
+.eqv SPITTER_PROJECTILE_ORIGIN_OFFSET 8
 
 .eqv ENEMY_PROJECTILE_SPITTER       1
 .eqv ENEMY_PROJECTILE_BOSS_HEAVY    2
 .eqv SPITTER_PROJECTILE_SIZE        3
 .eqv BOSS_PROJECTILE_CENTER_OFFSET  11
 .eqv BOSS_PROJECTILE_EDGE_OFFSET    22
+.eqv BOSS_PROJECTILE_LEFT_ADJUST    21
 .eqv SPITTER_PROJECTILE_DAMAGE      1
 .eqv BOSS_PROJECTILE_SIZE           10
 .eqv BOSS_PROJECTILE_DAMAGE         1

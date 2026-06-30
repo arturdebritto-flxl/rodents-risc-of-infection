@@ -491,11 +491,19 @@ spitter_retreat:
 
 spitter_back_right:
     addi t5, t5, SPITTER_RETREAT_SPEED
+    li t6, SPITTER_MAX_X
+    ble t5, t6, spitter_store_retreat_x
+    li t5, SPITTER_MAX_X
+spitter_store_retreat_x:
     sw t5, 0(t4)
     j next_update_enemy
 
 spitter_back_left:
-    addi t5, t5, -2
+    addi t5, t5, -SPITTER_RETREAT_SPEED
+    li t6, SPITTER_MIN_X
+    bge t5, t6, spitter_store_retreat_left_x
+    li t5, SPITTER_MIN_X
+spitter_store_retreat_left_x:
     sw t5, 0(t4)
     j next_update_enemy
 
@@ -509,9 +517,11 @@ spitter_strafe_up:
     la t0, enemy_y
     add t4, t0, t3
     lw t5, 0(t4)
-    addi t5, t5, -1
-    li t6, 10
-    blt t5, t6, spitter_strafe_done
+    addi t5, t5, -SPITTER_STRAFE_SPEED
+    li t6, SPITTER_MIN_Y
+    bge t5, t6, spitter_store_strafe_y
+    li t5, SPITTER_MIN_Y
+spitter_store_strafe_y:
     sw t5, 0(t4)
     j spitter_strafe_done
 
@@ -520,8 +530,10 @@ spitter_strafe_down:
     add t4, t0, t3
     lw t5, 0(t4)
     addi t5, t5, SPITTER_STRAFE_SPEED
-    li t6, 225
-    bgt t5, t6, spitter_strafe_done
+    li t6, SPITTER_MAX_Y
+    ble t5, t6, spitter_store_strafe_down_y
+    li t5, SPITTER_MAX_Y
+spitter_store_strafe_down_y:
     sw t5, 0(t4)
 
 spitter_strafe_done:
@@ -534,12 +546,12 @@ spitter_fire_at_player:
     la t0, enemy_x
     add t4, t0, t3
     lw a0, 0(t4)
-    addi a0, a0, 4
+    addi a0, a0, SPITTER_PROJECTILE_ORIGIN_OFFSET
 
     la t0, enemy_y
     add t4, t0, t3
     lw a1, 0(t4)
-    addi a1, a1, 4
+    addi a1, a1, SPITTER_PROJECTILE_ORIGIN_OFFSET
 
     la t0, player_x
     lw t5, 0(t0)

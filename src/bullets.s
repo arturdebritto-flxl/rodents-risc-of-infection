@@ -164,13 +164,18 @@ spawn_bullet:
 
     la t0, boss_ammo_count
     lw t1, 0(t0)
-    blez t1, prepare_normal_rifle_shot
+    blez t1, end_spawn_bullet
     addi t1, t1, -1
     sw t1, 0(t0)
     li a5, WEAPON_BOSS_DAMAGE
+    la t0, rifle_fire_cooldown
+    li t1, RIFLE_FIRE_DELAY
+    sw t1, 0(t0)
     li t5, BULLET_SPEED
     call set_cardinal_delta
     call create_bullet_with_delta
+    li a0, WEAPON_BOSS
+    call play_weapon_shot_sfx
     j end_spawn_bullet
 
 prepare_normal_rifle_shot:
@@ -193,6 +198,8 @@ arm_rifle_cooldown:
     li t5, BULLET_SPEED
     call set_cardinal_delta
     call create_bullet_with_delta
+    li a0, WEAPON_NORMAL
+    call play_weapon_shot_sfx
     j end_spawn_bullet
 
 spawn_shotgun_blast:
@@ -235,6 +242,8 @@ spawn_shotgun_blast:
     li t6, SHOTGUN_SPREAD_SPEED
     call set_spread_delta_right
     call create_bullet_with_delta
+    li a0, WEAPON_SHOTGUN
+    call play_weapon_shot_sfx
     j end_spawn_bullet
 
 try_start_shotgun_reload_from_shot:
@@ -336,14 +345,36 @@ create_bullet_here:
 
     la t0, player_x
     lw t5, 0(t0)
-    addi t5, t5, 4
+    li t6, DIR_LEFT
+    beq a0, t6, player_bullet_x_left
+    li t6, DIR_RIGHT
+    beq a0, t6, player_bullet_x_right
+    addi t5, t5, PLAYER_PROJECTILE_CENTER_OFFSET
+    j store_player_bullet_x
+player_bullet_x_left:
+    addi t5, t5, -BULLET_SIZE
+    j store_player_bullet_x
+player_bullet_x_right:
+    addi t5, t5, PLAYER_PROJECTILE_EDGE_OFFSET
+store_player_bullet_x:
     la t0, bullet_x
     add t6, t0, t3
     sw t5, 0(t6)
 
     la t0, player_y
     lw t5, 0(t0)
-    addi t5, t5, 4
+    li t6, DIR_UP
+    beq a0, t6, player_bullet_y_up
+    li t6, DIR_DOWN
+    beq a0, t6, player_bullet_y_down
+    addi t5, t5, PLAYER_PROJECTILE_CENTER_OFFSET
+    j store_player_bullet_y
+player_bullet_y_up:
+    addi t5, t5, -BULLET_SIZE
+    j store_player_bullet_y
+player_bullet_y_down:
+    addi t5, t5, PLAYER_PROJECTILE_EDGE_OFFSET
+store_player_bullet_y:
     la t0, bullet_y
     add t6, t0, t3
     sw t5, 0(t6)
@@ -364,21 +395,30 @@ create_bullet_here:
     add t6, t0, t3
     sw a5, 0(t6)
 
-    la t0, noise_timer
-    lw t5, 0(t0)
-    li t6, NOISE_SHOT_FRAMES
-    bge t5, t6, play_bullet_sfx
-    sw t6, 0(t0)
+end_create_bullet_with_delta:
+    ret
 
-play_bullet_sfx:
+play_weapon_shot_sfx:
+    la t0, noise_timer
+    li t1, NOISE_SHOT_FRAMES
+    sw t1, 0(t0)
+    li t1, WEAPON_SHOTGUN
+    beq a0, t1, weapon_sfx_shotgun
+    li t1, WEAPON_BOSS
+    beq a0, t1, weapon_sfx_boss
     li a0, 76
+    j emit_weapon_sfx
+weapon_sfx_shotgun:
+    li a0, 48
+    j emit_weapon_sfx
+weapon_sfx_boss:
+    li a0, 36
+emit_weapon_sfx:
     li a1, 35
     li a2, 80
     li a3, 72
     li a7, 31
     ecall
-
-end_create_bullet_with_delta:
     ret
 
 end_spawn_bullet:

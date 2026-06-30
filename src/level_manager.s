@@ -331,6 +331,8 @@ start_laboratory_wave3:
 
 
 start_boss_fight:
+    call reset_level_runtime
+
     la t0, boss_active
     lw t1, 0(t0)
     bnez t1, end_advance_wave
