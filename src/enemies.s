@@ -56,6 +56,9 @@ spawn_wave_if_needed:
     li t2, STATE_LEVEL2
     beq t1, t2, spawn_wave_state_ok
 
+    li t2, STATE_LEVEL3
+    beq t1, t2, spawn_wave_state_ok
+
     li t2, STATE_BOSS
     beq t1, t2, spawn_wave_state_ok
 
@@ -356,6 +359,9 @@ update_enemies:
     beq t1, t2, update_enemies_state_ok
 
     li t2, STATE_LEVEL2
+    beq t1, t2, update_enemies_state_ok
+
+    li t2, STATE_LEVEL3
     beq t1, t2, update_enemies_state_ok
 
     li t2, STATE_BOSS

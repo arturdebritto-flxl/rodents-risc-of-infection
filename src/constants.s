@@ -10,9 +10,9 @@
 .eqv STATE_LEVEL1                  1
 .eqv STATE_LEVEL2                  2
 .eqv STATE_LEVEL3                  3
-.eqv STATE_BOSS                    3
-.eqv STATE_GAME_OVER               4
-.eqv STATE_VICTORY                 5
+.eqv STATE_BOSS                    4
+.eqv STATE_GAME_OVER               5
+.eqv STATE_VICTORY                 6
 
 # ------------------------------------------------------------
 # Identificação dos cenários
@@ -121,10 +121,20 @@
 # ------------------------------------------------------------
 
 .eqv DEBUG_LOOP_FRAMES          120
-.eqv DEBUG_FRAME_DELAY_MS       16
+.eqv DEBUG_FRAME_DELAY_MS       2
 .eqv ANIMATION_FRAME_DELAY      8
 .eqv SPRITE_FRAME_0             0
 .eqv SPRITE_FRAME_1             1
+
+# ------------------------------------------------------------
+# Musica MIDI
+# ------------------------------------------------------------
+
+.eqv MUSIC_NOTE_INTERVAL_MS     180
+.eqv MUSIC_NOTE_DURATION_MS     160
+.eqv MUSIC_NOTE_COUNT           8
+.eqv MUSIC_INSTRUMENT           80
+.eqv MUSIC_VOLUME               40
 
 # ------------------------------------------------------------
 # Fallbacks de renderizacao com sprites
@@ -143,8 +153,8 @@
 .eqv PLAYER_START_X             152
 .eqv PLAYER_START_Y             112
 .eqv PLAYER_SMOOTH_SPEED        2
-.eqv PLAYER_MOVE_HOLD_FRAMES    16
-.eqv PLAYER_SHOOT_HOLD_FRAMES   16
+.eqv PLAYER_MOVE_HOLD_FRAMES    4
+.eqv PLAYER_SHOOT_HOLD_FRAMES   6
 .eqv PLAYER_SPEED               3
 .eqv PLAYER_SIZE                16
 
@@ -170,6 +180,8 @@
 .eqv SHOTGUN_UNLOCK_RESERVE     18
 .eqv BULLET_SPEED               10
 .eqv BULLET_SIZE                3
+.eqv BULLET_CENTER_OFFSET       6
+.eqv BULLET_EDGE_OFFSET         13
 .eqv BULLET_INACTIVE            0
 .eqv BULLET_ACTIVE              1
 
@@ -231,6 +243,8 @@
 .eqv ENEMY_PROJECTILE_SPITTER       1
 .eqv ENEMY_PROJECTILE_BOSS_HEAVY    2
 .eqv SPITTER_PROJECTILE_SIZE        3
+.eqv BOSS_PROJECTILE_CENTER_OFFSET  11
+.eqv BOSS_PROJECTILE_EDGE_OFFSET    22
 .eqv SPITTER_PROJECTILE_DAMAGE      1
 .eqv BOSS_PROJECTILE_SIZE           10
 .eqv BOSS_PROJECTILE_DAMAGE         1

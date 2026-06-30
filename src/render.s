@@ -548,6 +548,38 @@ sprite_weapon_boss_icon:
 .text
 
 # ------------------------------------------------------------
+# init_video
+# Inicializa explicitamente os dois framebuffers.
+#
+# Frame 0 começa visível.
+# Frame 1 será o primeiro frame de desenho.
+# ------------------------------------------------------------
+
+init_video:
+    # Exibe inicialmente o framebuffer 0
+    li t0, VGAFRAMESELECT
+    sw zero, 0(t0)
+
+    # O primeiro desenho será feito no framebuffer 1
+    la t0, draw_frame
+    li t1, 1
+    sw t1, 0(t0)
+
+    # Limpa o framebuffer 0
+    li a0, 0x00
+    li a1, 0
+    li a7, 148
+    ecall
+
+    # Limpa o framebuffer 1
+    li a0, 0x00
+    li a1, 1
+    li a7, 148
+    ecall
+
+    ret
+
+# ------------------------------------------------------------
 # begin_frame
 # Limpa o frame atual de desenho.
 #
@@ -1556,7 +1588,7 @@ next_draw_enemy:
 end_draw_enemies:
     lw ra, 0(sp)
     addi sp, sp, 20
-    
+
     ret
 
 # ------------------------------------------------------------
@@ -1848,4 +1880,3 @@ draw_victory_screen:
     lw ra, 0(sp)
     addi sp, sp, 8
     ret
-    

@@ -55,6 +55,9 @@ update_bullets:
     li t2, STATE_LEVEL2
     beq t1, t2, update_bullets_state_ok
 
+    li t2, STATE_LEVEL3
+    beq t1, t2, update_bullets_state_ok
+
     li t2, STATE_BOSS
     beq t1, t2, update_bullets_state_ok
 
