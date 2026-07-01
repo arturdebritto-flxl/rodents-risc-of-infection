@@ -50,6 +50,10 @@ update_boss:
 
     call move_boss
     call update_boss_melee
+    la t0, game_state
+    lw t1, 0(t0)
+    li t2, STATE_BOSS
+    bne t1, t2, end_update_boss
     call update_boss_heavy_attack
 
 end_update_boss:
@@ -176,11 +180,11 @@ update_boss_heavy_attack:
 
     la t0, boss_x
     lw a0, 0(t0)
-    addi a0, a0, 8
+    addi a0, a0, BOSS_PROJECTILE_CENTER_OFFSET
 
     la t0, boss_y
     lw a1, 0(t0)
-    addi a1, a1, 16
+    addi a1, a1, BOSS_PROJECTILE_EDGE_OFFSET
 
     li a2, BOSS_HEAVY_PROJECTILE_DX
     li a3, BOSS_PROJECTILE_SPEED
@@ -196,11 +200,15 @@ update_boss_heavy_attack:
     j boss_heavy_spawn
 
 boss_heavy_left:
-    li a2, -2
+    addi a0, a0, -BOSS_PROJECTILE_LEFT_ADJUST
+    addi a1, a1, -BOSS_PROJECTILE_CENTER_OFFSET
+    li a2, -BOSS_PROJECTILE_SPEED
     li a3, 0
     j boss_heavy_spawn
 
 boss_heavy_right:
+    addi a0, a0, BOSS_PROJECTILE_CENTER_OFFSET
+    addi a1, a1, -BOSS_PROJECTILE_CENTER_OFFSET
     li a2, BOSS_PROJECTILE_SPEED
     li a3, 0
 

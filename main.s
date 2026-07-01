@@ -26,6 +26,7 @@ main:
     call init_enemies
     call init_powerups
     call init_inventory
+    call init_video
 
     call set_state_menu
 
@@ -38,6 +39,8 @@ main:
 .include "src/game_state.s"
 .include "src/level_manager.s"
 .include "src/input.s"
+.include "src/cheats.s"
+.include "src/music.s"
 .include "src/player.s"
 .include "src/bullets.s"
 .include "src/enemies.s"

@@ -32,6 +32,9 @@ init_inventory:
     la t0, shotgun_owned
     sw zero, 0(t0)
 
+    la t0, boss_weapon_owned
+    sw zero, 0(t0)
+
     la t0, shotgun_ammo_count
     sw zero, 0(t0)
 
@@ -42,8 +45,7 @@ init_inventory:
     sw zero, 0(t0)
 
     la t0, inventory_visible
-    li t1, 1
-    sw t1, 0(t0)
+    sw zero, 0(t0)
 
     ret
 
@@ -58,6 +60,9 @@ update_inventory:
     beq t1, t2, update_inventory_state_ok
 
     li t2, STATE_LEVEL2
+    beq t1, t2, update_inventory_state_ok
+
+    li t2, STATE_LEVEL3
     beq t1, t2, update_inventory_state_ok
 
     li t2, STATE_BOSS
@@ -111,6 +116,11 @@ check_reload_timer:
     j check_shotgun_reload_timer
 
 maybe_start_auto_reload:
+    la t0, weapon_type
+    lw t1, 0(t0)
+    li t2, WEAPON_NORMAL
+    bne t1, t2, check_shotgun_reload_timer
+
     la t0, rifle_mag_count
     lw t1, 0(t0)
     bgtz t1, check_shotgun_reload_timer
@@ -345,8 +355,19 @@ handle_weapon_select_input:
     beq t1, t2, select_normal_weapon
 
     li t2, '2'
-    bne t1, t2, end_handle_weapon_select_input
+    beq t1, t2, try_select_shotgun
 
+    li t2, '3'
+    bne t1, t2, end_handle_weapon_select_input
+    la t0, boss_weapon_owned
+    lw t1, 0(t0)
+    beqz t1, end_handle_weapon_select_input
+    la t0, weapon_type
+    li t1, WEAPON_BOSS
+    sw t1, 0(t0)
+    j end_handle_weapon_select_input
+
+try_select_shotgun:
     la t0, shotgun_owned
     lw t1, 0(t0)
     beqz t1, end_handle_weapon_select_input
@@ -386,6 +407,8 @@ try_manual_reload:
     lw t1, 0(t0)
     li t2, WEAPON_SHOTGUN
     beq t1, t2, try_manual_shotgun_reload
+    li t2, WEAPON_NORMAL
+    bne t1, t2, end_handle_reload_input
 
     la t0, rifle_mag_count
     lw t1, 0(t0)

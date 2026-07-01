@@ -548,6 +548,38 @@ sprite_weapon_boss_icon:
 .text
 
 # ------------------------------------------------------------
+# init_video
+# Inicializa explicitamente os dois framebuffers.
+#
+# Frame 0 começa visível.
+# Frame 1 será o primeiro frame de desenho.
+# ------------------------------------------------------------
+
+init_video:
+    # Exibe inicialmente o framebuffer 0
+    li t0, VGAFRAMESELECT
+    sw zero, 0(t0)
+
+    # O primeiro desenho será feito no framebuffer 1
+    la t0, draw_frame
+    li t1, 1
+    sw t1, 0(t0)
+
+    # Limpa o framebuffer 0
+    li a0, 0x00
+    li a1, 0
+    li a7, 148
+    ecall
+
+    # Limpa o framebuffer 1
+    li a0, 0x00
+    li a1, 1
+    li a7, 148
+    ecall
+
+    ret
+
+# ------------------------------------------------------------
 # begin_frame
 # Limpa o frame atual de desenho.
 #
@@ -642,7 +674,7 @@ draw_background:
     li a1, 18
     li a2, SCREEN_WIDTH
     li a3, 2
-    li a4, 0x24
+    li a4, PAL_ARENA_BORDER
     lw a5, 4(sp)
     call draw_rect
 
@@ -650,7 +682,7 @@ draw_background:
     li a1, 214
     li a2, SCREEN_WIDTH
     li a3, 2
-    li a4, 0x24
+    li a4, PAL_ARENA_BORDER
     lw a5, 4(sp)
     call draw_rect
 
@@ -673,7 +705,7 @@ draw_town_background:
     li a1, 68
     li a2, 64
     li a3, 10
-    li a4, 0x89
+    li a4, PAL_TOWN_PLATFORM
     lw a5, 4(sp)
     call draw_rect
 
@@ -681,7 +713,7 @@ draw_town_background:
     li a1, 152
     li a2, 64
     li a3, 10
-    li a4, 0x89
+    li a4, PAL_TOWN_PLATFORM
     lw a5, 4(sp)
     call draw_rect
     j end_draw_background
@@ -691,7 +723,7 @@ draw_sewer_background:
     li a1, 44
     li a2, 12
     li a3, 76
-    li a4, 0x1C
+    li a4, PAL_SEWER_WALL
     lw a5, 4(sp)
     call draw_rect
 
@@ -699,7 +731,7 @@ draw_sewer_background:
     li a1, 118
     li a2, 12
     li a3, 76
-    li a4, 0x1C
+    li a4, PAL_SEWER_WALL
     lw a5, 4(sp)
     call draw_rect
     j end_draw_background
@@ -709,7 +741,7 @@ draw_laboratory_background:
     li a1, 88
     li a2, 40
     li a3, 36
-    li a4, 0x6D
+    li a4, PAL_LAB_BLOCK
     lw a5, 4(sp)
     call draw_rect
 
@@ -717,7 +749,7 @@ draw_laboratory_background:
     li a1, 58
     li a2, 72
     li a3, 10
-    li a4, 0x92
+    li a4, PAL_LAB_PLATFORM
     lw a5, 4(sp)
     call draw_rect
 
@@ -725,7 +757,7 @@ draw_laboratory_background:
     li a1, 172
     li a2, 72
     li a3, 10
-    li a4, 0x92
+    li a4, PAL_LAB_PLATFORM
     lw a5, 4(sp)
     call draw_rect
 
@@ -1244,9 +1276,14 @@ draw_player_square:
     la t0, player_direction
     lw t1, 0(t0)
 
+    li t6, SPRITE_FRAME_0
+    la t0, player_moved
+    lw t0, 0(t0)
+    beqz t0, player_animation_selected
     la t0, animation_frame
     lw t6, 0(t0)
     andi t6, t6, 1
+player_animation_selected:
 
     li t2, DIR_UP
     beq t1, t2, select_player_up_sprite
@@ -1304,7 +1341,7 @@ draw_player_fallback_rect:
 
     li a2, PLAYER_SIZE
     li a3, PLAYER_SIZE
-    li a4, 0xF6
+    li a4, PAL_PLAYER_FALLBACK
     call draw_rect
 
 end_draw_player_square:
@@ -1543,7 +1580,7 @@ draw_enemy_fallback_rect:
     lw a1, 16(sp)
     li a2, ENEMY_SIZE
     li a3, ENEMY_SIZE
-    li a4, 0x49
+    li a4, PAL_ENEMY_FALLBACK
     lw a5, 4(sp)
     call draw_rect
 
@@ -1556,7 +1593,7 @@ next_draw_enemy:
 end_draw_enemies:
     lw ra, 0(sp)
     addi sp, sp, 20
-    
+
     ret
 
 # ------------------------------------------------------------
@@ -1730,7 +1767,7 @@ draw_boss_fallback_rect:
     lw a1, 8(sp)
     li a2, BOSS_SIZE
     li a3, BOSS_SIZE
-    li a4, 0x6D
+    li a4, PAL_BOSS_FALLBACK
     call draw_rect
 
 end_draw_boss_square:
@@ -1756,14 +1793,14 @@ draw_menu_screen:
     la a0, label_echo
     li a1, 152
     li a2, 80
-    li a3, 0xFF
+    li a3, PAL_TEXT
     lw a4, 4(sp)
     call draw_small_text
 
     la a0, label_start
     li a1, 150
     li a2, 120
-    li a3, 0xFF
+    li a3, PAL_TEXT
     lw a4, 4(sp)
     call draw_small_text
 
@@ -1787,14 +1824,14 @@ draw_game_over_screen:
     la a0, label_gameover
     li a1, 144
     li a2, 80
-    li a3, 0xFF
+    li a3, PAL_TEXT
     lw a4, 4(sp)
     call draw_small_text
 
     la a0, label_pts
     li a1, 138
     li a2, 120
-    li a3, 0xFF
+    li a3, PAL_TEXT
     lw a4, 4(sp)
     call draw_small_text
 
@@ -1802,7 +1839,7 @@ draw_game_over_screen:
     lw a0, 0(t0)
     li a1, 156
     li a2, 120
-    li a3, 0xFF
+    li a3, PAL_TEXT
     lw a4, 4(sp)
     call draw_small_number
 
@@ -1826,14 +1863,14 @@ draw_victory_screen:
     la a0, label_victory
     li a1, 146
     li a2, 80
-    li a3, 0xFF
+    li a3, PAL_TEXT
     lw a4, 4(sp)
     call draw_small_text
 
     la a0, label_pts
     li a1, 138
     li a2, 120
-    li a3, 0xFF
+    li a3, PAL_TEXT
     lw a4, 4(sp)
     call draw_small_text
 
@@ -1841,11 +1878,10 @@ draw_victory_screen:
     lw a0, 0(t0)
     li a1, 156
     li a2, 120
-    li a3, 0xFF
+    li a3, PAL_TEXT
     lw a4, 4(sp)
     call draw_small_number
 
     lw ra, 0(sp)
     addi sp, sp, 8
     ret
-    

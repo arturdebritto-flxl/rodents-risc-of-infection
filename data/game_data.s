@@ -30,6 +30,9 @@ frame_counter:          .word 0
 draw_frame:             .word 1
 animation_tick:         .word 0
 animation_frame:        .word 0
+screen_dirty:           .word 1
+music_next_time:        .word 0
+music_index:            .word 0
 
 # ------------------------------------------------------------
 # Controle de testes e apresentação
