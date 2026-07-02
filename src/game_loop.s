@@ -72,14 +72,14 @@ loop_playing_level:
     call begin_frame
 
     call draw_background
+    call draw_player_square
     call draw_enemies
     call draw_boss_square
     call draw_bullets
     call draw_enemy_bullets
     call draw_powerups
-    call draw_player_square
-    call draw_hud
     call draw_inventory
+    call draw_hud
 
     call end_frame
 
