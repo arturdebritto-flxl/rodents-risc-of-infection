@@ -335,14 +335,42 @@ create_bullet_here:
 
     la t0, player_x
     lw t5, 0(t0)
-    addi t5, t5, 4
+    li t6, DIR_LEFT
+    beq a0, t6, spawn_bullet_x_left
+    li t6, DIR_RIGHT
+    beq a0, t6, spawn_bullet_x_right
+    addi t5, t5, 6
+    j store_bullet_x
+
+spawn_bullet_x_left:
+    addi t5, t5, -3
+    j store_bullet_x
+
+spawn_bullet_x_right:
+    addi t5, t5, PLAYER_SIZE
+
+store_bullet_x:
     la t0, bullet_x
     add t6, t0, t3
     sw t5, 0(t6)
 
     la t0, player_y
     lw t5, 0(t0)
-    addi t5, t5, 4
+    li t6, DIR_UP
+    beq a0, t6, spawn_bullet_y_up
+    li t6, DIR_DOWN
+    beq a0, t6, spawn_bullet_y_down
+    addi t5, t5, 6
+    j store_bullet_y
+
+spawn_bullet_y_up:
+    addi t5, t5, -3
+    j store_bullet_y
+
+spawn_bullet_y_down:
+    addi t5, t5, PLAYER_SIZE
+
+store_bullet_y:
     la t0, bullet_y
     add t6, t0, t3
     sw t5, 0(t6)

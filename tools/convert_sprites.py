@@ -22,35 +22,80 @@ FORMULA = (
     "((green >> 5) << 3) | (red >> 5))"
 )
 
-# Selection consumed by the functional runtime from commit 1f1802e.  Sizes,
-# directions and animation slots remain unchanged.
-RUNTIME_SPRITES = {
-    "sprite_player_down_0": ("_protagonista", "sprite_00.png", 16),
-    "sprite_player_down_1": ("_protagonista", "sprite_01.png", 16),
-    "sprite_player_up_0": ("_protagonista", "sprite_04.png", 16),
-    "sprite_player_up_1": ("_protagonista", "sprite_05.png", 16),
-    "sprite_player_right_0": ("_protagonista", "sprite_08.png", 16),
-    "sprite_player_right_1": ("_protagonista", "sprite_09.png", 16),
-    "sprite_player_left_0": ("_protagonista", "sprite_16.png", 16),
-    "sprite_player_left_1": ("_protagonista", "sprite_17.png", 16),
-    "sprite_enemy_common_0": ("_sprites_1", "sprites/image-1.png.png", 16),
-    "sprite_enemy_common_1": ("_sprites_1", "sprites/image-2.png.png", 16),
-    "sprite_enemy_echo_0": ("_sprites_1", "sprites/image-12.png.png", 16),
-    "sprite_enemy_echo_1": ("_sprites_1", "sprites/image-13.png.png", 16),
-    "sprite_enemy_mutant_0": ("_sprites_1", "sprites/image-10.png.png", 16),
-    "sprite_enemy_mutant_1": ("_sprites_1", "sprites/image-11.png.png", 16),
-    "sprite_enemy_spitter_0": ("_sprites_1", "sprites/image-18.png.png", 16),
-    "sprite_enemy_spitter_1": ("_sprites_1", "sprites/image-19.png.png", 16),
-    "sprite_boss_0": ("_sprites_1", "sprites/New Piskel-1.png.png", 32),
-    "sprite_boss_1": ("_sprites_1", "sprites/New Piskel-2.png.png", 32),
-    "sprite_powerup_heal": ("_med_kit", "Med-Kit.png", 16),
-    "sprite_powerup_ammo": ("_armas", "sprite_1.png", 16),
-    "sprite_powerup_boss_weapon": ("_armas", "sprite_0.png", 16),
-    "sprite_powerup_boss_ammo": ("_armas", "sprite_5.png", 16),
-    "sprite_weapon_normal_icon": ("_armas", "sprite_0.png", 16),
-    "sprite_weapon_shotgun_icon": ("_armas", "sprite_4.png", 16),
-    "sprite_weapon_boss_icon": ("_armas", "sprite_2.png", 16),
-}
+DIRECTIONS = ("down", "left", "right", "up")
+ACTIONS = ("idle", "walk_1", "walk_2", "attack")
+FINAL_GROUP = "_final_sprites"
+
+
+def build_runtime_sprites() -> dict[str, tuple[str, str, int]]:
+    """Return baseline runtime art plus the explicitly approved final sprites."""
+    sprites: dict[str, tuple[str, str, int]] = {
+        "sprite_player_down_0": ("_protagonista", "sprite_00.png", 16),
+        "sprite_player_down_1": ("_protagonista", "sprite_01.png", 16),
+        "sprite_player_up_0": ("_protagonista", "sprite_04.png", 16),
+        "sprite_player_up_1": ("_protagonista", "sprite_05.png", 16),
+        "sprite_player_right_0": ("_protagonista", "sprite_08.png", 16),
+        "sprite_player_right_1": ("_protagonista", "sprite_09.png", 16),
+        "sprite_player_left_0": ("_protagonista", "sprite_16.png", 16),
+        "sprite_player_left_1": ("_protagonista", "sprite_17.png", 16),
+        "sprite_enemy_common_0": ("_sprites_1", "sprites/image-1.png.png", 16),
+        "sprite_enemy_common_1": ("_sprites_1", "sprites/image-2.png.png", 16),
+        "sprite_enemy_echo_0": ("_sprites_1", "sprites/image-12.png.png", 16),
+        "sprite_enemy_echo_1": ("_sprites_1", "sprites/image-13.png.png", 16),
+        "sprite_enemy_mutant_0": ("_sprites_1", "sprites/image-10.png.png", 16),
+        "sprite_enemy_mutant_1": ("_sprites_1", "sprites/image-11.png.png", 16),
+        "sprite_boss_0": ("_sprites_1", "sprites/New Piskel-1.png.png", 32),
+        "sprite_boss_1": ("_sprites_1", "sprites/New Piskel-2.png.png", 32),
+        "sprite_powerup_heal": ("_med_kit", "Med-Kit.png", 16),
+        "sprite_powerup_ammo": ("_armas", "sprite_1.png", 16),
+        "sprite_powerup_boss_weapon": ("_armas", "sprite_0.png", 16),
+        "sprite_powerup_boss_ammo": ("_armas", "sprite_5.png", 16),
+        "sprite_weapon_normal_icon": ("_armas", "sprite_0.png", 16),
+        "sprite_weapon_shotgun_icon": ("_armas", "sprite_4.png", 16),
+        "sprite_weapon_boss_icon": ("_armas", "sprite_2.png", 16),
+    }
+
+    spitter_dir = "03_INIMIGOS/rat_spitter_16x16/frames"
+    for direction in DIRECTIONS:
+        for action in ACTIONS:
+            sprites[f"sprite_enemy_spitter_{direction}_{action}"] = (
+                FINAL_GROUP,
+                f"{spitter_dir}/{direction}__{action}.png",
+                16,
+            )
+
+    static = {
+        "sprite_ammo_pistol_pickup": ("05_MUNICAO_E_MEDKIT_8x8/ammo_pistol_pickup_8x8.png", 8),
+        "sprite_ammo_shotgun_pickup": ("05_MUNICAO_E_MEDKIT_8x8/ammo_shotgun_pickup_8x8.png", 8),
+        "sprite_ammo_uzi_pickup": ("05_MUNICAO_E_MEDKIT_8x8/ammo_uzi_pickup_8x8.png", 8),
+        "sprite_medkit_pickup": ("05_MUNICAO_E_MEDKIT_8x8/medkit_pickup_8x8.png", 8),
+        "sprite_projectile_pistol": ("06_PROJETEIS/projectile_pistol_3x3.png", 3),
+        "sprite_projectile_shotgun": ("06_PROJETEIS/projectile_shotgun_3x3.png", 3),
+        "sprite_projectile_uzi": ("06_PROJETEIS/projectile_uzi_3x3.png", 3),
+        "sprite_projectile_spitter": ("06_PROJETEIS/projectile_spitter_4x4.png", 4),
+        "sprite_projectile_boss": ("06_PROJETEIS/projectile_boss_green_6x6.png", 6),
+    }
+    for symbol, (source, size) in static.items():
+        sprites[symbol] = (FINAL_GROUP, source, size)
+    return sprites
+
+
+RUNTIME_SPRITES = build_runtime_sprites()
+
+
+def build_runtime_tables() -> dict[str, list[str]]:
+    """Build Spitter direction tables in the game's DIR_UP/RIGHT/DOWN/LEFT order."""
+    tables: dict[str, list[str]] = {}
+    direction_order = ("up", "right", "down", "left")
+    for action in ACTIONS:
+        tables[f"sprite_enemy_spitter_{action}_table"] = [
+            f"sprite_enemy_spitter_{direction}_{action}"
+            for direction in direction_order
+        ]
+    return tables
+
+
+RUNTIME_TABLES = build_runtime_tables()
 
 
 @dataclass(frozen=True)
@@ -116,11 +161,45 @@ def transform(data: bytes, target: int) -> tuple[int, int, bytes, dict]:
     return target, target, payload, metadata
 
 
+def transform_exact(data: bytes, size: int) -> tuple[int, int, bytes, dict]:
+    """Convert a final-size RGBA sprite without cropping or repositioning it."""
+    with Image.open(io.BytesIO(data)) as source:
+        image = source.convert("RGBA")
+    if image.size != (size, size):
+        raise ValueError(f"expected {size}x{size} sprite, got {image.width}x{image.height}")
+    pixels = (
+        image.get_flattened_data()
+        if hasattr(image, "get_flattened_data")
+        else image.getdata()
+    )
+    payload = bytes(rgba_to_rars8(pixel) for pixel in pixels)
+    metadata = {
+        "source_size": [size, size],
+        "crop": [0, 0, size, size],
+        "content_size": [size, size],
+        "output_size": [size, size],
+        "offset": [0, 0],
+        "resampling": "none",
+        "transparent_value": TRANSPARENT,
+        "payload_sha256": hashlib.sha256(payload).hexdigest(),
+    }
+    return size, size, payload, metadata
+
+
 def discover(source_dir: Path) -> list[SourceEntry]:
     entries: list[SourceEntry] = []
     for source in sorted(source_dir.iterdir(), key=lambda path: path.name.casefold()):
         group = symbol_for("", Path(source.stem)).removeprefix("asset_")
-        if source.suffix.lower() == ".zip":
+        if source.is_dir():
+            pngs = sorted(
+                source.rglob("*.png"),
+                key=lambda path: path.relative_to(source).as_posix().casefold(),
+            )
+            entries.extend(
+                SourceEntry(group, path.relative_to(source), path.read_bytes())
+                for path in pngs
+            )
+        elif source.suffix.lower() == ".zip":
             with zipfile.ZipFile(source) as archive:
                 members = archive.infolist()
                 for member in members:
@@ -147,6 +226,7 @@ def emit(source_dir: Path, output_dir: Path, target: int = 16) -> dict:
     output_dir.mkdir(parents=True, exist_ok=True)
     records: list[dict] = []
     symbols: set[str] = set()
+    entries = discover(source_dir)
     asm = [
         "# Generated by tools/convert_sprites.py; do not edit.\n",
         f"# Format: {FORMAT}\n",
@@ -154,7 +234,11 @@ def emit(source_dir: Path, output_dir: Path, target: int = 16) -> dict:
         ".data\n",
     ]
 
-    for entry in discover(source_dir):
+    for entry in entries:
+        # Final assets are emitted at their manifest dimensions below.  Keep the
+        # legacy all-assets catalog stable instead of adding resized duplicates.
+        if entry.group == FINAL_GROUP:
+            continue
         symbol = symbol_for(entry.group, entry.relative)
         if symbol in symbols:
             raise ValueError(f"duplicate Assembly symbol: {symbol}")
@@ -188,7 +272,7 @@ def emit(source_dir: Path, output_dir: Path, target: int = 16) -> dict:
 
     entries_by_key = {
         (entry.group, entry.relative.as_posix()): entry
-        for entry in discover(source_dir)
+        for entry in entries
     }
     runtime_asm = [
         "# Generated by tools/convert_sprites.py; do not edit.\n",
@@ -198,7 +282,8 @@ def emit(source_dir: Path, output_dir: Path, target: int = 16) -> dict:
     runtime_records = []
     for symbol, (group, source, size) in RUNTIME_SPRITES.items():
         entry = entries_by_key[(group, source)]
-        _, _, payload, metadata = transform(entry.data, size)
+        transform_runtime = transform_exact if group == FINAL_GROUP else transform
+        _, _, payload, metadata = transform_runtime(entry.data, size)
         runtime_asm.append(f"\n# {group}/{source}\n{symbol}:\n")
         for offset in range(0, len(payload), 16):
             values = ", ".join(
@@ -215,11 +300,19 @@ def emit(source_dir: Path, output_dir: Path, target: int = 16) -> dict:
             }
         )
 
+    runtime_asm.append("\n.align 2\n")
+    for table, symbols in RUNTIME_TABLES.items():
+        missing = [symbol for symbol in symbols if symbol not in RUNTIME_SPRITES]
+        if missing:
+            raise ValueError(f"runtime table {table} references unknown sprites: {missing}")
+        runtime_asm.append(f"{table}:\n    .word {', '.join(symbols)}\n")
+
     manifest = {
         "format": FORMAT,
         "formula": FORMULA,
         "sprites": records,
         "runtime_sprites": runtime_records,
+        "runtime_tables": RUNTIME_TABLES,
     }
     (output_dir / "sprites.s").write_text("".join(asm), encoding="ascii", newline="\n")
     (output_dir / "runtime_sprites.s").write_text(

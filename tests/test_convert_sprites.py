@@ -8,11 +8,13 @@ from PIL import Image
 from tools.convert_sprites import (
     FORMULA,
     RUNTIME_SPRITES,
+    RUNTIME_TABLES,
     discover,
     emit,
     rgba_to_rars8,
     replace_runtime_block,
     transform,
+    transform_exact,
 )
 
 
@@ -58,6 +60,20 @@ class SpriteConverterTests(unittest.TestCase):
 
         self.assertEqual(bytes([0x07]), payload)
 
+    def test_final_size_transform_preserves_transparent_margins(self):
+        image = Image.new("RGBA", (3, 3), (0, 0, 0, 0))
+        image.putpixel((0, 0), (255, 0, 0, 255))
+        stream = io.BytesIO()
+        image.save(stream, format="PNG")
+
+        width, height, payload, metadata = transform_exact(stream.getvalue(), 3)
+
+        self.assertEqual((3, 3), (width, height))
+        self.assertEqual([0, 0], metadata["offset"])
+        self.assertEqual("none", metadata["resampling"])
+        self.assertEqual(0x07, payload[0])
+        self.assertEqual(0, payload[-1])
+
     def test_all_real_assets_and_representatives_are_emitted_deterministically(self):
         first = emit(SOURCE, GENERATED)
         first_files = {
@@ -72,12 +88,16 @@ class SpriteConverterTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(first_files, second_files)
 
-        self.assertEqual(53, len(first["sprites"]))
-        self.assertEqual(25, len(first["runtime_sprites"]))
+        legacy_entries = [
+            entry for entry in discover(SOURCE) if entry.group != "_final_sprites"
+        ]
+        self.assertEqual(len(legacy_entries), len(first["sprites"]))
+        self.assertEqual(len(RUNTIME_SPRITES), len(first["runtime_sprites"]))
         self.assertEqual(set(RUNTIME_SPRITES), {
             record["symbol"] for record in first["runtime_sprites"]
         })
         self.assertEqual(FORMULA, first["formula"])
+        self.assertEqual(RUNTIME_TABLES, first["runtime_tables"])
         records = {
             (record["group"], record["source"]): record
             for record in first["sprites"]
@@ -133,6 +153,34 @@ class SpriteConverterTests(unittest.TestCase):
         self.assertNotIn("stale", updated)
         for symbol in RUNTIME_SPRITES:
             self.assertEqual(1, updated.count(f"{symbol}:"))
+        for table in RUNTIME_TABLES:
+            self.assertEqual(1, updated.count(f"{table}:"))
+
+    def test_runtime_projectiles_keep_manifest_dimensions(self):
+        manifest = emit(SOURCE, GENERATED)
+        records = {
+            record["symbol"]: record for record in manifest["runtime_sprites"]
+        }
+        expected = {
+            "sprite_projectile_pistol": [3, 3],
+            "sprite_projectile_shotgun": [3, 3],
+            "sprite_projectile_uzi": [3, 3],
+            "sprite_projectile_spitter": [4, 4],
+            "sprite_projectile_boss": [6, 6],
+        }
+        for symbol, size in expected.items():
+            with self.subTest(symbol=symbol):
+                self.assertEqual(size, records[symbol]["output_size"])
+
+        boss_entry = next(
+            entry
+            for entry in discover(SOURCE)
+            if entry.relative.as_posix() == "06_PROJETEIS/projectile_boss_green_6x6.png"
+        )
+        boss_payload = transform_exact(boss_entry.data, 6)[2]
+        nontransparent = [value for value in boss_payload if value]
+        self.assertTrue(nontransparent)
+        self.assertTrue(any(value & 0x38 for value in nontransparent))
 
     def test_checked_in_runtime_bytes_match_fresh_generation(self):
         emit(SOURCE, GENERATED)

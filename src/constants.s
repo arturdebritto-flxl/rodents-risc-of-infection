@@ -83,6 +83,7 @@
 .eqv POWERUP_HEAL              2
 .eqv POWERUP_BOSS_WEAPON       3
 .eqv POWERUP_BOSS_AMMO         4
+.eqv POWERUP_SHOTGUN_AMMO      5
 .eqv MAX_POWERUPS              8
 .eqv POWERUP_SIZE              16
 
@@ -93,6 +94,7 @@
 .eqv PLAYER_MAX_LIVES          3
 .eqv NORMAL_AMMO_GAIN          5
 .eqv BOSS_AMMO_GAIN            3
+.eqv SHOTGUN_AMMO_GAIN         5
 .eqv HEAL_GAIN                 1
 .eqv WEAPON_NORMAL_DAMAGE      1
 .eqv WEAPON_BOSS_DAMAGE        3
@@ -113,11 +115,26 @@
 # ------------------------------------------------------------
 
 .eqv SEWER_TOTAL_WAVES          5
-.eqv SEWER_WAVE1_ENEMIES        8
-.eqv SEWER_WAVE2_ENEMIES        9
-.eqv SEWER_WAVE3_ENEMIES        10
-.eqv SEWER_WAVE4_ENEMIES        11
-.eqv SEWER_WAVE5_ENEMIES        12
+.eqv SEWER_WAVE1_ENEMIES        6
+.eqv SEWER_WAVE2_ENEMIES        7
+.eqv SEWER_WAVE3_ENEMIES        7
+.eqv SEWER_WAVE4_ENEMIES        8
+.eqv SEWER_WAVE5_ENEMIES        9
+
+# Ciclo de drops preservado do baseline: 7 resultados em 15 mortes.
+.eqv DROP_CYCLE_LENGTH           15
+.eqv DROP_ALLOWED_PER_CYCLE      7
+.eqv DROP_HEAL_INTERVAL          5
+.eqv DROP_AMMO_INTERVAL          3
+
+# Pesos aplicados somente depois de um drop de municao ser autorizado.
+.eqv AMMO_WEIGHT_PISTOL_PHASE1   100
+.eqv AMMO_WEIGHT_PISTOL_PHASE2   75
+.eqv AMMO_WEIGHT_SHOTGUN_PHASE2  25
+.eqv AMMO_WEIGHT_PISTOL_PHASE3   25
+.eqv AMMO_WEIGHT_SHOTGUN_PHASE3  25
+.eqv AMMO_WEIGHT_UZI_PHASE3      50
+.eqv AMMO_WEIGHT_TOTAL           100
 
 # ------------------------------------------------------------
 # Configuracao das waves da fase 3: Laboratory

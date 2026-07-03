@@ -78,15 +78,21 @@ spawn_powerup_from_enemy_death:
     addi t1, t1, 1
     sw t1, 0(t0)
 
-    li t2, 5
+    # Gate geral preservado do baseline: multiplos de 3 ou 5 recebem drop.
+    li t2, DROP_HEAL_INTERVAL
+    rem t3, t1, t2
+    beqz t3, choose_drop_kind_from_kill
+
+    li t2, DROP_AMMO_INTERVAL
+    rem t3, t1, t2
+    bnez t3, end_spawn_powerup_from_enemy_death
+
+choose_drop_kind_from_kill:
+    li t2, DROP_HEAL_INTERVAL
     rem t3, t1, t2
     beqz t3, spawn_heal_from_kill
 
-    li t2, 3
-    rem t3, t1, t2
-    beqz t3, spawn_ammo_from_kill
-
-    j end_spawn_powerup_from_enemy_death
+    j spawn_ammo_from_kill
 
 spawn_heal_from_kill:
     lw a0, 4(sp)
@@ -98,12 +104,56 @@ spawn_heal_from_kill:
 spawn_ammo_from_kill:
     lw a0, 4(sp)
     lw a1, 8(sp)
-    li a2, POWERUP_NORMAL_AMMO
+    call select_ammo_powerup_for_level
     call spawn_powerup_at
 
 end_spawn_powerup_from_enemy_death:
     lw ra, 0(sp)
     addi sp, sp, 12
+    ret
+
+# Seleciona o tipo de municao somente apos o drop geral e a escolha por municao.
+# Saida: a2 = POWERUP_*_AMMO
+select_ammo_powerup_for_level:
+    li a2, POWERUP_NORMAL_AMMO
+
+    la t0, current_level
+    lw t1, 0(t0)
+    li t2, LEVEL_SEWER
+    beq t1, t2, select_phase2_ammo
+    li t2, LEVEL_LABORATORY
+    beq t1, t2, select_phase3_ammo
+    ret
+
+select_phase2_ammo:
+    la t0, enemy_kill_counter
+    lw t1, 0(t0)
+    li t2, AMMO_WEIGHT_TOTAL
+    rem t1, t1, t2
+    li t2, AMMO_WEIGHT_PISTOL_PHASE2
+    blt t1, t2, end_select_ammo_powerup
+    li a2, POWERUP_SHOTGUN_AMMO
+    ret
+
+select_phase3_ammo:
+    la t0, enemy_kill_counter
+    lw t1, 0(t0)
+    li t2, AMMO_WEIGHT_TOTAL
+    rem t1, t1, t2
+    li t2, AMMO_WEIGHT_PISTOL_PHASE3
+    blt t1, t2, end_select_ammo_powerup
+
+    li t3, AMMO_WEIGHT_SHOTGUN_PHASE3
+    add t2, t2, t3
+    blt t1, t2, select_shotgun_ammo_powerup
+
+    li a2, POWERUP_BOSS_AMMO
+    ret
+
+select_shotgun_ammo_powerup:
+    li a2, POWERUP_SHOTGUN_AMMO
+
+end_select_ammo_powerup:
     ret
 
 spawn_boss_powerups:
@@ -228,6 +278,9 @@ powerup_collision_loop:
     li t6, POWERUP_BOSS_AMMO
     beq t5, t6, collect_boss_ammo
 
+    li t6, POWERUP_SHOTGUN_AMMO
+    beq t5, t6, collect_shotgun_ammo
+
     j next_powerup_collision
 
 collect_normal_ammo:
@@ -268,6 +321,13 @@ collect_boss_ammo:
     la t0, boss_ammo_count
     lw t5, 0(t0)
     addi t5, t5, BOSS_AMMO_GAIN
+    sw t5, 0(t0)
+    j play_powerup_collect_sfx
+
+collect_shotgun_ammo:
+    la t0, shotgun_ammo_count
+    lw t5, 0(t0)
+    addi t5, t5, SHOTGUN_AMMO_GAIN
     sw t5, 0(t0)
     j play_powerup_collect_sfx
 
@@ -357,22 +417,41 @@ draw_powerups_loop:
     li t5, POWERUP_BOSS_AMMO
     beq t6, t5, select_powerup_boss_ammo_sprite
 
+    li t5, POWERUP_SHOTGUN_AMMO
+    beq t6, t5, select_powerup_shotgun_ammo_sprite
+
 select_powerup_ammo_sprite:
-    la a2, sprite_powerup_ammo
-    j draw_selected_powerup_sprite
+    la a2, sprite_ammo_pistol_pickup
+    j draw_selected_new_pickup_sprite
 
 select_powerup_heal_sprite:
-    la a2, sprite_powerup_heal
-    j draw_selected_powerup_sprite
+    la a2, sprite_medkit_pickup
+    j draw_selected_new_pickup_sprite
 
 select_powerup_boss_weapon_sprite:
     la a2, sprite_powerup_boss_weapon
-    j draw_selected_powerup_sprite
+    j draw_selected_baseline_powerup_sprite
 
 select_powerup_boss_ammo_sprite:
-    la a2, sprite_powerup_boss_ammo
+    la a2, sprite_ammo_uzi_pickup
+    j draw_selected_new_pickup_sprite
 
-draw_selected_powerup_sprite:
+select_powerup_shotgun_ammo_sprite:
+    la a2, sprite_ammo_shotgun_pickup
+
+draw_selected_new_pickup_sprite:
+    lw a0, 12(sp)
+    lw a1, 16(sp)
+    addi a0, a0, 4
+    addi a1, a1, 4
+    li a3, 8
+    li a4, 8
+    call draw_sprite_8bpp_fast
+
+    lw t1, 8(sp)
+    j next_draw_powerup
+
+draw_selected_baseline_powerup_sprite:
     lw a0, 12(sp)
     lw a1, 16(sp)
     li a3, POWERUP_SIZE

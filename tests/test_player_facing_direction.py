@@ -66,10 +66,7 @@ class PlayerFacingDirectionTests(unittest.TestCase):
         }
         for direction, label in expected_routes.items():
             with self.subTest(direction=direction):
-                self.assertRegex(
-                    selection,
-                    rf"li t2, {direction}\s+beq t1, t2, {label}",
-                )
+                self.assertRegex(selection, rf"li t2, {direction}\s+beq t1, t2, {label}")
         self.assertIn("select_player_down_sprite:", selection)
 
     def test_horizontal_projectile_deltas_keep_their_direction(self) -> None:
