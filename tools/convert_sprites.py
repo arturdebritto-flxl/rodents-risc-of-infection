@@ -22,8 +22,6 @@ FORMULA = (
     "((green >> 5) << 3) | (red >> 5))"
 )
 
-DIRECTIONS = ("down", "left", "right", "up")
-ACTIONS = ("idle", "walk_1", "walk_2", "attack")
 FINAL_GROUP = "_final_sprites"
 
 
@@ -44,6 +42,8 @@ def build_runtime_sprites() -> dict[str, tuple[str, str, int]]:
         "sprite_enemy_echo_1": ("_sprites_1", "sprites/image-13.png.png", 16),
         "sprite_enemy_mutant_0": ("_sprites_1", "sprites/image-10.png.png", 16),
         "sprite_enemy_mutant_1": ("_sprites_1", "sprites/image-11.png.png", 16),
+        "sprite_enemy_spitter_0": ("_sprites_1", "sprites/image-18.png.png", 16),
+        "sprite_enemy_spitter_1": ("_sprites_1", "sprites/image-19.png.png", 16),
         "sprite_boss_0": ("_sprites_1", "sprites/New Piskel-1.png.png", 32),
         "sprite_boss_1": ("_sprites_1", "sprites/New Piskel-2.png.png", 32),
         "sprite_powerup_heal": ("_med_kit", "Med-Kit.png", 16),
@@ -54,15 +54,6 @@ def build_runtime_sprites() -> dict[str, tuple[str, str, int]]:
         "sprite_weapon_shotgun_icon": ("_armas", "sprite_4.png", 16),
         "sprite_weapon_boss_icon": ("_armas", "sprite_2.png", 16),
     }
-
-    spitter_dir = "03_INIMIGOS/rat_spitter_16x16/frames"
-    for direction in DIRECTIONS:
-        for action in ACTIONS:
-            sprites[f"sprite_enemy_spitter_{direction}_{action}"] = (
-                FINAL_GROUP,
-                f"{spitter_dir}/{direction}__{action}.png",
-                16,
-            )
 
     static = {
         "sprite_ammo_pistol_pickup": ("05_MUNICAO_E_MEDKIT_8x8/ammo_pistol_pickup_8x8.png", 8),
@@ -84,15 +75,7 @@ RUNTIME_SPRITES = build_runtime_sprites()
 
 
 def build_runtime_tables() -> dict[str, list[str]]:
-    """Build Spitter direction tables in the game's DIR_UP/RIGHT/DOWN/LEFT order."""
-    tables: dict[str, list[str]] = {}
-    direction_order = ("up", "right", "down", "left")
-    for action in ACTIONS:
-        tables[f"sprite_enemy_spitter_{action}_table"] = [
-            f"sprite_enemy_spitter_{direction}_{action}"
-            for direction in direction_order
-        ]
-    return tables
+    return {}
 
 
 RUNTIME_TABLES = build_runtime_tables()

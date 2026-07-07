@@ -84,6 +84,7 @@
 .eqv POWERUP_BOSS_WEAPON       3
 .eqv POWERUP_BOSS_AMMO         4
 .eqv POWERUP_SHOTGUN_AMMO      5
+.eqv POWERUP_SHOTGUN_WEAPON    6
 .eqv MAX_POWERUPS              8
 .eqv POWERUP_SIZE              16
 

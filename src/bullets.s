@@ -418,7 +418,7 @@ move_bullets:
 
 move_bullets_loop:
     li t2, MAX_BULLETS
-    beq t1, t2, end_move_bullets
+    bge t1, t2, end_move_bullets
 
     slli t3, t1, 2
 

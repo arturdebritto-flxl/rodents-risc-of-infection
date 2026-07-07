@@ -90,6 +90,100 @@ init_level3:
     ret
 
 # ------------------------------------------------------------
+# handle_next_level_cheat
+# Cheat explicito de gameplay: C avanca para a proxima fase.
+# Retorna a0 = 1 quando consumiu a tecla e mudou de fase.
+# ------------------------------------------------------------
+
+handle_next_level_cheat:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    li a0, 0
+
+    la t0, game_state
+    lw t1, 0(t0)
+
+    li t2, STATE_LEVEL1
+    beq t1, t2, next_level_cheat_state_ok
+
+    li t2, STATE_LEVEL2
+    beq t1, t2, next_level_cheat_state_ok
+
+    li t2, STATE_BOSS
+    bne t1, t2, end_handle_next_level_cheat
+
+next_level_cheat_state_ok:
+    la t0, key_pressed
+    lw t1, 0(t0)
+    beqz t1, end_handle_next_level_cheat
+
+    la t0, last_key
+    lw t1, 0(t0)
+
+    li t2, 'c'
+    beq t1, t2, try_next_level_cheat
+
+    li t2, 'C'
+    bne t1, t2, end_handle_next_level_cheat
+
+try_next_level_cheat:
+    la t0, current_level
+    lw t1, 0(t0)
+
+    li t2, LEVEL_TOWN
+    beq t1, t2, cheat_to_level2
+
+    li t2, LEVEL_SEWER
+    beq t1, t2, cheat_to_level3
+
+    li t2, LEVEL_LABORATORY
+    beq t1, t2, cheat_to_victory
+
+    j end_handle_next_level_cheat
+
+cheat_to_level2:
+    call reset_transient_level_state
+    call set_state_level2
+    li a0, 1
+    j end_handle_next_level_cheat
+
+cheat_to_level3:
+    call reset_transient_level_state
+    call set_state_level3
+    li a0, 1
+    j end_handle_next_level_cheat
+
+cheat_to_victory:
+    call reset_transient_level_state
+    call set_state_victory
+    li a0, 1
+
+end_handle_next_level_cheat:
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
+# ------------------------------------------------------------
+# reset_transient_level_state
+# Limpa entidades e timers de fase sem apagar player/inventario.
+# ------------------------------------------------------------
+
+reset_transient_level_state:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    call init_enemies
+    call init_bullets
+    call init_enemy_bullets
+    call init_powerups
+    call init_boss
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
+# ------------------------------------------------------------
 # advance_wave
 # Avanca waves e muda de level quando a wave atual termina.
 #

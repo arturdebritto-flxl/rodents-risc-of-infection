@@ -3,9 +3,6 @@ import re
 import unittest
 from pathlib import Path
 
-from PIL import Image
-
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -27,6 +24,8 @@ class SelectiveSpriteIntegrationTests(unittest.TestCase):
         cls.render = (ROOT / "src/render.s").read_text(encoding="utf-8")
         cls.powerups = (ROOT / "src/powerups.s").read_text(encoding="utf-8")
         cls.bullets = (ROOT / "src/bullets.s").read_text(encoding="utf-8")
+        cls.collision = (ROOT / "src/collision.s").read_text(encoding="utf-8")
+        cls.inventory = (ROOT / "src/inventory.s").read_text(encoding="utf-8")
         manifest = json.loads(
             (ROOT / "assets/generated/manifest.json").read_text(encoding="utf-8")
         )
@@ -59,30 +58,22 @@ class SelectiveSpriteIntegrationTests(unittest.TestCase):
         }
         self.assertTrue(final_sources)
         self.assertTrue(all(
-            source.startswith("03_INIMIGOS/rat_spitter_16x16/")
-            or source.startswith("05_MUNICAO_E_MEDKIT_8x8/")
+            source.startswith("05_MUNICAO_E_MEDKIT_8x8/")
             or source.startswith("06_PROJETEIS/")
             for source in final_sources
         ))
 
-    def test_spitter_is_16px_with_transparent_background_and_no_white_disc(self) -> None:
-        root = ROOT / "assets/source/final_sprites/03_INIMIGOS/rat_spitter_16x16/frames"
-        for path in sorted(root.glob("*.png")):
-            with self.subTest(frame=path.name), Image.open(path) as image:
-                rgba = image.convert("RGBA")
-                self.assertEqual((16, 16), rgba.size)
-                self.assertEqual(0, rgba.getpixel((15, 15))[3])
-                white_bottom = sum(
-                    1
-                    for y in range(12, 16)
-                    for x in range(16)
-                    if rgba.getpixel((x, y))[3]
-                    and min(rgba.getpixel((x, y))[:3]) >= 200
-                )
-                self.assertLessEqual(white_bottom, 2)
+    def test_spitter_uses_original_two_frame_contract(self) -> None:
+        self.assertEqual(
+            "sprites/image-18.png.png", self.runtime["sprite_enemy_spitter_0"]["source"]
+        )
+        self.assertEqual(
+            "sprites/image-19.png.png", self.runtime["sprite_enemy_spitter_1"]["source"]
+        )
         enemies = routine(self.render, "draw_enemies", "draw_enemy_bullets")
-        self.assertIn("sprite_enemy_spitter_walk_1_table", enemies)
-        self.assertNotIn("draw_sprite_8bpp_scaled", enemies)
+        self.assertIn("sprite_enemy_spitter_0", enemies)
+        self.assertIn("sprite_enemy_spitter_1", enemies)
+        self.assertNotIn("sprite_enemy_spitter_walk_1_table", enemies)
 
     def test_rendering_has_baseline_sizes_and_no_generic_scaler(self) -> None:
         for name, value in {
@@ -177,6 +168,45 @@ class SelectiveSpriteIntegrationTests(unittest.TestCase):
         spawn = routine(self.bullets, "create_bullet_here", "play_bullet_sfx")
         self.assertIn("addi t5, t5, -3", spawn)
         self.assertIn("addi t5, t5, PLAYER_SIZE", spawn)
+
+    def test_bullet_loop_rejects_indices_at_or_above_capacity(self) -> None:
+        movement = routine(self.bullets, "move_bullets", "end_move_bullets")
+        self.assertIn("bge t1, t2, end_move_bullets", movement)
+        self.assertNotIn("beq t1, t2, end_move_bullets", movement)
+
+    def test_weapons_equip_only_after_their_ground_drop_is_collected(self) -> None:
+        self.assertEqual(6, eqv(self.constants, "POWERUP_SHOTGUN_WEAPON"))
+        death = routine(
+            self.collision, "apply_rat_score", "next_collision_enemy"
+        )
+        self.assertNotIn("call unlock_shotgun", death)
+        spawn = routine(
+            self.powerups, "maybe_spawn_shotgun_weapon_drop", "spawn_boss_powerups"
+        )
+        self.assertIn("POWERUP_SHOTGUN_WEAPON", spawn)
+        collect = routine(
+            self.powerups, "powerup_collision_loop", "end_player_powerup_collisions"
+        )
+        self.assertRegex(
+            collect, r"POWERUP_SHOTGUN_WEAPON[\s\S]*?collect_shotgun_weapon"
+        )
+        self.assertRegex(collect, r"collect_shotgun_weapon:[\s\S]*?call unlock_shotgun")
+        self.assertRegex(
+            collect,
+            r"collect_shotgun_weapon:[\s\S]*?sw t1, 4\(sp\)[\s\S]*?"
+            r"call unlock_shotgun[\s\S]*?lw t1, 4\(sp\)",
+        )
+        self.assertRegex(
+            collect, r"POWERUP_BOSS_WEAPON[\s\S]*?collect_boss_weapon"
+        )
+        init = routine(self.inventory, "init_inventory", "update_inventory")
+        self.assertRegex(init, r"weapon_type[\s\S]*?WEAPON_NORMAL")
+
+    def test_ground_weapon_sprites_and_invalid_type_guard_are_explicit(self) -> None:
+        draw = routine(self.powerups, "draw_powerups", "end_draw_powerups")
+        self.assertIn("sprite_weapon_shotgun_icon", draw)
+        self.assertIn("sprite_weapon_boss_icon", draw)
+        self.assertIn("blt t6, t5, next_draw_powerup", draw)
 
 
 if __name__ == "__main__":

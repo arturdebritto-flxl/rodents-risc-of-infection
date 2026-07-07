@@ -53,6 +53,11 @@ main:
     li a4, 106
     call run_projectile_case
 
+    # Reproduz o indice corrompido inferido do fault 0x1101588C.
+    # O loop deve rejeitar qualquer indice >= MAX_BULLETS antes de acessar arrays.
+    li t1, 0x004015F4
+    call move_bullets_loop
+
     beqz s0, projectile_tests_passed
 
     la a0, projectile_tests_fail_message

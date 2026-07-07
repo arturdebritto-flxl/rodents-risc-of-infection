@@ -186,13 +186,6 @@ apply_rat_score:
     sw a2, 4(sp)
     sw a3, 8(sp)
 
-    la t0, current_level
-    lw t6, 0(t0)
-    li a4, LEVEL_SEWER
-    bne t6, a4, skip_shotgun_unlock
-    call unlock_shotgun
-
-skip_shotgun_unlock:
     lw a2, 4(sp)
     lw a3, 8(sp)
     mv a0, a2

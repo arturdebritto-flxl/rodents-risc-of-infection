@@ -11,3 +11,4 @@ powerup_active:         .space 32
 enemy_kill_counter:     .word 0
 boss_weapon_spawned:    .word 0
 boss_ammo_timer:        .word 0
+shotgun_weapon_spawned: .word 0

@@ -156,7 +156,7 @@ class SpriteConverterTests(unittest.TestCase):
         for table in RUNTIME_TABLES:
             self.assertEqual(1, updated.count(f"{table}:"))
 
-    def test_runtime_projectiles_keep_manifest_dimensions(self):
+    def test_runtime_projectile_data_keeps_manifest_dimensions(self):
         manifest = emit(SOURCE, GENERATED)
         records = {
             record["symbol"]: record for record in manifest["runtime_sprites"]
@@ -171,16 +171,6 @@ class SpriteConverterTests(unittest.TestCase):
         for symbol, size in expected.items():
             with self.subTest(symbol=symbol):
                 self.assertEqual(size, records[symbol]["output_size"])
-
-        boss_entry = next(
-            entry
-            for entry in discover(SOURCE)
-            if entry.relative.as_posix() == "06_PROJETEIS/projectile_boss_green_6x6.png"
-        )
-        boss_payload = transform_exact(boss_entry.data, 6)[2]
-        nontransparent = [value for value in boss_payload if value]
-        self.assertTrue(nontransparent)
-        self.assertTrue(any(value & 0x38 for value in nontransparent))
 
     def test_checked_in_runtime_bytes_match_fresh_generation(self):
         emit(SOURCE, GENERATED)

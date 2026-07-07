@@ -16,12 +16,17 @@ sprite_ammo_shotgun_pickup: .byte 0
 sprite_ammo_uzi_pickup: .byte 0
 sprite_medkit_pickup: .byte 0
 sprite_powerup_boss_weapon: .byte 0
+sprite_weapon_shotgun_icon: .byte 0
+sprite_weapon_boss_icon: .byte 0
 
 .text
 .globl main
 
 main:
     li s0, 0
+
+    call run_shotgun_weapon_drop_case
+    call run_uzi_weapon_drop_case
 
     # counter anterior, fase, active esperado, tipo esperado
     li a0, 0
@@ -97,6 +102,93 @@ drop_tests_passed:
     li a7, 93
     ecall
 
+run_shotgun_weapon_drop_case:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+    call init_powerups
+
+    la t0, shotgun_owned
+    sw zero, 0(t0)
+    la t0, weapon_type
+    li t1, WEAPON_NORMAL
+    sw t1, 0(t0)
+    la t0, current_level
+    li t1, LEVEL_SEWER
+    sw t1, 0(t0)
+
+    li a0, 100
+    li a1, 100
+    call spawn_powerup_from_enemy_death
+
+    la t0, powerup_active
+    lw t1, 0(t0)
+    li t2, 1
+    bne t1, t2, shotgun_weapon_drop_failed
+    la t0, powerup_type
+    lw t1, 0(t0)
+    li t2, POWERUP_SHOTGUN_WEAPON
+    bne t1, t2, shotgun_weapon_drop_failed
+    la t0, weapon_type
+    lw t1, 0(t0)
+    li t2, WEAPON_NORMAL
+    bne t1, t2, shotgun_weapon_drop_failed
+
+    la t0, player_x
+    li t1, 100
+    sw t1, 0(t0)
+    la t0, player_y
+    sw t1, 0(t0)
+    call check_player_powerup_collisions
+
+    la t0, powerup_active
+    lw t1, 0(t0)
+    bnez t1, shotgun_weapon_drop_failed
+    la t0, weapon_type
+    lw t1, 0(t0)
+    li t2, WEAPON_SHOTGUN
+    beq t1, t2, shotgun_weapon_drop_done
+
+shotgun_weapon_drop_failed:
+    addi s0, s0, 1
+
+shotgun_weapon_drop_done:
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
+run_uzi_weapon_drop_case:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+    call init_powerups
+    la t0, weapon_type
+    li t1, WEAPON_NORMAL
+    sw t1, 0(t0)
+    li a0, 100
+    li a1, 100
+    li a2, POWERUP_BOSS_WEAPON
+    call spawn_powerup_at
+    la t0, player_x
+    li t1, 100
+    sw t1, 0(t0)
+    la t0, player_y
+    sw t1, 0(t0)
+    call check_player_powerup_collisions
+    la t0, powerup_active
+    lw t1, 0(t0)
+    bnez t1, uzi_weapon_drop_failed
+    la t0, weapon_type
+    lw t1, 0(t0)
+    li t2, WEAPON_BOSS
+    beq t1, t2, uzi_weapon_drop_done
+
+uzi_weapon_drop_failed:
+    addi s0, s0, 1
+
+uzi_weapon_drop_done:
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
 run_drop_case:
     addi sp, sp, -20
     sw ra, 0(sp)
@@ -106,6 +198,9 @@ run_drop_case:
     sw a3, 16(sp)
 
     call init_powerups
+    la t0, shotgun_owned
+    li t1, 1
+    sw t1, 0(t0)
     la t0, enemy_kill_counter
     lw t1, 4(sp)
     sw t1, 0(t0)
@@ -145,6 +240,15 @@ draw_sprite_8bpp_fast:
     ret
 
 draw_rect:
+    ret
+
+unlock_shotgun:
+    la t0, shotgun_owned
+    li t1, 1
+    sw t1, 0(t0)
+    la t0, weapon_type
+    li t1, WEAPON_SHOTGUN
+    sw t1, 0(t0)
     ret
 
 .include "src/powerups.s"

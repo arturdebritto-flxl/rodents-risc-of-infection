@@ -16,6 +16,9 @@ init_inventory:
     la t0, boss_ammo_count
     sw zero, 0(t0)
 
+    la t0, boss_weapon_owned
+    sw zero, 0(t0)
+
     la t0, heal_count
     sw zero, 0(t0)
 
@@ -345,8 +348,21 @@ handle_weapon_select_input:
     beq t1, t2, select_normal_weapon
 
     li t2, '2'
+    beq t1, t2, try_select_shotgun
+
+    li t2, '3'
     bne t1, t2, end_handle_weapon_select_input
 
+    la t0, boss_weapon_owned
+    lw t1, 0(t0)
+    beqz t1, end_handle_weapon_select_input
+
+    la t0, weapon_type
+    li t1, WEAPON_BOSS
+    sw t1, 0(t0)
+    j end_handle_weapon_select_input
+
+try_select_shotgun:
     la t0, shotgun_owned
     lw t1, 0(t0)
     beqz t1, end_handle_weapon_select_input

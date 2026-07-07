@@ -48,6 +48,8 @@ loop_menu:
 
 loop_playing_level:
     call read_input
+    call handle_next_level_cheat
+    bnez a0, finish_playing_frame
 
     call update_player
     call update_bullets
@@ -83,6 +85,7 @@ loop_playing_level:
 
     call end_frame
 
+finish_playing_frame:
     call clear_input_frame
     call frame_delay
 

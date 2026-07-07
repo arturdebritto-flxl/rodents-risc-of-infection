@@ -7,6 +7,7 @@
 weapon_type:            .word WEAPON_NORMAL
 normal_ammo_count:      .word 0
 boss_ammo_count:        .word 0
+boss_weapon_owned:      .word 0
 heal_count:             .word 0
 rifle_mag_count:        .word RIFLE_MAG_SIZE
 rifle_reload_timer:     .word 0

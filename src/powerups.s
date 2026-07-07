@@ -29,6 +29,9 @@ end_init_powerups:
     la t0, boss_ammo_timer
     sw zero, 0(t0)
 
+    la t0, shotgun_weapon_spawned
+    sw zero, 0(t0)
+
     ret
 
 spawn_powerup_at:
@@ -73,6 +76,8 @@ spawn_powerup_from_enemy_death:
     sw a0, 4(sp)
     sw a1, 8(sp)
 
+    call maybe_spawn_shotgun_weapon_drop
+
     la t0, enemy_kill_counter
     lw t1, 0(t0)
     addi t1, t1, 1
@@ -110,6 +115,33 @@ spawn_ammo_from_kill:
 end_spawn_powerup_from_enemy_death:
     lw ra, 0(sp)
     addi sp, sp, 12
+    ret
+
+maybe_spawn_shotgun_weapon_drop:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    la t0, current_level
+    lw t1, 0(t0)
+    li t2, LEVEL_SEWER
+    bne t1, t2, end_maybe_spawn_shotgun_weapon_drop
+
+    la t0, shotgun_owned
+    lw t1, 0(t0)
+    bnez t1, end_maybe_spawn_shotgun_weapon_drop
+
+    la t0, shotgun_weapon_spawned
+    lw t1, 0(t0)
+    bnez t1, end_maybe_spawn_shotgun_weapon_drop
+    li t1, 1
+    sw t1, 0(t0)
+
+    li a2, POWERUP_SHOTGUN_WEAPON
+    call spawn_powerup_at
+
+end_maybe_spawn_shotgun_weapon_drop:
+    lw ra, 0(sp)
+    addi sp, sp, 4
     ret
 
 # Seleciona o tipo de municao somente apos o drop geral e a escolha por municao.
@@ -215,6 +247,8 @@ end_update_powerups:
     ret
 
 check_player_powerup_collisions:
+    addi sp, sp, -8
+    sw ra, 0(sp)
     li t1, 0
 
 powerup_collision_loop:
@@ -258,13 +292,18 @@ powerup_collision_loop:
     add a4, a3, t6
     bge a1, a4, next_powerup_collision
 
-    la t0, powerup_active
-    add t4, t0, t3
-    sw zero, 0(t4)
-
     la t0, powerup_type
     add t4, t0, t3
     lw t5, 0(t4)
+
+    li t6, POWERUP_NORMAL_AMMO
+    blt t5, t6, next_powerup_collision
+    li t6, POWERUP_SHOTGUN_WEAPON
+    bgt t5, t6, next_powerup_collision
+
+    la t0, powerup_active
+    add t4, t0, t3
+    sw zero, 0(t4)
 
     li t6, POWERUP_NORMAL_AMMO
     beq t5, t6, collect_normal_ammo
@@ -280,6 +319,9 @@ powerup_collision_loop:
 
     li t6, POWERUP_SHOTGUN_AMMO
     beq t5, t6, collect_shotgun_ammo
+
+    li t6, POWERUP_SHOTGUN_WEAPON
+    beq t5, t6, collect_shotgun_weapon
 
     j next_powerup_collision
 
@@ -304,8 +346,8 @@ finish_collect_heal:
     j next_powerup_collision
 
 collect_boss_weapon:
-    la t0, weapon_type
-    li t5, WEAPON_BOSS
+    la t0, boss_weapon_owned
+    li t5, 1
     sw t5, 0(t0)
 
     la t0, boss_ammo_count
@@ -331,6 +373,12 @@ collect_shotgun_ammo:
     sw t5, 0(t0)
     j play_powerup_collect_sfx
 
+collect_shotgun_weapon:
+    sw t1, 4(sp)
+    call unlock_shotgun
+    lw t1, 4(sp)
+    j play_powerup_collect_sfx
+
 finish_collect_boss_ammo:
     j next_powerup_collision
 
@@ -347,6 +395,8 @@ next_powerup_collision:
     j powerup_collision_loop
 
 end_player_powerup_collisions:
+    lw ra, 0(sp)
+    addi sp, sp, 8
     ret
 
 draw_powerups:
@@ -401,6 +451,11 @@ draw_powerups_loop:
     add t5, t0, t4
     lw t6, 0(t5)
 
+    li t5, POWERUP_NORMAL_AMMO
+    blt t6, t5, next_draw_powerup
+    li t5, POWERUP_SHOTGUN_WEAPON
+    bgt t6, t5, next_draw_powerup
+
     sw t1, 8(sp)
     sw a2, 12(sp)
     sw a3, 16(sp)
@@ -420,6 +475,9 @@ draw_powerups_loop:
     li t5, POWERUP_SHOTGUN_AMMO
     beq t6, t5, select_powerup_shotgun_ammo_sprite
 
+    li t5, POWERUP_SHOTGUN_WEAPON
+    beq t6, t5, select_powerup_shotgun_weapon_sprite
+
 select_powerup_ammo_sprite:
     la a2, sprite_ammo_pistol_pickup
     j draw_selected_new_pickup_sprite
@@ -429,7 +487,7 @@ select_powerup_heal_sprite:
     j draw_selected_new_pickup_sprite
 
 select_powerup_boss_weapon_sprite:
-    la a2, sprite_powerup_boss_weapon
+    la a2, sprite_weapon_boss_icon
     j draw_selected_baseline_powerup_sprite
 
 select_powerup_boss_ammo_sprite:
@@ -438,6 +496,11 @@ select_powerup_boss_ammo_sprite:
 
 select_powerup_shotgun_ammo_sprite:
     la a2, sprite_ammo_shotgun_pickup
+    j draw_selected_new_pickup_sprite
+
+select_powerup_shotgun_weapon_sprite:
+    la a2, sprite_weapon_shotgun_icon
+    j draw_selected_baseline_powerup_sprite
 
 draw_selected_new_pickup_sprite:
     lw a0, 12(sp)

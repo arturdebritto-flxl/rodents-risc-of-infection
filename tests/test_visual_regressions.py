@@ -68,6 +68,10 @@ class VisualRegressionTests(unittest.TestCase):
         enemy_bullets = routine(self.render, "draw_enemy_bullets", "draw_boss_square")
         self.assertNotIn("draw_sprite_8bpp_scaled", player_bullets)
         self.assertNotIn("draw_sprite_8bpp_scaled", enemy_bullets)
+        self.assertNotIn("sprite_projectile_", player_bullets)
+        self.assertNotIn("sprite_projectile_", enemy_bullets)
+        self.assertIn("COLOR_PLAYER_BULLET", player_bullets)
+        self.assertIn("COLOR_ENEMY_BULLET", enemy_bullets)
 
     def test_boss_visual_remains_centered_on_logical_box(self) -> None:
         boss = routine(self.render, "draw_boss_square", "draw_menu_screen")
