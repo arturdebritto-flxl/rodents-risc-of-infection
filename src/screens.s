@@ -112,6 +112,52 @@ end_update_cutscene:
     addi sp, sp, 4
     ret
 
+update_post_boss_detonator:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    la t0, key_pressed
+    lw t1, 0(t0)
+    beqz t1, end_update_post_boss_detonator
+
+    la t0, last_key
+    lw t1, 0(t0)
+    li t2, 32
+    beq t1, t2, advance_to_post_boss_explosion
+    li t2, 10
+    beq t1, t2, advance_to_post_boss_explosion
+    li t2, 13
+    bne t1, t2, end_update_post_boss_detonator
+
+advance_to_post_boss_explosion:
+    call clear_input_frame
+    call set_state_cutscene_explosion
+    call clear_input_frame
+
+end_update_post_boss_detonator:
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
+update_post_boss_explosion:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    la t0, post_boss_explosion_timer
+    lw t1, 0(t0)
+    addi t1, t1, 1
+    sw t1, 0(t0)
+
+    li t2, POST_BOSS_EXPLOSION_FRAMES
+    blt t1, t2, end_update_post_boss_explosion
+
+    call set_state_victory
+
+end_update_post_boss_explosion:
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
 # ------------------------------------------------------------
 # update_game_over. Se T for pressionado, volta ao menu.
 # ------------------------------------------------------------

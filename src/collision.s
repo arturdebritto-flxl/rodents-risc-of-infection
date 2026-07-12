@@ -116,7 +116,7 @@ enemy_collision_loop:
     add t5, t0, t2
     lw a5, 0(t5)
     bgtz a5, bullet_damage_ok
-    li a5, WEAPON_NORMAL_DAMAGE
+    li a5, WEAPON_PISTOL_DAMAGE
 
 bullet_damage_ok:
     la t0, enemy_hp
@@ -455,7 +455,7 @@ end_enemy_bullet_player_collisions:
 #   se boss_hp <= 0:
 #       boss_active = 0
 #       score += SCORE_BOSS
-#       set_state_victory
+#       set_state_cutscene_detonator
 #
 # Modifica: t0-t6, a0-a4
 # ------------------------------------------------------------
@@ -537,7 +537,7 @@ bullet_boss_loop:
     add t4, t0, t3
     lw a5, 0(t4)
     bgtz a5, boss_bullet_damage_ok
-    li a5, WEAPON_NORMAL_DAMAGE
+    li a5, WEAPON_PISTOL_DAMAGE
 
 boss_bullet_damage_ok:
     la t0, boss_hp
@@ -562,7 +562,7 @@ boss_defeated:
     add t5, t5, t6
     sw t5, 0(t0)
 
-    call set_state_victory
+    call set_state_cutscene_detonator
 
     j end_bullet_boss_collisions
 

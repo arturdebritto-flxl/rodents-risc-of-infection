@@ -1,4 +1,4 @@
-"""Convert the three 320x240 cutscenes to RARS16 Custom1 BGR233 bytes."""
+"""Convert the 320x240 cutscenes to RARS16 Custom1 BGR233 bytes."""
 
 import argparse
 
@@ -15,6 +15,8 @@ SOURCES = (
     ("cutscene_intro.png", "cutscene_intro_pixels"),
     ("cutscene_level2.png", "cutscene_level2_pixels"),
     ("cutscene_level3.png", "cutscene_level3_pixels"),
+    ("post_boss_detonator.png", "cutscene_post_boss_detonator"),
+    ("post_boss_explosion.png", "cutscene_post_boss_explosion"),
 )
 
 

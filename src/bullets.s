@@ -40,6 +40,18 @@ end_init_bullets:
     la t0, shoot_hold_timer
     sw zero, 0(t0)
 
+    la t0, shoot_request_pending
+    sw zero, 0(t0)
+
+    la t0, player_burst_weapon
+    sw zero, 0(t0)
+
+    la t0, player_burst_remaining
+    sw zero, 0(t0)
+
+    la t0, player_burst_interval_timer
+    sw zero, 0(t0)
+
     ret
 
 update_bullets:
@@ -55,12 +67,16 @@ update_bullets:
     li t2, STATE_LEVEL2
     beq t1, t2, update_bullets_state_ok
 
+    li t2, STATE_LEVEL3
+    beq t1, t2, update_bullets_state_ok
+
     li t2, STATE_BOSS
     beq t1, t2, update_bullets_state_ok
 
     j end_update_bullets
 
 update_bullets_state_ok:
+    call update_player_burst
     call check_shoot_input
     call move_bullets
 
@@ -75,7 +91,7 @@ check_shoot_input:
 
     la t0, key_pressed
     lw t1, 0(t0)
-    beqz t1, apply_shoot_buffer
+    beqz t1, refresh_player_facing
 
     la t0, last_key
     lw t1, 0(t0)
@@ -92,7 +108,7 @@ check_shoot_input:
     li t2, 'l'
     beq t1, t2, buffer_shoot_right
 
-    j apply_shoot_buffer
+    j refresh_player_facing
 
 buffer_shoot_up:
     li t1, DIR_UP
@@ -110,81 +126,232 @@ buffer_shoot_right:
     li t1, DIR_RIGHT
 
 store_shoot_buffer:
+    # Um evento durante rajada ativa e descartado, sem formar fila.
+    la t0, player_burst_remaining
+    lw t2, 0(t0)
+    bgtz t2, refresh_player_facing
+
     la t0, shoot_direction
     sw t1, 0(t0)
 
-    la t0, shoot_hold_timer
-    li t2, PLAYER_SHOOT_HOLD_FRAMES
+    la t0, shoot_request_pending
+    li t2, 1
     sw t2, 0(t0)
 
-apply_shoot_buffer:
-    call update_player_facing_direction
-
     la t0, shoot_hold_timer
-    lw t1, 0(t0)
-    blez t1, end_check_shoot_input
+    li t2, SHOOT_REQUEST_BUFFER_FRAMES
+    sw t2, 0(t0)
 
-    addi t1, t1, -1
+    la t0, weapon_type
+    lw t2, 0(t0)
+    li t3, WEAPON_SHOTGUN
+    beq t2, t3, fire_single_shotgun_event
+    li t3, WEAPON_PISTOL
+    beq t2, t3, start_pistol_burst
+    li t3, WEAPON_UZI
+    beq t2, t3, start_uzi_burst
+    j clear_consumed_shoot_event
+
+start_pistol_burst:
+    li t3, PISTOL_BURST_SIZE
+    j store_new_burst
+
+start_uzi_burst:
+    li t3, UZI_BURST_SIZE
+
+store_new_burst:
+    la t0, player_burst_weapon
+    sw t2, 0(t0)
+    la t0, player_burst_direction
     sw t1, 0(t0)
+    la t0, player_burst_remaining
+    sw t3, 0(t0)
+    la t0, player_burst_interval_timer
+    sw zero, 0(t0)
+    call update_player_facing_direction
+    call fire_player_burst_projectile
+    j clear_consumed_shoot_event
 
+fire_single_shotgun_event:
+    call update_player_facing_direction
     la t0, shoot_direction
     lw a0, 0(t0)
     call spawn_bullet
+
+clear_consumed_shoot_event:
+    la t0, shoot_request_pending
+    sw zero, 0(t0)
+    la t0, shoot_hold_timer
+    sw zero, 0(t0)
+    j end_check_shoot_input
+
+refresh_player_facing:
+    call update_player_facing_direction
 
 end_check_shoot_input:
     lw ra, 0(sp)
     addi sp, sp, 4
     ret
 
+# Processa no maximo um projetil da rajada ativa por frame.
+update_player_burst:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    la t0, player_burst_remaining
+    lw t1, 0(t0)
+    blez t1, end_update_player_burst
+
+    la t0, key_pressed
+    lw t1, 0(t0)
+    beqz t1, continue_active_burst
+    la t0, last_key
+    lw t1, 0(t0)
+    li t2, '1'
+    beq t1, t2, cancel_active_burst_before_selection
+    li t2, '2'
+    beq t1, t2, cancel_active_burst_before_selection
+    li t2, '3'
+    bne t1, t2, continue_active_burst
+
+cancel_active_burst_before_selection:
+    la t0, player_burst_remaining
+    sw zero, 0(t0)
+    la t0, player_burst_interval_timer
+    sw zero, 0(t0)
+    j end_update_player_burst
+
+continue_active_burst:
+
+    call update_player_facing_direction
+
+    la t0, player_burst_interval_timer
+    lw t1, 0(t0)
+    blez t1, fire_active_burst_now
+    addi t1, t1, -1
+    sw t1, 0(t0)
+    bgtz t1, end_update_player_burst
+
+fire_active_burst_now:
+    call fire_player_burst_projectile
+
+end_update_player_burst:
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
+fire_player_burst_projectile:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    # Troca externa de arma tambem cancela defensivamente a rajada.
+    la t0, player_burst_weapon
+    lw t1, 0(t0)
+    la t0, weapon_type
+    lw t2, 0(t0)
+    bne t1, t2, cancel_player_burst
+
+    la t0, player_burst_direction
+    lw a0, 0(t0)
+    call spawn_bullet
+    beqz a0, cancel_player_burst
+
+    la t0, player_burst_remaining
+    lw t1, 0(t0)
+    addi t1, t1, -1
+    sw t1, 0(t0)
+    blez t1, finish_player_burst
+
+    la t0, player_burst_weapon
+    lw t1, 0(t0)
+    li t2, WEAPON_PISTOL
+    beq t1, t2, arm_pistol_burst_interval
+    li t2, WEAPON_UZI
+    bne t1, t2, cancel_player_burst
+    li t1, UZI_BURST_INTERVAL
+    j store_burst_interval
+
+arm_pistol_burst_interval:
+    li t1, PISTOL_BURST_INTERVAL
+
+store_burst_interval:
+    la t0, player_burst_interval_timer
+    sw t1, 0(t0)
+    j end_fire_player_burst_projectile
+
+finish_player_burst:
+    la t0, player_burst_interval_timer
+    sw zero, 0(t0)
+    j end_fire_player_burst_projectile
+
+cancel_player_burst:
+    la t0, player_burst_remaining
+    sw zero, 0(t0)
+    la t0, player_burst_interval_timer
+    sw zero, 0(t0)
+
+end_fire_player_burst_projectile:
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
 spawn_bullet:
-    addi sp, sp, -8
+    addi sp, sp, -12
     sw ra, 0(sp)
     sw a0, 4(sp)
+    sw zero, 8(sp)
 
     la t0, weapon_type
     lw t1, 0(t0)
     li t2, WEAPON_SHOTGUN
     beq t1, t2, spawn_shotgun_blast
 
+    li t2, WEAPON_UZI
+    beq t1, t2, spawn_uzi_bullet
+
+    li t2, WEAPON_PISTOL
+    bne t1, t2, end_spawn_bullet
+
+spawn_pistol_bullet:
     la t0, rifle_reload_timer
     lw t1, 0(t0)
     bgtz t1, end_spawn_bullet
 
-    la t0, rifle_fire_cooldown
-    lw t1, 0(t0)
-    bgtz t1, end_spawn_bullet
+    li a5, WEAPON_PISTOL_DAMAGE
+    j prepare_pistol_shot
 
-    li a5, WEAPON_NORMAL_DAMAGE
-
-    la t0, weapon_type
-    lw t1, 0(t0)
-    li t2, WEAPON_BOSS
-    bne t1, t2, prepare_normal_rifle_shot
-
+spawn_uzi_bullet:
     la t0, boss_ammo_count
     lw t1, 0(t0)
-    blez t1, prepare_normal_rifle_shot
+    blez t1, end_spawn_bullet
     addi t1, t1, -1
     sw t1, 0(t0)
-    li a5, WEAPON_BOSS_DAMAGE
+
+    la t0, rifle_fire_cooldown
+    li t1, UZI_FIRE_DELAY
+    sw t1, 0(t0)
+
+    lw a0, 4(sp)
+    li a5, WEAPON_UZI_DAMAGE
     li t5, BULLET_SPEED
     call set_cardinal_delta
     call create_bullet_with_delta
+    sw a0, 8(sp)
     j end_spawn_bullet
 
-prepare_normal_rifle_shot:
+prepare_pistol_shot:
     la t0, rifle_mag_count
     lw t1, 0(t0)
     blez t1, try_start_reload_from_shot
     addi t1, t1, -1
     sw t1, 0(t0)
-    j arm_rifle_cooldown
+    j arm_pistol_cooldown
 
 try_start_reload_from_shot:
     call start_rifle_reload
     j end_spawn_bullet
 
-arm_rifle_cooldown:
+arm_pistol_cooldown:
     la t0, rifle_fire_cooldown
     li t1, RIFLE_FIRE_DELAY
     sw t1, 0(t0)
@@ -192,6 +359,7 @@ arm_rifle_cooldown:
     li t5, BULLET_SPEED
     call set_cardinal_delta
     call create_bullet_with_delta
+    sw a0, 8(sp)
     j end_spawn_bullet
 
 spawn_shotgun_blast:
@@ -222,18 +390,25 @@ spawn_shotgun_blast:
     li t5, SHOTGUN_BULLET_SPEED
     call set_cardinal_delta
     call create_bullet_with_delta
+    sw a0, 8(sp)
 
     lw a0, 4(sp)
     li t5, SHOTGUN_BULLET_SPEED
     li t6, SHOTGUN_SPREAD_SPEED
     call set_spread_delta_left
     call create_bullet_with_delta
+    lw t0, 8(sp)
+    or t0, t0, a0
+    sw t0, 8(sp)
 
     lw a0, 4(sp)
     li t5, SHOTGUN_BULLET_SPEED
     li t6, SHOTGUN_SPREAD_SPEED
     call set_spread_delta_right
     call create_bullet_with_delta
+    lw t0, 8(sp)
+    or t0, t0, a0
+    sw t0, 8(sp)
     j end_spawn_bullet
 
 try_start_shotgun_reload_from_shot:
@@ -319,7 +494,7 @@ create_bullet_with_delta:
 
 find_free_bullet_loop:
     li t2, MAX_BULLETS
-    beq t1, t2, end_create_bullet_with_delta
+    beq t1, t2, create_bullet_failed
 
     slli t3, t1, 2
     add t4, t0, t3
@@ -405,12 +580,17 @@ play_bullet_sfx:
     li a7, 31
     ecall
 
-end_create_bullet_with_delta:
+    li a0, 1
+    ret
+
+create_bullet_failed:
+    li a0, 0
     ret
 
 end_spawn_bullet:
+    lw a0, 8(sp)
     lw ra, 0(sp)
-    addi sp, sp, 8
+    addi sp, sp, 12
     ret
 
 move_bullets:

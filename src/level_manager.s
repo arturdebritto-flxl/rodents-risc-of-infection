@@ -110,6 +110,9 @@ handle_next_level_cheat:
     li t2, STATE_LEVEL2
     beq t1, t2, next_level_cheat_state_ok
 
+    li t2, STATE_LEVEL3
+    beq t1, t2, next_level_cheat_state_ok
+
     li t2, STATE_BOSS
     bne t1, t2, end_handle_next_level_cheat
 
@@ -156,7 +159,7 @@ cheat_to_level3:
 
 cheat_to_victory:
     call reset_transient_level_state
-    call set_state_victory
+    call set_state_cutscene_detonator
     li a0, 1
 
 end_handle_next_level_cheat:
@@ -472,6 +475,8 @@ start_boss_fight:
 
     la t0, wave_spawned
     sw zero, 0(t0)
+
+    call clear_input_buffers
 
     j end_advance_wave
 

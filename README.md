@@ -20,13 +20,12 @@ Depois, monte e execute o programa. O jogo inicia no menu principal.
 - `SPACE` ou `ENTER`: iniciar no menu e avancar cutscenes.
 - `WASD`: mover o jogador.
 - `IJKL`: atirar para cima, esquerda, baixo e direita.
-- `H/h`: usar cura, se houver medkit no inventario.
+- `H/h`: usar cura, se houver medkit disponivel.
 - `R/r`: recarregar a arma selecionada durante o gameplay.
 - `T/t`: reiniciar a partir das telas de game over ou victory.
-- `1`: selecionar a arma normal.
+- `1`: selecionar a pistola com pente estendido.
 - `2`: selecionar a shotgun depois de coleta-la.
 - `3`: selecionar a UZI depois de coleta-la.
-- `E/e`: mostrar ou ocultar o inventario.
 - `C/c`: avancar para a proxima transicao durante o gameplay.
 
 ## Fluxo Do Jogo
@@ -42,6 +41,7 @@ A progressao principal e:
 - Fase 2: esgoto.
 - Cutscene para o laboratorio.
 - Fase 3: laboratorio e batalha final.
+- Cutscene do detonador e cutscene da explosao.
 - Tela de victory ou game over.
 
 Durante menu, cutscenes, game over e victory, o gameplay fica pausado. Nessas telas, `R/r` nao reinicia a partida.
@@ -52,11 +52,11 @@ O objetivo e sobreviver as hordas, coletar recursos no mapa e derrotar o boss fi
 
 ## Elementos Do Jogo
 
-- Jogador com vida, direcao, cura, inventario e armas.
-- Arma normal com municao e recarga.
+- Jogador com vida, direcao, cura e armas exibidas no HUD permanente.
+- Pistola com pente estendido, municao e recarga.
 - Shotgun desbloqueada por coleta.
 - UZI desbloqueada por coleta.
-- Medkit para recuperar cura disponivel no inventario.
+- Medkit para recuperar cura disponivel.
 - Municoes coletaveis para diferentes armas.
 - Inimigos com comportamentos variados.
 - Boss final com ataques proprios.
@@ -96,6 +96,7 @@ Principais diretorios e arquivos:
 - `STATE_LEVEL2`: fase do esgoto.
 - `STATE_CUTSCENE_LEVEL3`: cutscene antes do laboratorio.
 - `STATE_LEVEL3` / `STATE_BOSS`: laboratorio e boss final.
+- `STATE_CUTSCENE_DETONATOR` / `STATE_CUTSCENE_EXPLOSION`: sequencia apos o boss.
 - `STATE_GAME_OVER`: tela de derrota.
 - `STATE_VICTORY`: tela de vitoria.
 

@@ -10,12 +10,14 @@
 .eqv STATE_LEVEL1                  1
 .eqv STATE_LEVEL2                  2
 .eqv STATE_LEVEL3                  3
-.eqv STATE_BOSS                    3
-.eqv STATE_GAME_OVER               4
-.eqv STATE_VICTORY                 5
-.eqv STATE_CUTSCENE_INTRO          6
-.eqv STATE_CUTSCENE_LEVEL2         7
-.eqv STATE_CUTSCENE_LEVEL3         8
+.eqv STATE_BOSS                    4
+.eqv STATE_GAME_OVER               5
+.eqv STATE_VICTORY                 6
+.eqv STATE_CUTSCENE_INTRO          7
+.eqv STATE_CUTSCENE_LEVEL2         8
+.eqv STATE_CUTSCENE_LEVEL3         9
+.eqv STATE_CUTSCENE_DETONATOR      10
+.eqv STATE_CUTSCENE_EXPLOSION      11
 
 # ------------------------------------------------------------
 # Identificação dos cenários
@@ -84,6 +86,7 @@
 .eqv POWERUP_NONE              0
 .eqv POWERUP_NORMAL_AMMO       1
 .eqv POWERUP_HEAL              2
+# Nomes legados: estes dois tipos representam a arma e a munição da UZI.
 .eqv POWERUP_BOSS_WEAPON       3
 .eqv POWERUP_BOSS_AMMO         4
 .eqv POWERUP_SHOTGUN_AMMO      5
@@ -91,17 +94,17 @@
 .eqv MAX_POWERUPS              8
 .eqv POWERUP_SIZE              16
 
-.eqv WEAPON_NORMAL             1
-.eqv WEAPON_BOSS               2
-.eqv WEAPON_SHOTGUN            3
+.eqv WEAPON_PISTOL             1
+.eqv WEAPON_SHOTGUN            2
+.eqv WEAPON_UZI                3
 
 .eqv PLAYER_MAX_LIVES          3
 .eqv NORMAL_AMMO_GAIN          5
-.eqv BOSS_AMMO_GAIN            3
+.eqv BOSS_AMMO_GAIN            10  # ganho de munição da UZI (nome legado)
 .eqv SHOTGUN_AMMO_GAIN         5
 .eqv HEAL_GAIN                 1
-.eqv WEAPON_NORMAL_DAMAGE      1
-.eqv WEAPON_BOSS_DAMAGE        3
+.eqv WEAPON_PISTOL_DAMAGE      1
+.eqv WEAPON_UZI_DAMAGE         3
 .eqv WEAPON_SHOTGUN_DAMAGE     2
 
 # ------------------------------------------------------------
@@ -135,9 +138,9 @@
 .eqv AMMO_WEIGHT_PISTOL_PHASE1   100
 .eqv AMMO_WEIGHT_PISTOL_PHASE2   75
 .eqv AMMO_WEIGHT_SHOTGUN_PHASE2  25
-.eqv AMMO_WEIGHT_PISTOL_PHASE3   25
-.eqv AMMO_WEIGHT_SHOTGUN_PHASE3  25
-.eqv AMMO_WEIGHT_UZI_PHASE3      50
+.eqv AMMO_WEIGHT_SHOTGUN_PHASE3  4
+.eqv AMMO_WEIGHT_UZI_PHASE3      6
+.eqv AMMO_WEIGHT_TOTAL_PHASE3    10
 .eqv AMMO_WEIGHT_TOTAL           100
 
 # ------------------------------------------------------------
@@ -161,6 +164,7 @@
 
 .eqv DEBUG_LOOP_FRAMES          120
 .eqv DEBUG_FRAME_DELAY_MS       16
+.eqv POST_BOSS_EXPLOSION_FRAMES 125
 .eqv ANIMATION_FRAME_DELAY      8
 .eqv SPRITE_FRAME_0             0
 .eqv SPRITE_FRAME_1             1
@@ -181,9 +185,11 @@
 
 .eqv PLAYER_START_X             152
 .eqv PLAYER_START_Y             112
+.eqv PLAYER_LAB_START_X         152
+.eqv PLAYER_LAB_START_Y         132
 .eqv PLAYER_SMOOTH_SPEED        2
-.eqv PLAYER_MOVE_HOLD_FRAMES    16
-.eqv PLAYER_SHOOT_HOLD_FRAMES   16
+.eqv MOVE_AXIS_BUFFER_FRAMES    6
+.eqv SHOOT_REQUEST_BUFFER_FRAMES 3
 .eqv PLAYER_SPEED               3
 .eqv PLAYER_SIZE                16
 
@@ -199,6 +205,11 @@
 .eqv RIFLE_BULLET_SPEED         10
 .eqv RIFLE_MAG_SIZE             40
 .eqv RIFLE_FIRE_DELAY           4
+.eqv UZI_FIRE_DELAY             2
+.eqv PISTOL_BURST_SIZE          3
+.eqv PISTOL_BURST_INTERVAL      3
+.eqv UZI_BURST_SIZE             6
+.eqv UZI_BURST_INTERVAL         2
 .eqv RIFLE_RELOAD_FRAMES        20
 .eqv RIFLE_START_RESERVE        60
 .eqv SHOTGUN_BULLET_SPEED       9
@@ -217,6 +228,9 @@
 # ------------------------------------------------------------
 
 .eqv ENEMY_SIZE                 16
+.eqv ENEMY_SPAWN_POINT_COUNT    20
+.eqv SPAWN_MIN_PLAYER_DISTANCE  96
+.eqv ENEMY_SPAWN_MAX_Y          198
 
 # ------------------------------------------------------------
 # Pontuacao

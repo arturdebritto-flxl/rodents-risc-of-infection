@@ -26,10 +26,19 @@ loop_frame:
     li t2, STATE_CUTSCENE_LEVEL3
     beq t1, t2, loop_cutscene
 
+    li t2, STATE_CUTSCENE_DETONATOR
+    beq t1, t2, loop_post_boss_detonator
+
+    li t2, STATE_CUTSCENE_EXPLOSION
+    beq t1, t2, loop_post_boss_explosion
+
     li t2, STATE_LEVEL1
     beq t1, t2, loop_playing_level
 
     li t2, STATE_LEVEL2
+    beq t1, t2, loop_playing_level
+
+    li t2, STATE_LEVEL3
     beq t1, t2, loop_playing_level
 
     li t2, STATE_BOSS
@@ -63,6 +72,28 @@ loop_cutscene:
     call end_frame
 
     call update_cutscene
+    call clear_input_frame
+    call frame_delay
+    j loop_frame
+
+loop_post_boss_detonator:
+    call read_input
+
+    call begin_frame
+    call draw_cutscene_screen
+    call end_frame
+
+    call update_post_boss_detonator
+    call clear_input_frame
+    call frame_delay
+    j loop_frame
+
+loop_post_boss_explosion:
+    call begin_frame
+    call draw_cutscene_screen
+    call end_frame
+
+    call update_post_boss_explosion
     call clear_input_frame
     call frame_delay
     j loop_frame
@@ -122,6 +153,12 @@ render_cheat_transition_frame:
     beq t1, t2, draw_cheat_cutscene_frame
 
     li t2, STATE_CUTSCENE_LEVEL3
+    beq t1, t2, draw_cheat_cutscene_frame
+
+    li t2, STATE_CUTSCENE_DETONATOR
+    beq t1, t2, draw_cheat_cutscene_frame
+
+    li t2, STATE_CUTSCENE_EXPLOSION
     beq t1, t2, draw_cheat_cutscene_frame
 
     li t2, STATE_VICTORY

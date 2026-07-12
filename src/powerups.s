@@ -39,7 +39,7 @@ spawn_powerup_at:
 
 find_free_powerup_loop:
     li t2, MAX_POWERUPS
-    beq t1, t2, end_spawn_powerup_at
+    beq t1, t2, spawn_powerup_failed
 
     slli t3, t1, 2
 
@@ -67,7 +67,11 @@ create_powerup_here:
     add t4, t0, t3
     sw a2, 0(t4)
 
-end_spawn_powerup_at:
+    li a0, 1
+    ret
+
+spawn_powerup_failed:
+    li a0, 0
     ret
 
 spawn_powerup_from_enemy_death:
@@ -75,6 +79,19 @@ spawn_powerup_from_enemy_death:
     sw ra, 0(sp)
     sw a0, 4(sp)
     sw a1, 8(sp)
+
+    la t0, game_state
+    lw t1, 0(t0)
+    li t2, STATE_LEVEL1
+    beq t1, t2, enemy_drop_state_ok
+    li t2, STATE_LEVEL2
+    beq t1, t2, enemy_drop_state_ok
+    li t2, STATE_LEVEL3
+    beq t1, t2, enemy_drop_state_ok
+    li t2, STATE_BOSS
+    bne t1, t2, end_spawn_powerup_from_enemy_death
+
+enemy_drop_state_ok:
 
     call maybe_spawn_shotgun_weapon_drop
 
@@ -168,15 +185,15 @@ select_phase2_ammo:
     ret
 
 select_phase3_ammo:
+    la t0, boss_weapon_owned
+    lw t1, 0(t0)
+    beqz t1, select_shotgun_ammo_powerup
+
     la t0, enemy_kill_counter
     lw t1, 0(t0)
-    li t2, AMMO_WEIGHT_TOTAL
+    li t2, AMMO_WEIGHT_TOTAL_PHASE3
     rem t1, t1, t2
-    li t2, AMMO_WEIGHT_PISTOL_PHASE3
-    blt t1, t2, end_select_ammo_powerup
-
-    li t3, AMMO_WEIGHT_SHOTGUN_PHASE3
-    add t2, t2, t3
+    li t2, AMMO_WEIGHT_SHOTGUN_PHASE3
     blt t1, t2, select_shotgun_ammo_powerup
 
     li a2, POWERUP_BOSS_AMMO
@@ -188,28 +205,39 @@ select_shotgun_ammo_powerup:
 end_select_ammo_powerup:
     ret
 
-spawn_boss_powerups:
+maybe_spawn_laboratory_uzi:
     addi sp, sp, -4
     sw ra, 0(sp)
 
+    la t0, current_level
+    lw t1, 0(t0)
+    li t2, LEVEL_LABORATORY
+    bne t1, t2, end_maybe_spawn_laboratory_uzi
+
+    la t0, current_wave
+    lw t1, 0(t0)
+    li t2, 2
+    blt t1, t2, end_maybe_spawn_laboratory_uzi
+
+    la t0, boss_weapon_owned
+    lw t1, 0(t0)
+    bnez t1, end_maybe_spawn_laboratory_uzi
+
     la t0, boss_weapon_spawned
     lw t1, 0(t0)
-    bnez t1, end_spawn_boss_powerups
+    bnez t1, end_maybe_spawn_laboratory_uzi
 
+    li a0, 252
+    li a1, 132
+    li a2, POWERUP_BOSS_WEAPON
+    call spawn_powerup_at
+    beqz a0, end_maybe_spawn_laboratory_uzi
+
+    la t0, boss_weapon_spawned
     li t1, 1
     sw t1, 0(t0)
 
-    li a0, 136
-    li a1, 96
-    li a2, POWERUP_BOSS_WEAPON
-    call spawn_powerup_at
-
-    li a0, 176
-    li a1, 96
-    li a2, POWERUP_BOSS_AMMO
-    call spawn_powerup_at
-
-end_spawn_boss_powerups:
+end_maybe_spawn_laboratory_uzi:
     lw ra, 0(sp)
     addi sp, sp, 4
     ret
@@ -220,10 +248,15 @@ update_powerups:
 
     la t0, game_state
     lw t1, 0(t0)
+    li t2, STATE_LEVEL3
+    beq t1, t2, update_laboratory_powerups
+
     li t2, STATE_BOSS
     bne t1, t2, end_update_powerups
 
-    call spawn_boss_powerups
+    la t0, boss_active
+    lw t1, 0(t0)
+    beqz t1, end_update_powerups
 
     la t0, boss_ammo_timer
     lw t1, 0(t0)
@@ -240,6 +273,10 @@ update_powerups:
 
 store_boss_ammo_timer:
     sw t1, 0(t0)
+    j end_update_powerups
+
+update_laboratory_powerups:
+    call maybe_spawn_laboratory_uzi
 
 end_update_powerups:
     lw ra, 0(sp)
@@ -352,7 +389,13 @@ collect_boss_weapon:
 
     la t0, boss_ammo_count
     lw t5, 0(t0)
+    li t6, 0x7ffffff5
+    bgt t5, t6, saturate_boss_weapon_ammo
     addi t5, t5, BOSS_AMMO_GAIN
+    j store_boss_weapon_ammo
+saturate_boss_weapon_ammo:
+    li t5, 0x7fffffff
+store_boss_weapon_ammo:
     sw t5, 0(t0)
     j play_powerup_collect_sfx
 
@@ -362,7 +405,13 @@ finish_collect_boss_weapon:
 collect_boss_ammo:
     la t0, boss_ammo_count
     lw t5, 0(t0)
+    li t6, 0x7ffffff5
+    bgt t5, t6, saturate_boss_ammo_pickup
     addi t5, t5, BOSS_AMMO_GAIN
+    j store_boss_ammo_pickup
+saturate_boss_ammo_pickup:
+    li t5, 0x7fffffff
+store_boss_ammo_pickup:
     sw t5, 0(t0)
     j play_powerup_collect_sfx
 

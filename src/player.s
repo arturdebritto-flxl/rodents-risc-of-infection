@@ -17,6 +17,9 @@ init_player:
     li t1, DIR_DOWN
     sw t1, 0(t0)
 
+    la t0, player_move_facing_direction
+    sw t1, 0(t0)
+
     la t0, player_lives
     li t1, PLAYER_MAX_LIVES
     sw t1, 0(t0)
@@ -24,17 +27,22 @@ init_player:
     la t0, player_moved
     sw zero, 0(t0)
 
-    la t0, player_move_direction
-    li t1, DIR_DOWN
-    sw t1, 0(t0)
+    la t0, move_x_direction
+    sw zero, 0(t0)
 
-    la t0, player_move_hold_timer
+    la t0, move_x_timer
+    sw zero, 0(t0)
+
+    la t0, move_y_direction
+    sw zero, 0(t0)
+
+    la t0, move_y_timer
     sw zero, 0(t0)
 
     ret
 
 update_player:
-    addi sp, sp, -12
+    addi sp, sp, -16
     sw ra, 0(sp)
 
     la t0, player_moved
@@ -42,165 +50,165 @@ update_player:
 
     la t0, key_pressed
     lw t1, 0(t0)
-    beqz t1, apply_move_buffer
+    beqz t1, apply_axis_buffers
 
     la t0, last_key
     lw t1, 0(t0)
-
     li t2, 'w'
     beq t1, t2, buffer_move_up
-
     li t2, 's'
     beq t1, t2, buffer_move_down
-
     li t2, 'a'
     beq t1, t2, buffer_move_left
-
     li t2, 'd'
     beq t1, t2, buffer_move_right
-
-    j apply_move_buffer
+    j apply_axis_buffers
 
 buffer_move_up:
+    la t0, move_y_direction
+    li t1, -1
+    sw t1, 0(t0)
+    la t0, move_y_timer
+    li t1, MOVE_AXIS_BUFFER_FRAMES
+    sw t1, 0(t0)
     li t1, DIR_UP
-    j store_move_buffer
+    j store_move_facing
 
 buffer_move_down:
+    la t0, move_y_direction
+    li t1, 1
+    sw t1, 0(t0)
+    la t0, move_y_timer
+    li t1, MOVE_AXIS_BUFFER_FRAMES
+    sw t1, 0(t0)
     li t1, DIR_DOWN
-    j store_move_buffer
+    j store_move_facing
 
 buffer_move_left:
+    la t0, move_x_direction
+    li t1, -1
+    sw t1, 0(t0)
+    la t0, move_x_timer
+    li t1, MOVE_AXIS_BUFFER_FRAMES
+    sw t1, 0(t0)
     li t1, DIR_LEFT
-    j store_move_buffer
+    j store_move_facing
 
 buffer_move_right:
+    la t0, move_x_direction
+    li t1, 1
+    sw t1, 0(t0)
+    la t0, move_x_timer
+    li t1, MOVE_AXIS_BUFFER_FRAMES
+    sw t1, 0(t0)
     li t1, DIR_RIGHT
 
-store_move_buffer:
-    la t0, player_move_direction
+store_move_facing:
+    la t0, player_move_facing_direction
+    sw t1, 0(t0)
+    la t0, player_direction
     sw t1, 0(t0)
 
-    la t0, player_move_hold_timer
-    li t2, PLAYER_MOVE_HOLD_FRAMES
-    sw t2, 0(t0)
-
-apply_move_buffer:
-    la t0, player_move_hold_timer
+apply_axis_buffers:
+    # Movimento cardinal usa 2 px; diagonal usa 1 px por eixo.
+    li t3, PLAYER_SMOOTH_SPEED
+    la t0, move_x_timer
     lw t1, 0(t0)
-    blez t1, end_update_player
+    la t0, move_y_timer
+    lw t2, 0(t0)
+    blez t1, store_axis_step
+    blez t2, store_axis_step
+    li t3, 1
 
+store_axis_step:
+    sw t3, 4(sp)
+
+    # X e validado primeiro; bloqueio nao impede a tentativa em Y.
+    la t0, move_x_timer
+    lw t1, 0(t0)
+    blez t1, try_move_y_axis
     addi t1, t1, -1
     sw t1, 0(t0)
-
-    la t0, player_move_direction
-    lw t1, 0(t0)
-
-    li t2, DIR_UP
-    beq t1, t2, move_player_up
-
-    li t2, DIR_DOWN
-    beq t1, t2, move_player_down
-
-    li t2, DIR_LEFT
-    beq t1, t2, move_player_left
-
-    li t2, DIR_RIGHT
-    beq t1, t2, move_player_right
-
-    j end_update_player
-
-move_player_up:
-    la t0, player_y
-    lw t1, 0(t0)
-    li t2, PLAYER_SMOOTH_SPEED
-    sub t1, t1, t2
-
-    li t3, PLAYER_MIN_Y
-    blt t1, t3, clamp_player_y_min
-    j try_store_player_y
-
-clamp_player_y_min:
-    li t1, PLAYER_MIN_Y
-    j try_store_player_y
-
-move_player_down:
-    la t0, player_y
-    lw t1, 0(t0)
-    li t2, PLAYER_SMOOTH_SPEED
-    add t1, t1, t2
-
-    li t3, PLAYER_MAX_Y
-    bgt t1, t3, clamp_player_y_max
-    j try_store_player_y
-
-clamp_player_y_max:
-    li t1, PLAYER_MAX_Y
-    j try_store_player_y
-
-try_store_player_y:
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-
-    la t2, player_x
-    lw a0, 0(t2)
-    mv a1, t1
-    call is_player_position_blocked
-
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    bnez a0, end_update_player
-
-    sw t1, 0(t0)
-    j mark_player_moved
-
-move_player_left:
+    la t0, move_x_direction
+    lw t2, 0(t0)
+    beqz t2, try_move_y_axis
     la t0, player_x
     lw t1, 0(t0)
-    li t2, PLAYER_SMOOTH_SPEED
-    sub t1, t1, t2
+    lw t3, 4(sp)
+    bltz t2, apply_x_left
+    add t1, t1, t3
+    j clamp_x_candidate
 
+apply_x_left:
+    sub t1, t1, t3
+
+clamp_x_candidate:
     li t3, PLAYER_MIN_X
-    blt t1, t3, clamp_player_x_min
-    j try_store_player_x
-
-clamp_player_x_min:
-    li t1, PLAYER_MIN_X
-    j try_store_player_x
-
-move_player_right:
-    la t0, player_x
-    lw t1, 0(t0)
-    li t2, PLAYER_SMOOTH_SPEED
-    add t1, t1, t2
-
+    bge t1, t3, check_x_max
+    mv t1, t3
+check_x_max:
     li t3, PLAYER_MAX_X
-    bgt t1, t3, clamp_player_x_max
-    j try_store_player_x
-
-clamp_player_x_max:
-    li t1, PLAYER_MAX_X
-    j try_store_player_x
-
-try_store_player_x:
-    sw t0, 4(sp)
+    ble t1, t3, test_x_collision
+    mv t1, t3
+test_x_collision:
     sw t1, 8(sp)
-
     mv a0, t1
-    la t2, player_y
-    lw a1, 0(t2)
+    la t0, player_y
+    lw a1, 0(t0)
     call is_player_position_blocked
-
-    lw t0, 4(sp)
+    bnez a0, try_move_y_axis
     lw t1, 8(sp)
-    bnez a0, end_update_player
-
+    la t0, player_x
     sw t1, 0(t0)
-
-mark_player_moved:
     la t0, player_moved
     li t1, 1
     sw t1, 0(t0)
 
+try_move_y_axis:
+    la t0, move_y_timer
+    lw t1, 0(t0)
+    blez t1, finish_player_movement
+    addi t1, t1, -1
+    sw t1, 0(t0)
+    la t0, move_y_direction
+    lw t2, 0(t0)
+    beqz t2, finish_player_movement
+    la t0, player_y
+    lw t1, 0(t0)
+    lw t3, 4(sp)
+    bltz t2, apply_y_up
+    add t1, t1, t3
+    j clamp_y_candidate
+
+apply_y_up:
+    sub t1, t1, t3
+
+clamp_y_candidate:
+    li t3, PLAYER_MIN_Y
+    bge t1, t3, check_y_max
+    mv t1, t3
+check_y_max:
+    li t3, PLAYER_MAX_Y
+    ble t1, t3, test_y_collision
+    mv t1, t3
+test_y_collision:
+    sw t1, 12(sp)
+    la t0, player_x
+    lw a0, 0(t0)
+    mv a1, t1
+    call is_player_position_blocked
+    bnez a0, finish_player_movement
+    lw t1, 12(sp)
+    la t0, player_y
+    sw t1, 0(t0)
+    la t0, player_moved
+    li t1, 1
+    sw t1, 0(t0)
+
+finish_player_movement:
+    la t0, player_moved
+    lw t1, 0(t0)
+    beqz t1, end_update_player
     la t0, noise_timer
     lw t1, 0(t0)
     li t2, NOISE_MOVE_FRAMES
@@ -209,7 +217,7 @@ mark_player_moved:
 
 end_update_player:
     lw ra, 0(sp)
-    addi sp, sp, 12
+    addi sp, sp, 16
     ret
 
 # ------------------------------------------------------------
@@ -220,15 +228,23 @@ end_update_player:
 # ------------------------------------------------------------
 
 update_player_facing_direction:
-    la t0, shoot_hold_timer
+    la t0, player_burst_remaining
+    lw t1, 0(t0)
+    bgtz t1, face_burst_direction
+
+    la t0, shoot_request_pending
     lw t1, 0(t0)
     bgtz t1, face_shoot_direction
 
     la t0, player_moved
     lw t1, 0(t0)
     beqz t1, end_update_player_facing_direction
+    la t0, player_move_facing_direction
+    lw t1, 0(t0)
+    j store_player_facing_direction
 
-    la t0, player_move_direction
+face_burst_direction:
+    la t0, player_burst_direction
     lw t1, 0(t0)
     j store_player_facing_direction
 
@@ -244,6 +260,13 @@ end_update_player_facing_direction:
     ret
 
 is_player_position_blocked:
+    li a4, PLAYER_SIZE
+    j is_position_blocked
+
+is_enemy_position_blocked:
+    li a4, ENEMY_SIZE
+
+is_position_blocked:
     la t0, current_level
     lw t1, 0(t0)
 
@@ -321,15 +344,13 @@ check_laboratory_obstacles_done:
     ret
 
 check_obstacle_rect:
-    li t4, PLAYER_SIZE
-    add t5, a0, t4
+    add t5, a0, a4
     ble t5, t0, next_obstacle_rect
 
     add t5, t0, t2
     bge a0, t5, next_obstacle_rect
 
-    li t4, PLAYER_SIZE
-    add t5, a1, t4
+    add t5, a1, a4
     ble t5, t1, next_obstacle_rect
 
     add t5, t1, t3

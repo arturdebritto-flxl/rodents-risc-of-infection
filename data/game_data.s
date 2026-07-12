@@ -30,6 +30,7 @@ frame_counter:          .word 0
 draw_frame:             .word 1
 animation_tick:         .word 0
 animation_frame:        .word 0
+post_boss_explosion_timer: .word 0
 
 # ------------------------------------------------------------
 # Controle de testes e apresentação
@@ -43,4 +44,5 @@ debug_mode:             .word 1
 
 last_key:               .word 0
 key_pressed:            .word 0
+shoot_request_pending:  .word 0
 noise_timer:            .word 0

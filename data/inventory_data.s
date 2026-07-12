@@ -4,7 +4,7 @@
 
 .data
 
-weapon_type:            .word WEAPON_NORMAL
+weapon_type:            .word WEAPON_PISTOL
 normal_ammo_count:      .word 0
 boss_ammo_count:        .word 0
 boss_weapon_owned:      .word 0
@@ -16,4 +16,3 @@ shotgun_owned:          .word 0
 shotgun_ammo_count:     .word 0
 shotgun_mag_count:      .word 0
 shotgun_reload_timer:   .word 0
-inventory_visible:      .word 1

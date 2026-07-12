@@ -40,6 +40,9 @@ init_game:
     la t0, animation_frame
     sw zero, 0(t0)
 
+    la t0, post_boss_explosion_timer
+    sw zero, 0(t0)
+
     la t0, debug_mode
     li t1, 1
     sw t1, 0(t0)
@@ -48,6 +51,43 @@ init_game:
     sw zero, 0(t0)
 
     la t0, key_pressed
+    sw zero, 0(t0)
+
+    la t0, shoot_request_pending
+    sw zero, 0(t0)
+
+    ret
+
+# Limpa eventos e buffers que nao podem atravessar mudancas de estado.
+clear_input_buffers:
+    la t0, last_key
+    sw zero, 0(t0)
+
+    la t0, key_pressed
+    sw zero, 0(t0)
+
+    la t0, shoot_request_pending
+    sw zero, 0(t0)
+
+    la t0, shoot_hold_timer
+    sw zero, 0(t0)
+
+    la t0, move_x_direction
+    sw zero, 0(t0)
+
+    la t0, move_x_timer
+    sw zero, 0(t0)
+
+    la t0, move_y_direction
+    sw zero, 0(t0)
+
+    la t0, move_y_timer
+    sw zero, 0(t0)
+
+    la t0, player_burst_remaining
+    sw zero, 0(t0)
+
+    la t0, player_burst_interval_timer
     sw zero, 0(t0)
 
     ret
@@ -73,7 +113,16 @@ set_state_level1:
     li t1, LEVEL_TOWN
     sw t1, 0(t0)
 
+    la t0, player_x
+    li t1, PLAYER_START_X
+    sw t1, 0(t0)
+
+    la t0, player_y
+    li t1, PLAYER_START_Y
+    sw t1, 0(t0)
+
     call init_level1
+    call clear_input_buffers
 
     lw ra,0(sp)
     addi sp, sp, 4
@@ -101,7 +150,16 @@ set_state_level2:
     li t1, LEVEL_SEWER
     sw t1, 0(t0)
 
+    la t0, player_x
+    li t1, PLAYER_START_X
+    sw t1, 0(t0)
+
+    la t0, player_y
+    li t1, PLAYER_START_Y
+    sw t1, 0(t0)
+
     call init_level2
+    call clear_input_buffers
 
     lw ra, 0(sp)
     addi sp, sp, 4
@@ -130,7 +188,16 @@ set_state_level3:
     li t1, LEVEL_LABORATORY
     sw t1, 0(t0)
 
+    la t0, player_x
+    li t1, PLAYER_LAB_START_X
+    sw t1, 0(t0)
+
+    la t0, player_y
+    li t1, PLAYER_LAB_START_Y
+    sw t1, 0(t0)
+
     call init_level3
+    call clear_input_buffers
 
     lw ra, 0(sp)
     addi sp, sp, 4
@@ -146,18 +213,52 @@ set_state_cutscene_intro:
     la t0, game_state
     li t1, STATE_CUTSCENE_INTRO
     sw t1, 0(t0)
-    ret
+    j clear_input_buffers
 
 set_state_cutscene_level2:
     la t0, game_state
     li t1, STATE_CUTSCENE_LEVEL2
     sw t1, 0(t0)
-    ret
+    j clear_input_buffers
 
 set_state_cutscene_level3:
     la t0, game_state
     li t1, STATE_CUTSCENE_LEVEL3
     sw t1, 0(t0)
+    j clear_input_buffers
+
+set_state_cutscene_detonator:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    la t0, game_state
+    li t1, STATE_CUTSCENE_DETONATOR
+    sw t1, 0(t0)
+
+    la t0, post_boss_explosion_timer
+    sw zero, 0(t0)
+
+    call clear_input_buffers
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
+set_state_cutscene_explosion:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    la t0, game_state
+    li t1, STATE_CUTSCENE_EXPLOSION
+    sw t1, 0(t0)
+
+    la t0, post_boss_explosion_timer
+    sw zero, 0(t0)
+
+    call clear_input_buffers
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
     ret
 
 # ------------------------------------------------------------
@@ -177,7 +278,7 @@ set_state_victory:
     li a7, 31
     ecall
 
-    ret
+    j clear_input_buffers
 
 # ------------------------------------------------------------
 # set_state_game_over
@@ -196,7 +297,7 @@ set_state_game_over:
     li a7, 31
     ecall
 
-    ret
+    j clear_input_buffers
 
 # ------------------------------------------------------------
 # set_state_menu
@@ -227,4 +328,4 @@ set_state_menu:
     la t0, boss_active
     sw zero, 0(t0)
 
-    ret
+    j clear_input_buffers

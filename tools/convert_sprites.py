@@ -23,6 +23,11 @@ FORMULA = (
 )
 
 FINAL_GROUP = "_final_sprites"
+RUNTIME_ONLY_GROUPS = {
+    FINAL_GROUP,
+    "_rato_mutante_new",
+    "_rato_boss_new",
+}
 NON_SPRITE_SOURCE_DIRS = {"cutscenes"}
 
 
@@ -37,23 +42,53 @@ def build_runtime_sprites() -> dict[str, tuple[str, str, int]]:
         "sprite_player_right_1": ("_protagonista", "sprite_09.png", 16),
         "sprite_player_left_0": ("_protagonista", "sprite_16.png", 16),
         "sprite_player_left_1": ("_protagonista", "sprite_17.png", 16),
-        "sprite_enemy_common_0": ("_sprites_1", "sprites/image-1.png.png", 16),
-        "sprite_enemy_common_1": ("_sprites_1", "sprites/image-2.png.png", 16),
-        "sprite_enemy_echo_0": ("_sprites_1", "sprites/image-12.png.png", 16),
-        "sprite_enemy_echo_1": ("_sprites_1", "sprites/image-13.png.png", 16),
-        "sprite_enemy_mutant_0": ("_sprites_1", "sprites/image-10.png.png", 16),
-        "sprite_enemy_mutant_1": ("_sprites_1", "sprites/image-11.png.png", 16),
-        "sprite_enemy_spitter_0": ("_sprites_1", "sprites/image-18.png.png", 16),
-        "sprite_enemy_spitter_1": ("_sprites_1", "sprites/image-19.png.png", 16),
-        "sprite_boss_0": ("_sprites_1", "sprites/New Piskel-1.png.png", 32),
-        "sprite_boss_1": ("_sprites_1", "sprites/New Piskel-2.png.png", 32),
+        "sprite_enemy_common_down_0": ("_sprites_1", "sprites/image-5.png.png", 16),
+        "sprite_enemy_common_down_1": ("_sprites_1", "sprites/image-5.png.png", 16),
+        "sprite_enemy_common_up_0": ("_sprites_1", "sprites/image-6.png.png", 16),
+        "sprite_enemy_common_up_1": ("_sprites_1", "sprites/image-6.png.png", 16),
+        "sprite_enemy_common_right_0": ("_sprites_1", "sprites/image-3.png.png", 16),
+        "sprite_enemy_common_right_1": ("_sprites_1", "sprites/image-4.png.png", 16),
+        "sprite_enemy_common_left_0": ("_sprites_1", "sprites/image-1.png.png", 16),
+        "sprite_enemy_common_left_1": ("_sprites_1", "sprites/image-2.png.png", 16),
+        "sprite_enemy_echo_down_0": ("_sprites_1", "sprites/image-12.png.png", 16),
+        "sprite_enemy_echo_down_1": ("_sprites_1", "sprites/image-18.png.png", 16),
+        "sprite_enemy_echo_up_0": ("_sprites_1", "sprites/image-13.png.png", 16),
+        "sprite_enemy_echo_up_1": ("_sprites_1", "sprites/image-19.png.png", 16),
+        "sprite_enemy_echo_right_0": ("_sprites_1", "sprites/image-16.png.png", 16),
+        "sprite_enemy_echo_right_1": ("_sprites_1", "sprites/image-17.png.png", 16),
+        "sprite_enemy_echo_left_0": ("_sprites_1", "sprites/image-14.png.png", 16),
+        "sprite_enemy_echo_left_1": ("_sprites_1", "sprites/image-15.png.png", 16),
+        "sprite_enemy_mutant_down_0": ("_rato_mutante_new", "baixo.png", 16),
+        "sprite_enemy_mutant_down_1": ("_rato_mutante_new", "baixo_andando.png", 16),
+        "sprite_enemy_mutant_up_0": ("_rato_mutante_new", "subindo.png", 16),
+        "sprite_enemy_mutant_up_1": ("_rato_mutante_new", "subindo_andando.png", 16),
+        "sprite_enemy_mutant_right_0": ("_rato_mutante_new", "direita.png", 16),
+        "sprite_enemy_mutant_right_1": ("_rato_mutante_new", "direita_andando.png", 16),
+        "sprite_enemy_mutant_left_0": ("_rato_mutante_new", "esquerda.png", 16),
+        "sprite_enemy_mutant_left_1": ("_rato_mutante_new", "esquerda_andando.png", 16),
+        "sprite_enemy_spitter_down_0": ("_sprites_1", "sprites/image-12.png.png", 16),
+        "sprite_enemy_spitter_down_1": ("_sprites_1", "sprites/image-18.png.png", 16),
+        "sprite_enemy_spitter_up_0": ("_sprites_1", "sprites/image-13.png.png", 16),
+        "sprite_enemy_spitter_up_1": ("_sprites_1", "sprites/image-19.png.png", 16),
+        "sprite_enemy_spitter_right_0": ("_sprites_1", "sprites/image-16.png.png", 16),
+        "sprite_enemy_spitter_right_1": ("_sprites_1", "sprites/image-17.png.png", 16),
+        "sprite_enemy_spitter_left_0": ("_sprites_1", "sprites/image-14.png.png", 16),
+        "sprite_enemy_spitter_left_1": ("_sprites_1", "sprites/image-15.png.png", 16),
+        "sprite_boss_down_0": ("_rato_boss_new", "descendo.png", 32),
+        "sprite_boss_down_1": ("_rato_boss_new", "descendo_andando.png", 32),
+        "sprite_boss_up_0": ("_rato_boss_new", "subindo.png", 32),
+        "sprite_boss_up_1": ("_rato_boss_new", "subindo_andando.png", 32),
+        "sprite_boss_right_0": ("_rato_boss_new", "direita.png", 32),
+        "sprite_boss_right_1": ("_rato_boss_new", "direita_andando.png", 32),
+        "sprite_boss_left_0": ("_rato_boss_new", "esquerda.png", 32),
+        "sprite_boss_left_1": ("_rato_boss_new", "esquerda_andando.png", 32),
         "sprite_powerup_heal": ("_med_kit", "Med-Kit.png", 16),
         "sprite_powerup_ammo": ("_armas", "sprite_1.png", 16),
         "sprite_powerup_boss_weapon": ("_armas", "sprite_0.png", 16),
         "sprite_powerup_boss_ammo": ("_armas", "sprite_5.png", 16),
         "sprite_weapon_normal_icon": ("_armas", "sprite_0.png", 16),
-        "sprite_weapon_shotgun_icon": ("_armas", "sprite_4.png", 16),
-        "sprite_weapon_boss_icon": ("_armas", "sprite_2.png", 16),
+        "sprite_weapon_shotgun_icon": ("_armas", "sprite_2.png", 16),
+        "sprite_weapon_boss_icon": ("_armas", "sprite_4.png", 16),
     }
 
     static = {
@@ -223,7 +258,7 @@ def emit(source_dir: Path, output_dir: Path, target: int = 16) -> dict:
     for entry in entries:
         # Final assets are emitted at their manifest dimensions below.  Keep the
         # legacy all-assets catalog stable instead of adding resized duplicates.
-        if entry.group == FINAL_GROUP:
+        if entry.group in RUNTIME_ONLY_GROUPS:
             continue
         symbol = symbol_for(entry.group, entry.relative)
         if symbol in symbols:

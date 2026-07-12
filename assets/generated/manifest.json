@@ -252,6 +252,192 @@
     },
     {
       "content_size": [
+        7,
+        16
+      ],
+      "crop": [
+        50,
+        0,
+        120,
+        150
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        4,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "0ec749704806530112256ff89eaf3c55a29c739e5f41f2794f1b60d3d9076dfe",
+      "resampling": "nearest",
+      "source": "sprites/image-5.png.png",
+      "source_sha256": "d5c0de557c1f9c78a29ec533fe3b8c9fb85d7a5a970e449c2d85ff90ae22d8a1",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_common_down_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        7,
+        16
+      ],
+      "crop": [
+        50,
+        0,
+        120,
+        150
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        4,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "0ec749704806530112256ff89eaf3c55a29c739e5f41f2794f1b60d3d9076dfe",
+      "resampling": "nearest",
+      "source": "sprites/image-5.png.png",
+      "source_sha256": "d5c0de557c1f9c78a29ec533fe3b8c9fb85d7a5a970e449c2d85ff90ae22d8a1",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_common_down_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        7,
+        16
+      ],
+      "crop": [
+        40,
+        10,
+        110,
+        160
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        4,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "46aa102ec148e72e71923082e728098aa4324a963e3bf7a064aa9305ed8f17b7",
+      "resampling": "nearest",
+      "source": "sprites/image-6.png.png",
+      "source_sha256": "a7cbd7c500d325be9665fd9abc04babf15c7ee3b337cf9db8699f1c64311bad7",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_common_up_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        7,
+        16
+      ],
+      "crop": [
+        40,
+        10,
+        110,
+        160
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        4,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "46aa102ec148e72e71923082e728098aa4324a963e3bf7a064aa9305ed8f17b7",
+      "resampling": "nearest",
+      "source": "sprites/image-6.png.png",
+      "source_sha256": "a7cbd7c500d325be9665fd9abc04babf15c7ee3b337cf9db8699f1c64311bad7",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_common_up_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        11
+      ],
+      "crop": [
+        10,
+        40,
+        150,
+        140
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "85ae8008be7109ae5212fb01b32717c0764204fe729482eaf15dd94c9c495b39",
+      "resampling": "nearest",
+      "source": "sprites/image-3.png.png",
+      "source_sha256": "a8416f82904ca642cf3530904117932dad47ce8386d2cd7a2904688e48459b4a",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_common_right_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        11
+      ],
+      "crop": [
+        10,
+        40,
+        150,
+        140
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "f0eeafd91f73ca1c636ef198547eb3116e056a35b64206c74c6a57dc9192876e",
+      "resampling": "nearest",
+      "source": "sprites/image-4.png.png",
+      "source_sha256": "fc04f426f6d4a8f153bfb16ea49df1f84aacc342b48c994ab6349d7456063cc3",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_common_right_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
         16,
         11
       ],
@@ -278,7 +464,7 @@
         160,
         160
       ],
-      "symbol": "sprite_enemy_common_0",
+      "symbol": "sprite_enemy_common_left_0",
       "transparent_value": 0
     },
     {
@@ -309,7 +495,7 @@
         160,
         160
       ],
-      "symbol": "sprite_enemy_common_1",
+      "symbol": "sprite_enemy_common_left_1",
       "transparent_value": 0
     },
     {
@@ -340,100 +526,7 @@
         160,
         160
       ],
-      "symbol": "sprite_enemy_echo_0",
-      "transparent_value": 0
-    },
-    {
-      "content_size": [
-        7,
-        16
-      ],
-      "crop": [
-        40,
-        10,
-        110,
-        160
-      ],
-      "group": "_sprites_1",
-      "offset": [
-        4,
-        0
-      ],
-      "output_size": [
-        16,
-        16
-      ],
-      "payload_sha256": "d9dddc7b7ccfe12e3e0eef1578ac7bc4537893165364e8e53f30640016dfeb70",
-      "resampling": "nearest",
-      "source": "sprites/image-13.png.png",
-      "source_sha256": "abff406d03d014aeb55fbe95db7d292ad37c87c05b6f2705074400a6206befea",
-      "source_size": [
-        160,
-        160
-      ],
-      "symbol": "sprite_enemy_echo_1",
-      "transparent_value": 0
-    },
-    {
-      "content_size": [
-        16,
-        11
-      ],
-      "crop": [
-        10,
-        40,
-        150,
-        140
-      ],
-      "group": "_sprites_1",
-      "offset": [
-        0,
-        2
-      ],
-      "output_size": [
-        16,
-        16
-      ],
-      "payload_sha256": "3a8dd346ff99ec56eb800da353f71fc24b189ae702ccf44553d5a4405c479ff9",
-      "resampling": "nearest",
-      "source": "sprites/image-10.png.png",
-      "source_sha256": "1cb82a8e14fd9f92b8e8b6ceaa4df28d61139936e1455c45766d540578c57d7b",
-      "source_size": [
-        160,
-        160
-      ],
-      "symbol": "sprite_enemy_mutant_0",
-      "transparent_value": 0
-    },
-    {
-      "content_size": [
-        16,
-        11
-      ],
-      "crop": [
-        10,
-        40,
-        150,
-        140
-      ],
-      "group": "_sprites_1",
-      "offset": [
-        0,
-        2
-      ],
-      "output_size": [
-        16,
-        16
-      ],
-      "payload_sha256": "3a8dd346ff99ec56eb800da353f71fc24b189ae702ccf44553d5a4405c479ff9",
-      "resampling": "nearest",
-      "source": "sprites/image-11.png.png",
-      "source_sha256": "1cb82a8e14fd9f92b8e8b6ceaa4df28d61139936e1455c45766d540578c57d7b",
-      "source_size": [
-        160,
-        160
-      ],
-      "symbol": "sprite_enemy_mutant_1",
+      "symbol": "sprite_enemy_echo_down_0",
       "transparent_value": 0
     },
     {
@@ -464,7 +557,38 @@
         160,
         160
       ],
-      "symbol": "sprite_enemy_spitter_0",
+      "symbol": "sprite_enemy_echo_down_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        7,
+        16
+      ],
+      "crop": [
+        40,
+        10,
+        110,
+        160
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        4,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "d9dddc7b7ccfe12e3e0eef1578ac7bc4537893165364e8e53f30640016dfeb70",
+      "resampling": "nearest",
+      "source": "sprites/image-13.png.png",
+      "source_sha256": "abff406d03d014aeb55fbe95db7d292ad37c87c05b6f2705074400a6206befea",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_echo_up_0",
       "transparent_value": 0
     },
     {
@@ -495,7 +619,751 @@
         160,
         160
       ],
-      "symbol": "sprite_enemy_spitter_1",
+      "symbol": "sprite_enemy_echo_up_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        11
+      ],
+      "crop": [
+        10,
+        40,
+        150,
+        140
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "6454c1aa323caeb51955678692f166dd3b4bd62ceb2681abe0a828536e191023",
+      "resampling": "nearest",
+      "source": "sprites/image-16.png.png",
+      "source_sha256": "d0d5fed4853bc8fd62a54b5aa4ec0782dd4bbe5e97db045096cd3c868b9091f6",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_echo_right_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        11
+      ],
+      "crop": [
+        10,
+        40,
+        150,
+        140
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "18c2d314b4e443937c997b93e2bf936e4acef8120cea1188c547e5b779a275be",
+      "resampling": "nearest",
+      "source": "sprites/image-17.png.png",
+      "source_sha256": "c1063c0886113c355ffaf0d8c87eea29d0d69842bfda4b9f0530240718638c1a",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_echo_right_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        11
+      ],
+      "crop": [
+        10,
+        40,
+        150,
+        140
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "430f53e56b3ce4629629d61164fa158bef28a6b6cddaff16e656c69bd95c0a2f",
+      "resampling": "nearest",
+      "source": "sprites/image-14.png.png",
+      "source_sha256": "4e0bcb1b2bcb0594446ddb1a89da0e60747ea7edca72b28c5717c118a402e5b9",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_echo_left_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        11
+      ],
+      "crop": [
+        10,
+        40,
+        150,
+        140
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "9e02c87b9d14c48f6c8cc7ef624604ba49248a50772dd5a76d79dd24d2d9a802",
+      "resampling": "nearest",
+      "source": "sprites/image-15.png.png",
+      "source_sha256": "19e0b4d6bfefbbdbdd44104900c9bec109dcb3e1eaa5b94192df7465d3b70a70",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_echo_left_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        9,
+        16
+      ],
+      "crop": [
+        40,
+        0,
+        130,
+        160
+      ],
+      "group": "_rato_mutante_new",
+      "offset": [
+        3,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "af32eab2be89667ed05d23e9ac83c6e9b37e4edb735cb27ff00632f5bbe8662d",
+      "resampling": "nearest",
+      "source": "baixo.png",
+      "source_sha256": "d0d403388805292b884979712ee00c07430ebff041147381baf0572d3684565c",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_mutant_down_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        9,
+        16
+      ],
+      "crop": [
+        40,
+        0,
+        130,
+        160
+      ],
+      "group": "_rato_mutante_new",
+      "offset": [
+        3,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "2357c9a1182370333fe7c955cafb406ff5f2fe8bf5e856caca492cf9edc7ea66",
+      "resampling": "nearest",
+      "source": "baixo_andando.png",
+      "source_sha256": "8e2adce9ca3e61b5e70e023d4658cc6c74146ae5b4e33e22a964126634ecd3fe",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_mutant_down_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        9,
+        16
+      ],
+      "crop": [
+        30,
+        0,
+        120,
+        160
+      ],
+      "group": "_rato_mutante_new",
+      "offset": [
+        3,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "da421da47db65362efecbb49bcb54e32a65f0c398c212c1e9ce853e9f847636f",
+      "resampling": "nearest",
+      "source": "subindo.png",
+      "source_sha256": "9384973a10c86a5407f4f243528d61e5a247f839e869a77a02f74797ba2ec795",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_mutant_up_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        9,
+        16
+      ],
+      "crop": [
+        30,
+        0,
+        120,
+        160
+      ],
+      "group": "_rato_mutante_new",
+      "offset": [
+        3,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "7be4616d2c73a35fe55064e4f9d41df28631cf37b8ca1cf8675ad0d138cb0791",
+      "resampling": "nearest",
+      "source": "subindo_andando.png",
+      "source_sha256": "c7b6452ae77ceb2591e9854a4aa77832d31a59a16bed94c29bf52f70299d3b4c",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_mutant_up_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        13
+      ],
+      "crop": [
+        10,
+        30,
+        150,
+        140
+      ],
+      "group": "_rato_mutante_new",
+      "offset": [
+        0,
+        1
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "d56a6522f2506dda374315d80b8c530915943b29bc23621df8202112322129b7",
+      "resampling": "nearest",
+      "source": "direita.png",
+      "source_sha256": "dad36ba6ecf499c7b6b90fa8f297221f6896960ac795178f9ac3a8f2aa1b00c8",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_mutant_right_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        13
+      ],
+      "crop": [
+        10,
+        30,
+        150,
+        140
+      ],
+      "group": "_rato_mutante_new",
+      "offset": [
+        0,
+        1
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "00e43ebd019d76b8773932481466f6dfeefeb00c3e72f438d0cca83409a0b5f6",
+      "resampling": "nearest",
+      "source": "direita_andando.png",
+      "source_sha256": "749b1555f67f489836d30c2801503cd17b288431ff07017039d6152e37883b3e",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_mutant_right_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        13
+      ],
+      "crop": [
+        10,
+        30,
+        150,
+        140
+      ],
+      "group": "_rato_mutante_new",
+      "offset": [
+        0,
+        1
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "314a37fb5bf298bba6147b270702bfe708e0e0977dbca7ca01d67317e6140cbc",
+      "resampling": "nearest",
+      "source": "esquerda.png",
+      "source_sha256": "a5715fc25b06c423f22488f9ffef347f8337c36ad93ab1d101a27a607a4dc420",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_mutant_left_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        13
+      ],
+      "crop": [
+        10,
+        30,
+        150,
+        140
+      ],
+      "group": "_rato_mutante_new",
+      "offset": [
+        0,
+        1
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "9e85dea09fbc1f188bc46d260321c0d4b4312ecb7e9a63d135ef537e8b38ab63",
+      "resampling": "nearest",
+      "source": "esquerda_andando.png",
+      "source_sha256": "520b5bcc98b12c8ae0c45d82911495c2d598ef06c1ffe6cab4df7d29b53db155",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_mutant_left_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        7,
+        16
+      ],
+      "crop": [
+        50,
+        0,
+        120,
+        150
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        4,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "86b000407f596a4e4d39a0d197074328182cd3f5b4a7ec86d0c3122ced7e023d",
+      "resampling": "nearest",
+      "source": "sprites/image-12.png.png",
+      "source_sha256": "252e0a050b944fbfcec40ad069efe926703fb350e0c5fe39cd19ac13018d71b4",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_spitter_down_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        7,
+        16
+      ],
+      "crop": [
+        50,
+        0,
+        120,
+        150
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        4,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "e1864048ba5a276448ed9925cfc1cd24a0af81ae5593f24bbe32cd393926a7e3",
+      "resampling": "nearest",
+      "source": "sprites/image-18.png.png",
+      "source_sha256": "f25775f9dcb392b2cac82c0bd13bccf13ce7e4997a53d7e8cba538380503e0e5",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_spitter_down_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        7,
+        16
+      ],
+      "crop": [
+        40,
+        10,
+        110,
+        160
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        4,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "d9dddc7b7ccfe12e3e0eef1578ac7bc4537893165364e8e53f30640016dfeb70",
+      "resampling": "nearest",
+      "source": "sprites/image-13.png.png",
+      "source_sha256": "abff406d03d014aeb55fbe95db7d292ad37c87c05b6f2705074400a6206befea",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_spitter_up_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        7,
+        16
+      ],
+      "crop": [
+        40,
+        10,
+        110,
+        160
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        4,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "dbed7c95c07f5a4c5cf388258eac0034571a67e54e4a2661e8411ec574d29453",
+      "resampling": "nearest",
+      "source": "sprites/image-19.png.png",
+      "source_sha256": "00eb5d80f301cc50134481e0f5aee5269f853a38cc57ee03b8e726cfaad8d4d3",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_spitter_up_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        11
+      ],
+      "crop": [
+        10,
+        40,
+        150,
+        140
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "6454c1aa323caeb51955678692f166dd3b4bd62ceb2681abe0a828536e191023",
+      "resampling": "nearest",
+      "source": "sprites/image-16.png.png",
+      "source_sha256": "d0d5fed4853bc8fd62a54b5aa4ec0782dd4bbe5e97db045096cd3c868b9091f6",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_spitter_right_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        11
+      ],
+      "crop": [
+        10,
+        40,
+        150,
+        140
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "18c2d314b4e443937c997b93e2bf936e4acef8120cea1188c547e5b779a275be",
+      "resampling": "nearest",
+      "source": "sprites/image-17.png.png",
+      "source_sha256": "c1063c0886113c355ffaf0d8c87eea29d0d69842bfda4b9f0530240718638c1a",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_spitter_right_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        11
+      ],
+      "crop": [
+        10,
+        40,
+        150,
+        140
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "430f53e56b3ce4629629d61164fa158bef28a6b6cddaff16e656c69bd95c0a2f",
+      "resampling": "nearest",
+      "source": "sprites/image-14.png.png",
+      "source_sha256": "4e0bcb1b2bcb0594446ddb1a89da0e60747ea7edca72b28c5717c118a402e5b9",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_spitter_left_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        11
+      ],
+      "crop": [
+        10,
+        40,
+        150,
+        140
+      ],
+      "group": "_sprites_1",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "9e02c87b9d14c48f6c8cc7ef624604ba49248a50772dd5a76d79dd24d2d9a802",
+      "resampling": "nearest",
+      "source": "sprites/image-15.png.png",
+      "source_sha256": "19e0b4d6bfefbbdbdd44104900c9bec109dcb3e1eaa5b94192df7465d3b70a70",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_enemy_spitter_left_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        25,
+        32
+      ],
+      "crop": [
+        40,
+        0,
+        280,
+        310
+      ],
+      "group": "_rato_boss_new",
+      "offset": [
+        3,
+        0
+      ],
+      "output_size": [
+        32,
+        32
+      ],
+      "payload_sha256": "9085863bc9ca4ec7fd10687a32d3340f05c8e15e4d232742bf20702e0d7947c2",
+      "resampling": "nearest",
+      "source": "descendo.png",
+      "source_sha256": "3917df7a3c686ee521ce6833782db5c4f186a5d26d66db8654bfeba611cfe453",
+      "source_size": [
+        320,
+        320
+      ],
+      "symbol": "sprite_boss_down_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        25,
+        32
+      ],
+      "crop": [
+        40,
+        0,
+        280,
+        310
+      ],
+      "group": "_rato_boss_new",
+      "offset": [
+        3,
+        0
+      ],
+      "output_size": [
+        32,
+        32
+      ],
+      "payload_sha256": "687a1c93892b556260c63fecc113df54e695fc066f1a51f185eb802d8d8b7029",
+      "resampling": "nearest",
+      "source": "descendo_andando.png",
+      "source_sha256": "ece181256129e55c87f585cf5bad534e5e3319bc48be8e2cb40225a9458c2ef6",
+      "source_size": [
+        320,
+        320
+      ],
+      "symbol": "sprite_boss_down_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        24,
+        32
+      ],
+      "crop": [
+        40,
+        0,
+        280,
+        320
+      ],
+      "group": "_rato_boss_new",
+      "offset": [
+        4,
+        0
+      ],
+      "output_size": [
+        32,
+        32
+      ],
+      "payload_sha256": "5bb69fde8073e0da39325bd4b743c245c06eb6c733a4ca31f1f0ec77bda30322",
+      "resampling": "nearest",
+      "source": "subindo.png",
+      "source_sha256": "8bfd6ffbcb8f60e5fd016e288340640bf3e7cdbb7ea32c293d804c331241eab6",
+      "source_size": [
+        320,
+        320
+      ],
+      "symbol": "sprite_boss_up_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        25,
+        32
+      ],
+      "crop": [
+        40,
+        0,
+        280,
+        310
+      ],
+      "group": "_rato_boss_new",
+      "offset": [
+        3,
+        0
+      ],
+      "output_size": [
+        32,
+        32
+      ],
+      "payload_sha256": "1ba73670b12b2c4ddb995dd7b55cb691b3ee51ff619df3445b6488fb573a412b",
+      "resampling": "nearest",
+      "source": "subindo_andando.png",
+      "source_sha256": "d20903c425fcfd2211634525e8cfaefc626df46178e7846d721e53b03dcc9dae",
+      "source_size": [
+        320,
+        320
+      ],
+      "symbol": "sprite_boss_up_1",
       "transparent_value": 0
     },
     {
@@ -509,7 +1377,69 @@
         320,
         320
       ],
-      "group": "_sprites_1",
+      "group": "_rato_boss_new",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        32,
+        32
+      ],
+      "payload_sha256": "0c1795dbe192fdb84edc9a7541e9a67902ce59c039a9cc1044560a33b35ebae9",
+      "resampling": "nearest",
+      "source": "direita.png",
+      "source_sha256": "d333ce1431b8fa7ec97a101c153af96c86a45069da6901b3b21321a17059f5e8",
+      "source_size": [
+        320,
+        320
+      ],
+      "symbol": "sprite_boss_right_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        32,
+        32
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        320
+      ],
+      "group": "_rato_boss_new",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        32,
+        32
+      ],
+      "payload_sha256": "bd65c7a18bdf5656349363e97c1d8ee578cdb270856e79dae9e35dbdb5a57e90",
+      "resampling": "nearest",
+      "source": "direita_andando.png",
+      "source_sha256": "a2f050f7ea1f0928af8ed951068de5fd55a177e0330bf9047396c4b9300668d5",
+      "source_size": [
+        320,
+        320
+      ],
+      "symbol": "sprite_boss_right_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        32,
+        32
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        320
+      ],
+      "group": "_rato_boss_new",
       "offset": [
         0,
         0
@@ -520,13 +1450,13 @@
       ],
       "payload_sha256": "d786523201560aa2cfb416b9e6224812f34915be95d23e7cebcbcb6f0d83709d",
       "resampling": "nearest",
-      "source": "sprites/New Piskel-1.png.png",
+      "source": "esquerda.png",
       "source_sha256": "665da7d300214da91bfbe9ab9d977b0d9ef554d095d3d7a71522a795b6f2a5cd",
       "source_size": [
         320,
         320
       ],
-      "symbol": "sprite_boss_0",
+      "symbol": "sprite_boss_left_0",
       "transparent_value": 0
     },
     {
@@ -540,7 +1470,7 @@
         320,
         320
       ],
-      "group": "_sprites_1",
+      "group": "_rato_boss_new",
       "offset": [
         0,
         0
@@ -551,13 +1481,13 @@
       ],
       "payload_sha256": "d2fc0753905858e82170455d3b74ec5981294cdddbf35d40ef3b244b708a8d2b",
       "resampling": "nearest",
-      "source": "sprites/New Piskel-2.png.png",
+      "source": "esquerda_andando.png",
       "source_sha256": "9a631843743f5064790e09bd613e062b192b64b735de81e633e51ff8986a89bb",
       "source_size": [
         320,
         320
       ],
-      "symbol": "sprite_boss_1",
+      "symbol": "sprite_boss_left_1",
       "transparent_value": 0
     },
     {
@@ -735,10 +1665,10 @@
         16,
         16
       ],
-      "payload_sha256": "d31b5af147fe6b8ece329de4dfdd06ee88c5acc64495d0f110f73851b64686fc",
+      "payload_sha256": "7aef8651de4ed420b6ec7eaa99cf25d0faac281b2b56b1d1212c4f798a918ba1",
       "resampling": "nearest",
-      "source": "sprite_4.png",
-      "source_sha256": "dfb4a1ab668f18948bbb769da9a6c6faebacdcd22e2cc3b4b35415dacd8ff8fd",
+      "source": "sprite_2.png",
+      "source_sha256": "de8cda174c3a730f856bf0126e5d56a23cb66c7a72f9926bac26146383bc5adf",
       "source_size": [
         60,
         60
@@ -766,10 +1696,10 @@
         16,
         16
       ],
-      "payload_sha256": "7aef8651de4ed420b6ec7eaa99cf25d0faac281b2b56b1d1212c4f798a918ba1",
+      "payload_sha256": "d31b5af147fe6b8ece329de4dfdd06ee88c5acc64495d0f110f73851b64686fc",
       "resampling": "nearest",
-      "source": "sprite_2.png",
-      "source_sha256": "de8cda174c3a730f856bf0126e5d56a23cb66c7a72f9926bac26146383bc5adf",
+      "source": "sprite_4.png",
+      "source_sha256": "dfb4a1ab668f18948bbb769da9a6c6faebacdcd22e2cc3b4b35415dacd8ff8fd",
       "source_size": [
         60,
         60

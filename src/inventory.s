@@ -6,7 +6,7 @@
 
 init_inventory:
     la t0, weapon_type
-    li t1, WEAPON_NORMAL
+    li t1, WEAPON_PISTOL
     sw t1, 0(t0)
 
     la t0, normal_ammo_count
@@ -44,10 +44,6 @@ init_inventory:
     la t0, shotgun_reload_timer
     sw zero, 0(t0)
 
-    la t0, inventory_visible
-    li t1, 1
-    sw t1, 0(t0)
-
     ret
 
 update_inventory:
@@ -63,6 +59,9 @@ update_inventory:
     li t2, STATE_LEVEL2
     beq t1, t2, update_inventory_state_ok
 
+    li t2, STATE_LEVEL3
+    beq t1, t2, update_inventory_state_ok
+
     li t2, STATE_BOSS
     beq t1, t2, update_inventory_state_ok
 
@@ -74,7 +73,6 @@ update_inventory_state_ok:
     call handle_heal_input
     call handle_weapon_select_input
     call handle_reload_input
-    call handle_inventory_input
 
 end_update_inventory:
     lw ra, 0(sp)
@@ -114,6 +112,11 @@ check_reload_timer:
     j check_shotgun_reload_timer
 
 maybe_start_auto_reload:
+    la t0, weapon_type
+    lw t1, 0(t0)
+    li t2, WEAPON_PISTOL
+    bne t1, t2, check_shotgun_reload_timer
+
     la t0, rifle_mag_count
     lw t1, 0(t0)
     bgtz t1, check_shotgun_reload_timer
@@ -289,10 +292,6 @@ unlock_shotgun:
     li t1, SHOTGUN_UNLOCK_RESERVE
     sw t1, 0(t0)
 
-    la t0, weapon_type
-    li t1, WEAPON_SHOTGUN
-    sw t1, 0(t0)
-
 end_unlock_shotgun:
     ret
 
@@ -345,7 +344,7 @@ handle_weapon_select_input:
     lw t1, 0(t0)
 
     li t2, '1'
-    beq t1, t2, select_normal_weapon
+    beq t1, t2, select_pistol_weapon
 
     li t2, '2'
     beq t1, t2, try_select_shotgun
@@ -358,9 +357,9 @@ handle_weapon_select_input:
     beqz t1, end_handle_weapon_select_input
 
     la t0, weapon_type
-    li t1, WEAPON_BOSS
+    li t1, WEAPON_UZI
     sw t1, 0(t0)
-    j end_handle_weapon_select_input
+    j finish_weapon_selection
 
 try_select_shotgun:
     la t0, shotgun_owned
@@ -370,12 +369,22 @@ try_select_shotgun:
     la t0, weapon_type
     li t1, WEAPON_SHOTGUN
     sw t1, 0(t0)
-    j end_handle_weapon_select_input
+    j finish_weapon_selection
 
-select_normal_weapon:
+select_pistol_weapon:
     la t0, weapon_type
-    li t1, WEAPON_NORMAL
+    li t1, WEAPON_PISTOL
     sw t1, 0(t0)
+
+finish_weapon_selection:
+    la t0, shoot_request_pending
+    sw zero, 0(t0)
+    la t0, shoot_hold_timer
+    sw zero, 0(t0)
+    la t0, player_burst_remaining
+    sw zero, 0(t0)
+    la t0, player_burst_interval_timer
+    sw zero, 0(t0)
 
 end_handle_weapon_select_input:
     ret
@@ -402,6 +411,9 @@ try_manual_reload:
     lw t1, 0(t0)
     li t2, WEAPON_SHOTGUN
     beq t1, t2, try_manual_shotgun_reload
+
+    li t2, WEAPON_UZI
+    beq t1, t2, end_handle_reload_input
 
     la t0, rifle_mag_count
     lw t1, 0(t0)
@@ -436,37 +448,10 @@ end_handle_reload_input:
     addi sp, sp, 4
     ret
 
-handle_inventory_input:
-    la t0, key_pressed
-    lw t1, 0(t0)
-    beqz t1, end_handle_inventory_input
-
-    la t0, last_key
-    lw t1, 0(t0)
-
-    li t2, 'e'
-    beq t1, t2, toggle_inventory_visible
-
-    li t2, 'E'
-    bne t1, t2, end_handle_inventory_input
-
-toggle_inventory_visible:
-    la t0, inventory_visible
-    lw t1, 0(t0)
-    xori t1, t1, 1
-    sw t1, 0(t0)
-
-end_handle_inventory_input:
-    ret
-
 draw_inventory:
-    # Sprite hook: inventario visual do grupo entra aqui.
+    # Faixa permanente do HUD para arma, municao, cura e recarga.
     addi sp, sp, -8
     sw ra, 0(sp)
-
-    la t0, inventory_visible
-    lw t1, 0(t0)
-    beqz t1, end_draw_inventory
 
     call get_draw_base_address
     sw a0, 4(sp)
@@ -480,10 +465,10 @@ draw_inventory:
     li t2, WEAPON_SHOTGUN
     beq t1, t2, select_inventory_shotgun_icon
 
-    li t2, WEAPON_BOSS
-    beq t1, t2, select_inventory_boss_icon
+    li t2, WEAPON_UZI
+    beq t1, t2, select_inventory_uzi_icon
 
-select_inventory_normal_icon:
+select_inventory_pistol_icon:
     la a2, sprite_weapon_normal_icon
     j draw_inventory_weapon_icon
 
@@ -491,7 +476,7 @@ select_inventory_shotgun_icon:
     la a2, sprite_weapon_shotgun_icon
     j draw_inventory_weapon_icon
 
-select_inventory_boss_icon:
+select_inventory_uzi_icon:
     la a2, sprite_weapon_boss_icon
 
 draw_inventory_weapon_icon:
@@ -529,6 +514,9 @@ draw_inventory_text_fields:
     li t2, WEAPON_SHOTGUN
     beq t1, t2, draw_shotgun_mag_ammo
 
+    li t2, WEAPON_UZI
+    beq t1, t2, draw_uzi_mag_ammo
+
     la t0, rifle_mag_count
     j draw_mag_ammo_value
 
@@ -537,6 +525,12 @@ draw_shotgun_mag_ammo:
 
 draw_mag_ammo_value:
     lw a0, 0(t0)
+    j draw_mag_ammo_number
+
+draw_uzi_mag_ammo:
+    li a0, 0
+
+draw_mag_ammo_number:
     li a1, 82
     li a2, 216
     li a3, COLOR_WHITE
@@ -555,6 +549,9 @@ draw_mag_ammo_value:
     li t2, WEAPON_SHOTGUN
     beq t1, t2, draw_shotgun_total_ammo
 
+    li t2, WEAPON_UZI
+    beq t1, t2, draw_uzi_total_ammo
+
     la t0, rifle_mag_count
     lw t1, 0(t0)
     la t0, normal_ammo_count
@@ -568,6 +565,11 @@ draw_shotgun_total_ammo:
     la t0, shotgun_ammo_count
     lw a0, 0(t0)
     add a0, a0, t1
+    j draw_total_ammo_value
+
+draw_uzi_total_ammo:
+    la t0, boss_ammo_count
+    lw a0, 0(t0)
 
 draw_total_ammo_value:
     li a1, 102
@@ -576,7 +578,7 @@ draw_total_ammo_value:
     lw a4, 4(sp)
     call draw_small_number
 
-    la a0, label_boss
+    la a0, label_uzi
     li a1, 8
     li a2, 224
     li a3, COLOR_WHITE
@@ -618,6 +620,9 @@ draw_total_ammo_value:
     li t2, WEAPON_SHOTGUN
     beq t1, t2, draw_shotgun_reload_timer
 
+    li t2, WEAPON_UZI
+    beq t1, t2, draw_uzi_reload_timer
+
     la t0, rifle_reload_timer
     j draw_reload_timer_value
 
@@ -626,6 +631,12 @@ draw_shotgun_reload_timer:
 
 draw_reload_timer_value:
     lw a0, 0(t0)
+    j draw_reload_timer_number
+
+draw_uzi_reload_timer:
+    li a0, 0
+
+draw_reload_timer_number:
     li a1, 138
     li a2, 224
     li a3, COLOR_WHITE
