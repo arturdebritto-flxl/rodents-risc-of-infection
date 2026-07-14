@@ -86,3 +86,10 @@ AGENTS.override.md
 /assets/generated/town_bgr233_comparison.png
 /assets/generated/town_bgr233_obstacles_check.png
 /assets/generated/town_bgr233_metrics.json
+
+# WIP local phase tooling
+/tests/test_level_backgrounds_bgr233.py
+/tests/test_sewer_interactive_fixes.py
+/tests/test_sewer_lab_runtime.py
+/tools/build_level_backgrounds_bgr233.py
+/tools/convert_backgrounds.py

@@ -26,7 +26,7 @@ Depois, monte e execute o programa. O jogo inicia no menu principal.
 - `1`: selecionar a pistola com pente estendido.
 - `2`: selecionar a shotgun depois de coleta-la.
 - `3`: selecionar a UZI depois de coleta-la.
-- `C/c`: avancar para a proxima transicao durante o gameplay.
+- `C/c`: avancar para a proxima transicao durante o gameplay; em uma saida/painel liberado e proximo, confirma a interacao normal.
 
 ## Fluxo Do Jogo
 

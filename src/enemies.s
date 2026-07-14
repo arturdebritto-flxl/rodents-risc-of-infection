@@ -59,264 +59,56 @@ end_init_enemies:
 spawn_wave_if_needed:
     addi sp, sp, -4
     sw ra, 0(sp)
-
-    # So cria inimigos durante gameplay
     la t0, game_state
     lw t1, 0(t0)
-
     li t2, STATE_LEVEL1
-    beq t1, t2, spawn_wave_state_ok
-
+    beq t1, t2, level_wave_state_ok
     li t2, STATE_LEVEL2
-    beq t1, t2, spawn_wave_state_ok
-
+    beq t1, t2, level_wave_state_ok
     li t2, STATE_LEVEL3
-    beq t1, t2, spawn_wave_state_ok
-
+    beq t1, t2, level_wave_state_ok
     li t2, STATE_BOSS
-    beq t1, t2, spawn_wave_state_ok
+    bne t1, t2, end_level_spawn_wave
 
-    j end_spawn_wave_if_needed
-
-spawn_wave_state_ok:
-    la t0, current_level
+level_wave_state_ok:
+    li t2, STATE_BOSS
+    beq t1, t2, check_level_wave_plan
+    la t0, level_exit_unlocked
     lw t1, 0(t0)
-    li t2, LEVEL_TOWN
-    beq t1, t2, spawn_town_enemy_if_needed
-
-    la t0, wave_spawned
-    lw t1, 0(t0)
-    bnez t1, end_spawn_wave_if_needed
-
-    la t0, remaining_enemies
-    lw t1, 0(t0)
-    beqz t1, end_spawn_wave_if_needed
-
-    call spawn_current_enemy_wave
-    beqz a0, end_spawn_wave_if_needed
-
-    la t0, wave_spawned
-    li t1, 1
-    sw t1, 0(t0)
-    j end_spawn_wave_if_needed
-
-spawn_town_enemy_if_needed:
-    la t0, town_exit_unlocked
-    lw t1, 0(t0)
-    bnez t1, end_spawn_wave_if_needed
-
-    call get_town_wave_enemy_count
+    bnez t1, end_level_spawn_wave
+check_level_wave_plan:
+    call get_current_wave_enemy_count
     mv t2, a0
     la t0, wave_spawned
     lw t1, 0(t0)
-    bge t1, t2, end_spawn_wave_if_needed
-
-    la t0, town_spawn_timer
+    bge t1, t2, end_level_spawn_wave
+    la t0, level_spawn_timer
     lw t1, 0(t0)
-    blez t1, check_town_spawn_slot
+    blez t1, check_level_spawn_slot
     addi t1, t1, -1
     sw t1, 0(t0)
-    bgtz t1, end_spawn_wave_if_needed
-
-check_town_spawn_slot:
+    bgtz t1, end_level_spawn_wave
+check_level_spawn_slot:
     call count_active_enemies
-    li t0, TOWN_MAX_ACTIVE_ENEMIES
-    bge a0, t0, end_spawn_wave_if_needed
-
-try_spawn_one_town_enemy:
-    call spawn_one_town_enemy
-    beqz a0, end_spawn_wave_if_needed
+    li t0, LEVEL_MAX_ACTIVE_ENEMIES
+    bge a0, t0, end_level_spawn_wave
+    call spawn_one_level_enemy
+    beqz a0, end_level_spawn_wave
     la t0, wave_spawned
     lw t1, 0(t0)
     addi t1, t1, 1
     sw t1, 0(t0)
-    la t0, town_spawn_timer
-    li t1, TOWN_SPAWN_INTERVAL
+    la t0, level_spawn_timer
+    li t1, LEVEL_SPAWN_INTERVAL
     sw t1, 0(t0)
-
-end_spawn_wave_if_needed:
+end_level_spawn_wave:
     lw ra, 0(sp)
     addi sp, sp, 4
-
     ret
 
-
-# ------------------------------------------------------------
-# spawn_current_enemy_wave
-# Ativa N inimigos conforme remaining_enemies.
-# Nao passa de MAX_ENEMIES.
-# ------------------------------------------------------------
-
-spawn_current_enemy_wave:
-    addi sp, sp, -16
-    sw ra, 0(sp)
-    sw s0, 4(sp)
-    sw s1, 8(sp)
-    sw s2, 12(sp)
-
-    call init_enemies
-
-    la t0, remaining_enemies
-    lw s1, 0(t0)                    # quantidade desejada
-
-    li t2, MAX_ENEMIES
-    ble s1, t2, spawn_count_ok
-    li s1, MAX_ENEMIES
-
-spawn_count_ok:
-    li s0, 0                        # indice
-
-spawn_enemy_loop:
-    beq s0, s1, spawn_current_enemy_wave_succeeded
-
-    slli s2, s0, 2                  # offset = indice * 4
-
-    # --------------------------------------------------------
-    # Define tipo e HP conforme fase/indice.
-    # --------------------------------------------------------
-
-    la t0, current_level
-    lw t5, 0(t0)
-
-    li t6, LEVEL_TOWN
-    beq t5, t6, spawn_type_town
-
-    li t6, LEVEL_SEWER
-    beq t5, t6, spawn_type_sewer
-
-    li t6, LEVEL_LABORATORY
-    beq t5, t6, spawn_type_laboratory
-
-    j spawn_type_common
-
-spawn_type_town:
-    # Town: a cada 4 inimigos, um RAT_ECHO; resto comum
-    andi t6, s0, 3
-    beqz t6, spawn_type_echo
-    j spawn_type_common
-
-spawn_type_sewer:
-    # Sewer: mistura comum, Echo e Mutant
-    andi t6, s0, 3
-    beqz t6, spawn_type_mutant
-
-    li t5, 1
-    beq t6, t5, spawn_type_echo
-
-    j spawn_type_common
-
-spawn_type_laboratory:
-    # Laboratory: mais inimigos resistentes/sensoriais
-    andi t6, s0, 3
-
-    beqz t6, spawn_type_mutant
-
-    li t5, 1
-    beq t6, t5, spawn_type_echo
-
-    li t5, 2
-    beq t6, t5, spawn_type_spitter
-
-    j spawn_type_common
-
-spawn_type_common:
-    la t0, enemy_type
-    add t4, t0, s2
-    li t5, RAT_COMMON
-    sw t5, 0(t4)
-
-    la t0, enemy_hp
-    add t4, t0, s2
-    li t5, RAT_COMMON_HP
-    sw t5, 0(t4)
-
-    j end_spawn_type
-
-spawn_type_echo:
-    la t0, enemy_type
-    add t4, t0, s2
-    li t5, RAT_ECHO
-    sw t5, 0(t4)
-
-    la t0, enemy_hp
-    add t4, t0, s2
-    li t5, RAT_ECHO_HP
-    sw t5, 0(t4)
-
-    j end_spawn_type
-
-spawn_type_mutant:
-    la t0, enemy_type
-    add t4, t0, s2
-    li t5, RAT_MUTANT
-    sw t5, 0(t4)
-
-    la t0, enemy_hp
-    add t4, t0, s2
-    li t5, RAT_MUTANT_HP
-    sw t5, 0(t4)
-
-    j end_spawn_type
-
-spawn_type_spitter:
-    la t0, enemy_type
-    add t4, t0, s2
-    li t5, RAT_SPITTER
-    sw t5, 0(t4)
-
-    la t0, enemy_hp
-    add t4, t0, s2
-    li t5, RAT_SPITTER_HP
-    sw t5, 0(t4)
-
-    j end_spawn_type
-
-end_spawn_type:
-    la t0, enemy_attack_timer
-    add t4, t0, s2
-    sw zero, 0(t4)
-
-    call select_enemy_spawn_position
-    beqz a0, spawn_current_enemy_wave_failed
-
-    la t0, enemy_x
-    add t4, t0, s2
-    sw a1, 0(t4)
-
-    la t0, enemy_y
-    add t4, t0, s2
-    sw a2, 0(t4)
-
-    # O slot so se torna ativo depois de uma posicao valida ser gravada.
-    la t0, enemy_active
-    add t4, t0, s2
-    li t5, 1
-    sw t5, 0(t4)
-
-    addi s0, s0, 1
-    j spawn_enemy_loop
-
-spawn_current_enemy_wave_succeeded:
-    li a0, 1
-    j finish_spawn_current_enemy_wave
-
-spawn_current_enemy_wave_failed:
-    # Descarta qualquer criacao parcial; a wave sera tentada novamente.
-    call init_enemies
-    li a0, 0
-
-finish_spawn_current_enemy_wave:
-    lw s2, 12(sp)
-    lw s1, 8(sp)
-    lw s0, 4(sp)
-    lw ra, 0(sp)
-    addi sp, sp, 16
-
-    ret
-
-# Cria exatamente um inimigo do Town no primeiro slot livre. O indice
-# wave_spawned preserva a ordem e os tipos da wave original.
-spawn_one_town_enemy:
+# Cria exatamente um inimigo da fase no primeiro slot livre. O indice
+# wave_spawned seleciona o tipo e a tabela de spawn da fase atual.
+spawn_one_level_enemy:
     addi sp, sp, -16
     sw ra, 0(sp)
     sw s0, 4(sp)
@@ -338,15 +130,51 @@ find_town_enemy_free_slot:
 configure_one_town_enemy:
     la t0, wave_spawned
     lw s2, 0(t0)
+    la t0, current_level
+    lw t0, 0(t0)
+    li t1, LEVEL_TOWN
+    beq t0, t1, configure_one_town_type
+    li t1, LEVEL_SEWER
+    beq t0, t1, configure_one_sewer_type
+
+configure_one_lab_type:
     andi t1, s2, 3
-    beqz t1, configure_one_town_echo
+    beqz t1, configure_one_mutant
+    li t2, 1
+    beq t1, t2, configure_one_echo
+    li t2, 2
+    beq t1, t2, configure_one_spitter
+    j configure_one_common
+
+configure_one_sewer_type:
+    andi t1, s2, 3
+    beqz t1, configure_one_mutant
+    li t2, 1
+    beq t1, t2, configure_one_echo
+    j configure_one_common
+
+configure_one_town_type:
+    andi t1, s2, 3
+    beqz t1, configure_one_echo
+
+configure_one_common:
     li t1, RAT_COMMON
     li t2, RAT_COMMON_HP
     j store_one_town_enemy_type
 
-configure_one_town_echo:
+configure_one_echo:
     li t1, RAT_ECHO
     li t2, RAT_ECHO_HP
+    j store_one_town_enemy_type
+
+configure_one_mutant:
+    li t1, RAT_MUTANT
+    li t2, RAT_MUTANT_HP
+    j store_one_town_enemy_type
+
+configure_one_spitter:
+    li t1, RAT_SPITTER
+    li t2, RAT_SPITTER_HP
 
 store_one_town_enemy_type:
     la t0, enemy_type
@@ -656,16 +484,16 @@ select_enemy_spawn_position:
     beq t1, t2, select_sewer_spawn_table
     li t2, LEVEL_LABORATORY
     bne t1, t2, select_enemy_spawn_failed
-    la s0, laboratory_enemy_spawn_points
-    li s1, ENEMY_SPAWN_POINT_COUNT
+    la s0, lab_spawn_points
+    li s1, LAB_SPAWN_POINT_COUNT
     j enemy_spawn_table_ready
 select_town_spawn_table:
     la s0, town_enemy_spawn_points
     li s1, TOWN_SPAWN_POINT_COUNT
     j enemy_spawn_table_ready
 select_sewer_spawn_table:
-    la s0, sewer_enemy_spawn_points
-    li s1, ENEMY_SPAWN_POINT_COUNT
+    la s0, sewer_spawn_points
+    li s1, SEWER_SPAWN_POINT_COUNT
 
 enemy_spawn_table_ready:
     li s2, 0
@@ -1104,62 +932,9 @@ end_try_move_enemy_y:
     ret
 
 move_rat_towards_player:
-    la t0, current_level
-    lw t5, 0(t0)
-    li t6, LEVEL_TOWN
-    bne t5, t6, move_rat_legacy_towards_player
     j move_rat_with_local_avoidance
 
-move_rat_legacy_towards_player:
-    # mover x em direcao ao player_x
-    la t0, enemy_x
-    add t4, t0, t3
-    lw t5, 0(t4)
-
-    la t0, player_x
-    lw t6, 0(t0)
-
-    blt t5, t6, rat_move_right
-    bgt t5, t6, rat_move_left
-    j rat_update_y
-
-rat_move_right:
-    add t5, t5, a5
-    li a4, DIR_RIGHT
-    jal ra, try_move_enemy_x
-    j rat_update_y
-
-rat_move_left:
-    sub t5, t5, a5
-    li a4, DIR_LEFT
-    jal ra, try_move_enemy_x
-
-rat_update_y:
-    la t0, enemy_y
-    add t4, t0, t3
-    lw t5, 0(t4)
-
-    la t0, player_y
-    lw t6, 0(t0)
-
-    blt t5, t6, rat_move_down
-    bgt t5, t6, rat_move_up
-    j next_update_enemy
-
-rat_move_down:
-    add t5, t5, a5
-    li a4, DIR_DOWN
-    jal ra, try_move_enemy_y
-    j next_update_enemy
-
-rat_move_up:
-    sub t5, t5, a5
-    li a4, DIR_UP
-    jal ra, try_move_enemy_y
-
-    j next_update_enemy
-
-# Desvio local do Town. Tenta o eixo dominante; quando bloqueado,
+# Desvio local compartilhado. Tenta o eixo dominante; quando bloqueado,
 # persiste no lado escolhido por 12 frames e retoma a perseguicao
 # assim que o movimento direto volta a ficar livre.
 move_rat_with_local_avoidance:

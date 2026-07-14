@@ -69,6 +69,8 @@ label_victory:  .asciz "VICTORY"
 .include "../assets/generated/text_cutscene_3.data"
 .include "../assets/generated/screen_art.s"
 .include "../assets/generated/town_bgr233.s"
+.include "../assets/generated/sewer_bgr233.s"
+.include "../assets/generated/lab_bgr233.s"
 .include "../assets/generated/menus/menu_game.data"
 .include "../assets/generated/menus/gameover.data"
 .include "../assets/generated/menus/victory.data"
@@ -1577,10 +1579,12 @@ begin_frame:
     la t0, game_state
     lw t1, 0(t0)
     li t2, STATE_LEVEL1
-    bne t1, t2, clear_draw_frame
-    la t0, current_level
-    lw t1, 0(t0)
-    li t2, LEVEL_TOWN
+    beq t1, t2, end_begin_frame
+    li t2, STATE_LEVEL2
+    beq t1, t2, end_begin_frame
+    li t2, STATE_LEVEL3
+    beq t1, t2, end_begin_frame
+    li t2, STATE_BOSS
     beq t1, t2, end_begin_frame
 
 clear_draw_frame:
@@ -1740,7 +1744,7 @@ store_animation_tick:
     ret
 
 draw_background:
-    addi sp, sp, -8
+    addi sp, sp, -16
     sw ra, 0(sp)
 
     call get_draw_base_address
@@ -1750,57 +1754,58 @@ draw_background:
     lw t1, 0(t0)
     li t2, LEVEL_TOWN
     beq t1, t2, draw_town_background
-
-    li a0, 0
-    li a1, 18
-    li a2, SCREEN_WIDTH
-    li a3, 2
-    li a4, COLOR_SCENE_BORDER
-    lw a5, 4(sp)
-    call draw_rect
-
-    li a0, 0
-    li a1, 214
-    li a2, SCREEN_WIDTH
-    li a3, 2
-    li a4, COLOR_SCENE_BORDER
-    lw a5, 4(sp)
-    call draw_rect
-
     li t2, LEVEL_SEWER
     beq t1, t2, draw_sewer_background
-
     li t2, LEVEL_LABORATORY
     beq t1, t2, draw_laboratory_background
-
     j end_draw_background
 
 draw_town_background:
+    la t0, town_bgr233_exit_overlay_pixels
+    sw t0, 8(sp)
     la t0, town_bgr233_base_pixels
+    li t2, 66
+    sw t2, 12(sp)
+    j copy_level_background
 
-copy_town_background:
+draw_sewer_background:
+    la t0, sewer_bgr233_interaction_overlay_pixels
+    sw t0, 8(sp)
+    la t0, sewer_bgr233_base_pixels
+    li t2, 42
+    sw t2, 12(sp)
+    j copy_level_background
+
+draw_laboratory_background:
+    la t0, lab_bgr233_interaction_overlay_pixels
+    sw t0, 8(sp)
+    la t0, lab_bgr233_base_pixels
+    li t2, 114
+    sw t2, 12(sp)
+
+copy_level_background:
     lw t1, 4(sp)
     li t2, 19200
 
-copy_town_background_word:
+copy_level_background_word:
     lw t3, 0(t0)
     sw t3, 0(t1)
     addi t0, t0, 4
     addi t1, t1, 4
     addi t2, t2, -1
-    bnez t2, copy_town_background_word
+    bnez t2, copy_level_background_word
 
-    la t0, town_exit_unlocked
+    la t0, level_exit_unlocked
     lw t0, 0(t0)
     beqz t0, end_draw_background
-    la t0, town_exit_blink_frame
+    la t0, level_exit_blink_frame
     lw t0, 0(t0)
     beqz t0, end_draw_background
 
-    la t0, town_bgr233_exit_overlay_pixels
+    lw t0, 8(sp)
     lw t1, 4(sp)
-    li t2, 66
-draw_town_exit_overlay_loop:
+    lw t2, 12(sp)
+draw_level_exit_overlay_loop:
     lw t3, 0(t0)
     andi t4, t3, 255
     srli t3, t3, 8
@@ -1808,55 +1813,11 @@ draw_town_exit_overlay_loop:
     sb t4, 0(t5)
     addi t0, t0, 4
     addi t2, t2, -1
-    bnez t2, draw_town_exit_overlay_loop
-    j end_draw_background
-
-draw_sewer_background:
-    li a0, 96
-    li a1, 44
-    li a2, 12
-    li a3, 76
-    li a4, COLOR_SEWER_DETAIL
-    lw a5, 4(sp)
-    call draw_rect
-
-    li a0, 212
-    li a1, 118
-    li a2, 12
-    li a3, 76
-    li a4, COLOR_SEWER_DETAIL
-    lw a5, 4(sp)
-    call draw_rect
-    j end_draw_background
-
-draw_laboratory_background:
-    li a0, 144
-    li a1, 88
-    li a2, 40
-    li a3, 36
-    li a4, COLOR_LAB_PANEL
-    lw a5, 4(sp)
-    call draw_rect
-
-    li a0, 40
-    li a1, 58
-    li a2, 72
-    li a3, 10
-    li a4, COLOR_LAB_DETAIL
-    lw a5, 4(sp)
-    call draw_rect
-
-    li a0, 208
-    li a1, 172
-    li a2, 72
-    li a3, 10
-    li a4, COLOR_LAB_DETAIL
-    lw a5, 4(sp)
-    call draw_rect
+    bnez t2, draw_level_exit_overlay_loop
 
 end_draw_background:
     lw ra, 0(sp)
-    addi sp, sp, 8
+    addi sp, sp, 16
     ret
 
 draw_rect:

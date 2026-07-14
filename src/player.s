@@ -260,29 +260,25 @@ end_update_player_facing_direction:
     ret
 
 is_player_position_blocked:
+    addi sp, sp, -12
+    sw ra, 0(sp)
+    sw a0, 4(sp)
+    sw a1, 8(sp)
     li a4, PLAYER_SIZE
-    j is_position_blocked
+    call is_position_blocked
+    bnez a0, finish_is_player_position_blocked
+    lw a0, 4(sp)
+    lw a1, 8(sp)
+    call is_sewer_water_position_blocked
+finish_is_player_position_blocked:
+    lw ra, 0(sp)
+    addi sp, sp, 12
+    ret
 
 is_enemy_position_blocked:
     li a4, ENEMY_SIZE
 
 is_position_blocked:
-    la t0, current_level
-    lw t1, 0(t0)
-
-    li t2, LEVEL_TOWN
-    beq t1, t2, check_town_player_obstacles
-
-    li t2, LEVEL_SEWER
-    beq t1, t2, check_sewer_player_obstacles
-
-    li t2, LEVEL_LABORATORY
-    beq t1, t2, check_laboratory_player_obstacles
-
-    mv a0, zero
-    ret
-
-check_town_player_obstacles:
     addi sp, sp, -16
     sw ra, 0(sp)
     sw a0, 4(sp)
@@ -290,42 +286,114 @@ check_town_player_obstacles:
     sw a4, 12(sp)
     add a2, a0, a4
     add a3, a1, a4
-    call is_town_external_rect_blocked
-    bnez a0, check_town_obstacle_blocked
+    call is_current_level_external_rect_blocked
+    bnez a0, current_level_position_blocked
+    call select_current_solid_collision_table
+    mv t6, a0
+    mv t4, a1
     lw a0, 4(sp)
     lw a1, 8(sp)
     lw a4, 12(sp)
-    la t6, town_collision_aabbs
-    li t4, TOWN_COLLISION_AABB_COUNT
-
-check_town_obstacle_loop:
-    beqz t4, check_town_obstacles_done
+current_level_obstacle_loop:
+    beqz t4, current_level_position_clear
     lw t0, 0(t6)
     lw t1, 4(t6)
     lw t2, 8(t6)
     lw t3, 12(t6)
-
     add t5, a0, a4
-    ble t5, t0, next_town_obstacle
-    bge a0, t2, next_town_obstacle
+    ble t5, t0, current_level_next_obstacle
+    bge a0, t2, current_level_next_obstacle
     add t5, a1, a4
-    ble t5, t1, next_town_obstacle
-    bge a1, t3, next_town_obstacle
-
-check_town_obstacle_blocked:
+    ble t5, t1, current_level_next_obstacle
+    bge a1, t3, current_level_next_obstacle
+current_level_position_blocked:
     li a0, 1
-    j finish_check_town_obstacles
-
-next_town_obstacle:
+    j finish_current_level_position_test
+current_level_next_obstacle:
     addi t6, t6, 16
     addi t4, t4, -1
-    j check_town_obstacle_loop
-
-check_town_obstacles_done:
+    j current_level_obstacle_loop
+current_level_position_clear:
     mv a0, zero
-finish_check_town_obstacles:
+finish_current_level_position_test:
     lw ra, 0(sp)
     addi sp, sp, 16
+    ret
+select_current_solid_collision_table:
+    la t0, current_level
+    lw t1, 0(t0)
+    li t2, LEVEL_TOWN
+    beq t1, t2, select_town_collision_table
+    li t2, LEVEL_SEWER
+    beq t1, t2, select_sewer_collision_table
+    li t2, LEVEL_LABORATORY
+    beq t1, t2, select_lab_collision_table
+    mv a0, zero
+    mv a1, zero
+    ret
+select_town_collision_table:
+    la a0, town_collision_aabbs
+    li a1, TOWN_COLLISION_AABB_COUNT
+    ret
+select_sewer_collision_table:
+    la a0, sewer_solid_aabbs
+    li a1, SEWER_SOLID_AABB_COUNT
+    ret
+select_lab_collision_table:
+    la a0, lab_collision_aabbs
+    li a1, LAB_COLLISION_AABB_COUNT
+    ret
+
+# WATER e uma categoria exclusiva do jogador no Sewer. Ratos e projeteis
+# usam somente a tabela SOLID e, portanto, atravessam estas regioes.
+is_sewer_water_position_blocked:
+    la t0, current_level
+    lw t1, 0(t0)
+    li t2, LEVEL_SEWER
+    bne t1, t2, sewer_water_position_clear
+    li a4, PLAYER_SIZE
+    la t6, sewer_water_aabbs
+    li t4, SEWER_WATER_AABB_COUNT
+sewer_water_obstacle_loop:
+    beqz t4, sewer_water_position_clear
+    lw t0, 0(t6)
+    lw t1, 4(t6)
+    lw t2, 8(t6)
+    lw t3, 12(t6)
+    add t5, a0, a4
+    ble t5, t0, sewer_water_next_obstacle
+    bge a0, t2, sewer_water_next_obstacle
+    add t5, a1, a4
+    ble t5, t1, sewer_water_next_obstacle
+    bge a1, t3, sewer_water_next_obstacle
+    li a0, 1
+    ret
+sewer_water_next_obstacle:
+    addi t6, t6, 16
+    addi t4, t4, -1
+    j sewer_water_obstacle_loop
+sewer_water_position_clear:
+    mv a0, zero
+    ret
+
+# Entrada: a0=x0,a1=y0,a2=x1,a3=y1. Town preserva os limites irregulares;
+# Sewer e Lab usam a area jogavel comum sem ler pixels do background.
+is_current_level_external_rect_blocked:
+    la t0, current_level
+    lw t1, 0(t0)
+    li t2, LEVEL_TOWN
+    beq t1, t2, is_town_external_rect_blocked
+    bltz a0, current_level_external_blocked
+    li t0, PLAYER_MIN_Y
+    blt a1, t0, current_level_external_blocked
+    li t0, SCREEN_WIDTH
+    bgt a2, t0, current_level_external_blocked
+    li t0, SCREEN_HEIGHT
+    bgt a3, t0, current_level_external_blocked
+    mv a0, zero
+    ret
+current_level_external_blocked:
+    li a0, 1
     ret
 
 # Limites externos do Town, fora da tabela interna. Os segmentos em
@@ -430,11 +498,11 @@ town_external_rect_blocked:
     li a0, 1
     ret
 
-# Movimento swept compartilhado por todos os projeteis do Town.
+# Movimento swept compartilhado por todos os projeteis e fases.
 # Entrada: a0=x, a1=y, a2=dx, a3=dy, a4=tamanho.
 # Retorno: a0=1 se todo o segmento estiver livre; a0=0 no impacto.
-move_town_projectile_swept:
-    addi sp, sp, -56
+move_level_projectile_swept:
+    addi sp, sp, -64
     sw ra, 0(sp)
     sw s0, 4(sp)
     sw s1, 8(sp)
@@ -475,14 +543,18 @@ town_swept_y_ordered:
     mv a1, s9
     mv a2, s8
     mv a3, s10
-    call is_town_external_rect_blocked
+    call is_current_level_external_rect_blocked
     sw a0, 52(sp)
 
+    call select_current_solid_collision_table
+    sw a0, 56(sp)
+    sw a1, 60(sp)
+
     li s11, 0
-    la t6, town_collision_aabbs
+    lw t6, 56(sp)
     li t5, 0
 town_projectile_broad_phase_loop:
-    li t4, TOWN_COLLISION_AABB_COUNT
+    lw t4, 60(sp)
     bge t5, t4, town_projectile_broad_phase_done
     lw a0, 0(t6)
     lw a1, 4(t6)
@@ -531,13 +603,13 @@ town_projectile_substep_loop:
     mv a1, s10
     add a2, s9, s4
     add a3, s10, s4
-    call is_town_external_rect_blocked
+    call is_current_level_external_rect_blocked
     bnez a0, town_projectile_path_blocked
 
-    la t6, town_collision_aabbs
+    lw t6, 56(sp)
     li t5, 0
 town_projectile_candidate_substep_loop:
-    li t4, TOWN_COLLISION_AABB_COUNT
+    lw t4, 60(sp)
     bge t5, t4, town_projectile_next_substep
     li t4, 1
     sll t4, t4, t5
@@ -565,10 +637,10 @@ town_projectile_next_substep:
 
 town_projectile_path_clear:
     li a0, 1
-    j finish_move_town_projectile_swept
+    j finish_move_level_projectile_swept
 town_projectile_path_blocked:
     mv a0, zero
-finish_move_town_projectile_swept:
+finish_move_level_projectile_swept:
     lw s11, 48(sp)
     lw s10, 44(sp)
     lw s9, 40(sp)
@@ -582,89 +654,5 @@ finish_move_town_projectile_swept:
     lw s1, 8(sp)
     lw s0, 4(sp)
     lw ra, 0(sp)
-    addi sp, sp, 56
+    addi sp, sp, 64
     ret
-
-check_sewer_player_obstacles:
-    li t0, 96
-    li t1, 44
-    li t2, 12
-    li t3, 76
-    jal zero, check_obstacle_rect
-
-check_sewer_obstacle_2:
-    li t0, 212
-    li t1, 118
-    li t2, 12
-    li t3, 76
-    jal zero, check_obstacle_rect
-
-check_sewer_obstacles_done:
-    mv a0, zero
-    ret
-
-check_laboratory_player_obstacles:
-    li t0, 144
-    li t1, 88
-    li t2, 40
-    li t3, 36
-    jal zero, check_obstacle_rect
-
-check_laboratory_obstacle_2:
-    li t0, 40
-    li t1, 58
-    li t2, 72
-    li t3, 10
-    jal zero, check_obstacle_rect
-
-check_laboratory_obstacle_3:
-    li t0, 208
-    li t1, 172
-    li t2, 72
-    li t3, 10
-    jal zero, check_obstacle_rect
-
-check_laboratory_obstacles_done:
-    mv a0, zero
-    ret
-
-check_obstacle_rect:
-    add t5, a0, a4
-    ble t5, t0, next_obstacle_rect
-
-    add t5, t0, t2
-    bge a0, t5, next_obstacle_rect
-
-    add t5, a1, a4
-    ble t5, t1, next_obstacle_rect
-
-    add t5, t1, t3
-    bge a1, t5, next_obstacle_rect
-
-    li a0, 1
-    ret
-
-next_obstacle_rect:
-    la t4, current_level
-    lw t5, 0(t4)
-
-    li t4, LEVEL_SEWER
-    beq t5, t4, route_next_sewer_obstacle
-
-    li t4, LEVEL_LABORATORY
-    beq t5, t4, route_next_laboratory_obstacle
-
-    mv a0, zero
-    ret
-
-route_next_sewer_obstacle:
-    li t4, 96
-    beq t0, t4, check_sewer_obstacle_2
-    j check_sewer_obstacles_done
-
-route_next_laboratory_obstacle:
-    li t4, 144
-    beq t0, t4, check_laboratory_obstacle_2
-    li t4, 40
-    beq t0, t4, check_laboratory_obstacle_3
-    j check_laboratory_obstacles_done

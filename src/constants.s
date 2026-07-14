@@ -126,6 +126,12 @@
 .eqv TOWN_EXIT_CENTER_Y         31
 .eqv TOWN_EXIT_RADIUS_SQUARED   144
 
+# Scheduler compartilhado por todas as fases jogaveis.
+.eqv LEVEL_FIRST_SPAWN_DELAY     TOWN_FIRST_SPAWN_DELAY
+.eqv LEVEL_SPAWN_INTERVAL        TOWN_SPAWN_INTERVAL
+.eqv LEVEL_MAX_ACTIVE_ENEMIES    TOWN_MAX_ACTIVE_ENEMIES
+.eqv LEVEL_EXIT_BLINK_FRAMES     TOWN_EXIT_BLINK_FRAMES
+
 # ------------------------------------------------------------
 # Configuracao das waves da fase 2: Sewer
 # ------------------------------------------------------------
@@ -136,6 +142,16 @@
 .eqv SEWER_WAVE3_ENEMIES        7
 .eqv SEWER_WAVE4_ENEMIES        8
 .eqv SEWER_WAVE5_ENEMIES        9
+.eqv SEWER_SOLID_AABB_COUNT      0
+.eqv SEWER_WATER_AABB_COUNT      14
+.eqv SEWER_SPAWN_POINT_COUNT     4
+.eqv SEWER_EXIT_CENTER_X         37
+.eqv SEWER_EXIT_CENTER_Y         32
+.eqv SEWER_EXIT_RADIUS_SQUARED   225
+.eqv SEWER_EXIT_APPROACH_MIN_X     33
+.eqv SEWER_EXIT_APPROACH_MAX_X     41
+.eqv SEWER_EXIT_APPROACH_MIN_Y     58
+.eqv SEWER_EXIT_APPROACH_MAX_Y     64
 
 # Ciclo de drops preservado do baseline: 7 resultados em 15 mortes.
 .eqv DROP_CYCLE_LENGTH           15
@@ -160,6 +176,11 @@
 .eqv LABORATORY_WAVE1_ENEMIES   13
 .eqv LABORATORY_WAVE2_ENEMIES   14
 .eqv LABORATORY_WAVE3_ENEMIES   15
+.eqv LAB_COLLISION_AABB_COUNT    11
+.eqv LAB_SPAWN_POINT_COUNT       3
+.eqv LAB_EXIT_CENTER_X           304
+.eqv LAB_EXIT_CENTER_Y           34
+.eqv LAB_EXIT_RADIUS_SQUARED     576
 
 # ------------------------------------------------------------
 # Configuracao da batalha final
@@ -239,7 +260,7 @@
 .eqv ENEMY_SIZE                 16
 .eqv ENEMY_SPAWN_POINT_COUNT    20
 .eqv SPAWN_MIN_PLAYER_DISTANCE  96
-.eqv ENEMY_SPAWN_MAX_Y          198
+.eqv ENEMY_SPAWN_MAX_Y          200
 .eqv ENEMY_AVOID_COMMIT_FRAMES  12
 
 # ------------------------------------------------------------

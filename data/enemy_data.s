@@ -20,14 +20,16 @@ town_enemy_spawn_points:
     .word 236,25, 97,106, 37,192, 240,167
 town_enemy_spawn_points_end:
 
+# Pontas das quatro setas do Sewer, ajustadas para o footprint 16x16 ficar
+# totalmente dentro da area jogavel.
+sewer_spawn_points:
 sewer_enemy_spawn_points:
-    .word 8,24, 40,24, 128,24, 160,24, 192,24
-    .word 240,24, 272,24, 304,24, 8,72, 40,72
-    .word 64,72, 128,72, 160,72, 192,72, 240,72
-    .word 272,72, 304,72, 8,136, 40,136, 64,136
+    .word 230,20, 288,86, 10,198, 281,200
+sewer_spawn_points_end:
 
+# Setas rosas visiveis no Lab: entrada superior esquerda, lateral direita
+# e entrada junto ao sangue na lateral da estrutura grande.
+lab_spawn_points:
 laboratory_enemy_spawn_points:
-    .word 8,24, 48,24, 88,24, 128,24, 168,24
-    .word 208,24, 248,24, 288,24, 8,76, 48,76
-    .word 88,76, 128,76, 192,76, 232,76, 272,76
-    .word 304,76, 8,132, 48,132, 88,132, 128,132
+    .word 10,20, 288,96, 176,178
+lab_spawn_points_end:

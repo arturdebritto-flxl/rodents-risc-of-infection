@@ -113,7 +113,7 @@ loop_playing_level:
     call check_player_powerup_collisions
 
     call advance_wave
-    call update_town_exit
+    call update_level_exit
     call update_animation_frame
 
     call begin_frame
@@ -181,7 +181,7 @@ loop_game_over:
     lw a0, 0(t0)
     call game_over_screen
     beqz a0, leave_game_loop
-    call start_new_game_from_menu
+    call retry_gameplay_state
     j loop_frame
 
 loop_victory:

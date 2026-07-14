@@ -613,47 +613,14 @@ move_bullets_loop:
     lw t5, 0(t4)
     beqz t5, next_bullet
 
-    la t0, current_level
-    lw t5, 0(t0)
-    li t6, LEVEL_TOWN
-    bne t5, t6, move_bullet_without_town_obstacles
-
     addi sp, sp, -4
     sw t1, 0(sp)
     mv a0, t1
-    call move_town_bullet_with_substeps
+    call move_level_bullet_with_substeps
     lw t1, 0(sp)
     addi sp, sp, 4
     slli t3, t1, 2
     beqz a0, deactivate_current_bullet
-    j next_bullet
-
-move_bullet_without_town_obstacles:
-    slli t3, t1, 2
-
-    la t0, bullet_x
-    add t4, t0, t3
-    lw t5, 0(t4)
-    la t0, bullet_dx
-    add t6, t0, t3
-    lw t6, 0(t6)
-    add t5, t5, t6
-    blt t5, zero, deactivate_current_bullet
-    li t6, SCREEN_WIDTH
-    bge t5, t6, deactivate_current_bullet
-    sw t5, 0(t4)
-
-    la t0, bullet_y
-    add t4, t0, t3
-    lw t5, 0(t4)
-    la t0, bullet_dy
-    add t6, t0, t3
-    lw t6, 0(t6)
-    add t5, t5, t6
-    blt t5, zero, deactivate_current_bullet
-    li t6, SCREEN_HEIGHT
-    bge t5, t6, deactivate_current_bullet
-    sw t5, 0(t4)
     j next_bullet
 
 deactivate_current_bullet:
@@ -672,7 +639,7 @@ end_move_bullets:
 
 # Broad phase swept compartilhada; subpassos de 1 pixel so rodam
 # quando o segmento possui candidatos internos ou externos.
-move_town_bullet_with_substeps:
+move_level_bullet_with_substeps:
     addi sp, sp, -24
     sw ra, 0(sp)
     sw s0, 4(sp)
@@ -700,7 +667,7 @@ move_town_bullet_with_substeps:
     mv a2, s3
     mv a3, s4
     li a4, BULLET_SIZE
-    call move_town_projectile_swept
+    call move_level_projectile_swept
     beqz a0, finish_move_town_bullet_with_substeps
 
     add t1, s1, s3

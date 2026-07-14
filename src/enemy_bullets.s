@@ -152,48 +152,14 @@ update_enemy_bullets_loop:
     sw t5, 0(t4)
     blez t5, deactivate_enemy_bullet
 
-    la t0, current_level
-    lw t5, 0(t0)
-    li t6, LEVEL_TOWN
-    bne t5, t6, move_enemy_bullet_without_town_obstacles
-
     addi sp, sp, -4
     sw t1, 0(sp)
     mv a0, t1
-    call move_town_enemy_bullet_with_substeps
+    call move_level_enemy_bullet_with_substeps
     lw t1, 0(sp)
     addi sp, sp, 4
     slli t3, t1, 2
     beqz a0, deactivate_enemy_bullet
-    j next_enemy_bullet_update
-
-move_enemy_bullet_without_town_obstacles:
-    slli t3, t1, 2
-
-    la t0, enemy_bullet_x
-    add t4, t0, t3
-    lw t5, 0(t4)
-    la t0, enemy_bullet_dx
-    add t6, t0, t3
-    lw t6, 0(t6)
-    add t5, t5, t6
-    blt t5, zero, deactivate_enemy_bullet
-    li t6, 319
-    bgt t5, t6, deactivate_enemy_bullet
-    sw t5, 0(t4)
-
-    la t0, enemy_bullet_y
-    add t4, t0, t3
-    lw t5, 0(t4)
-    la t0, enemy_bullet_dy
-    add t6, t0, t3
-    lw t6, 0(t6)
-    add t5, t5, t6
-    blt t5, zero, deactivate_enemy_bullet
-    li t6, 239
-    bgt t5, t6, deactivate_enemy_bullet
-    sw t5, 0(t4)
-
     j next_enemy_bullet_update
 
 deactivate_enemy_bullet:
@@ -211,7 +177,7 @@ end_update_enemy_bullets:
     ret
 
 # Usa a mesma broad phase swept e candidatos internos dos tiros do jogador.
-move_town_enemy_bullet_with_substeps:
+move_level_enemy_bullet_with_substeps:
     addi sp, sp, -28
     sw ra, 0(sp)
     sw s0, 4(sp)
@@ -243,7 +209,7 @@ move_town_enemy_bullet_with_substeps:
     mv a2, s3
     mv a3, s4
     mv a4, s5
-    call move_town_projectile_swept
+    call move_level_projectile_swept
     beqz a0, finish_move_town_enemy_bullet_with_substeps
 
     add t1, s1, s3

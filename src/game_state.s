@@ -58,6 +58,10 @@ init_game:
     la t0, town_exit_transitioned
     sw zero, 0(t0)
 
+    la t0, game_over_retry_state
+    li t1, STATE_LEVEL1
+    sw t1, 0(t0)
+
     la t0, debug_mode
     li t1, 1
     sw t1, 0(t0)
@@ -176,6 +180,7 @@ set_state_level2:
     li t1, PLAYER_START_Y
     sw t1, 0(t0)
 
+    call reset_transient_level_state
     call init_level2
     call clear_input_buffers
 
@@ -214,6 +219,7 @@ set_state_level3:
     li t1, PLAYER_LAB_START_Y
     sw t1, 0(t0)
 
+    call reset_transient_level_state
     call init_level3
     call clear_input_buffers
 
@@ -322,6 +328,12 @@ set_state_game_over:
     sw ra, 0(sp)
 
     la t0, game_state
+    lw t1, 0(t0)
+    li t3, STATE_GAME_OVER
+    beq t1, t3, keep_game_over_retry_state
+    la t2, game_over_retry_state
+    sw t1, 0(t2)
+keep_game_over_retry_state:
     li t1, STATE_GAME_OVER
     sw t1, 0(t0)
 
@@ -373,4 +385,42 @@ set_state_menu:
 
     lw ra, 0(sp)
     addi sp, sp, 4
+    ret
+
+# Retry retorna ao estado jogavel registrado antes do GAME OVER e reinicializa
+# entidades, wave, timers, background, colisao e interacao da fase correta.
+retry_gameplay_state:
+    addi sp, sp, -8
+    sw ra, 0(sp)
+    sw s0, 4(sp)
+    la t0, game_over_retry_state
+    lw s0, 0(t0)
+    call reset_game_run
+    li t0, STATE_LEVEL1
+    beq s0, t0, retry_level1
+    li t0, STATE_LEVEL2
+    beq s0, t0, retry_level2
+    li t0, STATE_LEVEL3
+    beq s0, t0, retry_level3
+    li t0, STATE_BOSS
+    beq s0, t0, retry_boss
+    call set_state_cutscene_intro
+    j finish_retry_gameplay_state
+retry_level1:
+    call set_state_level1
+    j finish_retry_gameplay_state
+retry_level2:
+    call set_state_level2
+    j finish_retry_gameplay_state
+retry_level3:
+    call set_state_level3
+    j finish_retry_gameplay_state
+retry_boss:
+    call set_state_level3
+    call reset_transient_level_state
+    call start_boss_fight
+finish_retry_gameplay_state:
+    lw s0, 4(sp)
+    lw ra, 0(sp)
+    addi sp, sp, 8
     ret

@@ -44,20 +44,40 @@ init_level1:
 
     ret
 
-get_town_wave_enemy_count:
-    la t0, current_wave
+# Retorna a quantidade planejada da wave corrente para a fase ativa.
+get_current_wave_enemy_count:
+    la t0, game_state
     lw t1, 0(t0)
-    li a0, TOWN_WAVE1_ENEMIES
-    li t2, 1
-    beq t1, t2, finish_get_town_wave_enemy_count
-    li a0, TOWN_WAVE2_ENEMIES
-    li t2, 2
-    beq t1, t2, finish_get_town_wave_enemy_count
-    li a0, TOWN_WAVE3_ENEMIES
-    li t2, 3
-    beq t1, t2, finish_get_town_wave_enemy_count
-    li a0, TOWN_WAVE4_ENEMIES
-finish_get_town_wave_enemy_count:
+    li t2, STATE_BOSS
+    beq t1, t2, get_boss_support_enemy_count
+    la t0, current_level
+    lw t1, 0(t0)
+    li t2, LEVEL_TOWN
+    beq t1, t2, select_town_wave_table
+    li t2, LEVEL_SEWER
+    beq t1, t2, select_sewer_wave_table
+    li t2, LEVEL_LABORATORY
+    beq t1, t2, select_lab_wave_table
+    mv a0, zero
+    ret
+select_town_wave_table:
+    la t0, town_wave_enemy_counts
+    j load_current_wave_enemy_count
+select_sewer_wave_table:
+    la t0, sewer_wave_enemy_counts
+    j load_current_wave_enemy_count
+select_lab_wave_table:
+    la t0, lab_wave_enemy_counts
+load_current_wave_enemy_count:
+    la t1, current_wave
+    lw t1, 0(t1)
+    addi t1, t1, -1
+    slli t1, t1, 2
+    add t0, t0, t1
+    lw a0, 0(t0)
+    ret
+get_boss_support_enemy_count:
+    li a0, BOSS_SUPPORT_ENEMIES
     ret
 
 # ------------------------------------------------------------
@@ -83,6 +103,20 @@ init_level2:
     sw t1, 0(t0)
 
     la t0, wave_spawned
+    sw zero, 0(t0)
+
+    la t0, level_spawn_timer
+    li t1, LEVEL_FIRST_SPAWN_DELAY
+    sw t1, 0(t0)
+    la t0, level_exit_unlocked
+    sw zero, 0(t0)
+    la t0, level_exit_blink_timer
+    sw zero, 0(t0)
+    la t0, level_exit_blink_frame
+    sw zero, 0(t0)
+    la t0, level_exit_transitioned
+    sw zero, 0(t0)
+    la t0, boss_active
     sw zero, 0(t0)
 
     ret
@@ -113,6 +147,18 @@ init_level3:
     la t0, wave_spawned
     sw zero, 0(t0)
 
+    la t0, level_spawn_timer
+    li t1, LEVEL_FIRST_SPAWN_DELAY
+    sw t1, 0(t0)
+    la t0, level_exit_unlocked
+    sw zero, 0(t0)
+    la t0, level_exit_blink_timer
+    sw zero, 0(t0)
+    la t0, level_exit_blink_frame
+    sw zero, 0(t0)
+    la t0, level_exit_transitioned
+    sw zero, 0(t0)
+
     la t0, boss_active
     sw zero, 0(t0)
 
@@ -120,80 +166,137 @@ init_level3:
 
 # ------------------------------------------------------------
 # handle_next_level_cheat
-# Cheat explicito de gameplay: C avanca para a proxima transicao.
-# Retorna a0 = 1 quando consumiu a tecla e mudou de fase.
+# Preserva C/c como cheat de progressao em gameplay. Na saida liberada do
+# Sewer, processa a interacao no mesmo ponto que reconheceu o evento.
 # ------------------------------------------------------------
-
 handle_next_level_cheat:
     addi sp, sp, -4
     sw ra, 0(sp)
-
-    li a0, 0
+    mv a0, zero
 
     la t0, game_state
     lw t1, 0(t0)
-
     li t2, STATE_LEVEL1
-    beq t1, t2, next_level_cheat_state_ok
-
+    beq t1, t2, check_next_level_cheat_key
     li t2, STATE_LEVEL2
-    beq t1, t2, next_level_cheat_state_ok
-
+    beq t1, t2, check_next_level_cheat_key
     li t2, STATE_LEVEL3
-    beq t1, t2, next_level_cheat_state_ok
-
+    beq t1, t2, check_next_level_cheat_key
     li t2, STATE_BOSS
     bne t1, t2, end_handle_next_level_cheat
 
-next_level_cheat_state_ok:
+check_next_level_cheat_key:
     la t0, key_pressed
     lw t1, 0(t0)
     beqz t1, end_handle_next_level_cheat
-
     la t0, last_key
     lw t1, 0(t0)
-
     li t2, 'c'
-    beq t1, t2, try_next_level_cheat
-
+    beq t1, t2, check_normal_level_interaction
     li t2, 'C'
     bne t1, t2, end_handle_next_level_cheat
+
+check_normal_level_interaction:
+    la t0, current_level
+    lw t1, 0(t0)
+    li t2, LEVEL_SEWER
+    beq t1, t2, handle_released_level_interaction
+    li t2, LEVEL_LABORATORY
+    bne t1, t2, try_next_level_cheat
+handle_released_level_interaction:
+    la t0, level_exit_unlocked
+    lw t2, 0(t0)
+    beqz t2, try_next_level_cheat
+    call is_player_in_level_exit_range
+    beqz a0, try_next_level_cheat
+
+    # No Sewer, conclui a interacao antes que o evento atravesse o frame.
+    la t0, current_level
+    lw t1, 0(t0)
+    li t2, LEVEL_SEWER
+    bne t1, t2, defer_released_level_interaction
+    call update_level_exit
+    mv a0, zero
+    la t0, game_state
+    lw t1, 0(t0)
+    li t2, STATE_CUTSCENE_LEVEL3
+    bne t1, t2, end_handle_next_level_cheat
+    li a0, 1
+    j end_handle_next_level_cheat
+
+defer_released_level_interaction:
+    mv a0, zero
+    j end_handle_next_level_cheat
 
 try_next_level_cheat:
     la t0, current_level
     lw t1, 0(t0)
-
     li t2, LEVEL_TOWN
     beq t1, t2, cheat_to_level2
-
     li t2, LEVEL_SEWER
     beq t1, t2, cheat_to_level3
-
     li t2, LEVEL_LABORATORY
-    beq t1, t2, cheat_to_victory
-
+    bne t1, t2, end_handle_next_level_cheat
+    call reset_transient_level_state
+    call set_state_cutscene_detonator
+    li a0, 1
     j end_handle_next_level_cheat
-
 cheat_to_level2:
     call reset_transient_level_state
     call set_state_cutscene_level2
     li a0, 1
     j end_handle_next_level_cheat
-
 cheat_to_level3:
     call reset_transient_level_state
     call set_state_cutscene_level3
     li a0, 1
-    j end_handle_next_level_cheat
-
-cheat_to_victory:
-    call reset_transient_level_state
-    call set_state_cutscene_detonator
-    li a0, 1
-
 end_handle_next_level_cheat:
     lw ra, 0(sp)
     addi sp, sp, 4
+    ret
+
+# Retorna a0=1 quando o centro do jogador esta dentro do trigger logico
+# acessivel de Sewer/Lab. INTERACTION nao participa da colisao fisica.
+is_player_in_level_exit_range:
+    la t0, current_level
+    lw t1, 0(t0)
+    la t0, player_x
+    lw t2, 0(t0)
+    addi t2, t2, 8
+    la t0, player_y
+    lw t3, 0(t0)
+    addi t3, t3, 8
+    li t4, LEVEL_SEWER
+    beq t1, t4, measure_sewer_exit_range
+    li t4, LEVEL_LABORATORY
+    bne t1, t4, player_outside_level_exit_range
+    addi t2, t2, -LAB_EXIT_CENTER_X
+    addi t3, t3, -LAB_EXIT_CENTER_Y
+    li t4, LAB_EXIT_RADIUS_SQUARED
+    j test_player_level_exit_range
+measure_sewer_exit_range:
+    li t4, SEWER_EXIT_APPROACH_MIN_X
+    blt t2, t4, measure_sewer_exit_circle
+    li t4, SEWER_EXIT_APPROACH_MAX_X
+    bgt t2, t4, measure_sewer_exit_circle
+    li t4, SEWER_EXIT_APPROACH_MIN_Y
+    blt t3, t4, measure_sewer_exit_circle
+    li t4, SEWER_EXIT_APPROACH_MAX_Y
+    ble t3, t4, player_inside_level_exit_range
+measure_sewer_exit_circle:
+    addi t2, t2, -SEWER_EXIT_CENTER_X
+    addi t3, t3, -SEWER_EXIT_CENTER_Y
+    li t4, SEWER_EXIT_RADIUS_SQUARED
+test_player_level_exit_range:
+    mul t2, t2, t2
+    mul t3, t3, t3
+    add t2, t2, t3
+    bgt t2, t4, player_outside_level_exit_range
+player_inside_level_exit_range:
+    li a0, 1
+    ret
+player_outside_level_exit_range:
+    mv a0, zero
     ret
 
 # ------------------------------------------------------------
@@ -225,160 +328,72 @@ reset_transient_level_state:
 # ------------------------------------------------------------
 
 advance_wave:
-    addi sp, sp, -4
+    addi sp, sp, -8
     sw ra, 0(sp)
-
     la t0, boss_active
     lw t1, 0(t0)
-    bnez t1, end_advance_wave
-
+    bnez t1, end_advance_level_wave
     la t0, remaining_enemies
     lw t1, 0(t0)
-    bnez t1, end_advance_wave
-
-    la t0, current_level
-    lw t1, 0(t0)
-
-    li t2, LEVEL_TOWN
-    beq t1, t2, advance_town_wave
-
-    li t2, LEVEL_SEWER
-    beq t1, t2, advance_sewer_wave
-
-    li t2, LEVEL_LABORATORY
-    beq t1, t2, advance_laboratory_wave
-
-    j end_advance_wave
-
-
-# ------------------------------------------------------------
-# Progressao da Town
-# ------------------------------------------------------------
-
-advance_town_wave:
-    call get_town_wave_enemy_count
-    mv t2, a0
+    bnez t1, end_advance_level_wave
+    call get_current_wave_enemy_count
+    sw a0, 4(sp)
     la t0, wave_spawned
     lw t1, 0(t0)
-    bne t1, t2, end_advance_wave
+    lw t2, 4(sp)
+    bne t1, t2, end_advance_level_wave
     call count_active_enemies
-    bnez a0, end_advance_wave
-
+    bnez a0, end_advance_level_wave
     la t0, current_wave
     lw t1, 0(t0)
-
-    li t2, 1
-    beq t1, t2, start_town_wave2
-
-    li t2, 2
-    beq t1, t2, start_town_wave3
-
-    li t2, 3
-    beq t1, t2, start_town_wave4
-
-    li t2, 4
-    beq t1, t2, finish_town
-
-    j end_advance_wave
-
-start_town_wave2:
-    li t1, 2
+    la t2, total_waves
+    lw t2, 0(t2)
+    bge t1, t2, finish_current_level_waves
+    addi t1, t1, 1
     sw t1, 0(t0)
-
+    call get_current_wave_enemy_count
     la t0, remaining_enemies
-    li t1, TOWN_WAVE2_ENEMIES
-    sw t1, 0(t0)
-
+    sw a0, 0(t0)
     la t0, wave_spawned
     sw zero, 0(t0)
-
-    la t0, town_spawn_timer
-    li t1, TOWN_FIRST_SPAWN_DELAY
+    la t0, level_spawn_timer
+    li t1, LEVEL_FIRST_SPAWN_DELAY
     sw t1, 0(t0)
+    j end_advance_level_wave
+finish_current_level_waves:
+    call unlock_current_level_exit
+end_advance_level_wave:
+    lw ra, 0(sp)
+    addi sp, sp, 8
+    ret
 
-    j end_advance_wave
-
-start_town_wave3:
-    li t1, 3
-    sw t1, 0(t0)
-
-    la t0, remaining_enemies
-    li t1, TOWN_WAVE3_ENEMIES
-    sw t1, 0(t0)
-
-    la t0, wave_spawned
-    sw zero, 0(t0)
-
-    la t0, town_spawn_timer
-    li t1, TOWN_FIRST_SPAWN_DELAY
-    sw t1, 0(t0)
-
-    j end_advance_wave
-
-
-start_town_wave4:
-    li t1, 4
-    sw t1, 0(t0)
-
-    la t0, remaining_enemies
-    li t1, TOWN_WAVE4_ENEMIES
-    sw t1, 0(t0)
-
-    la t0, wave_spawned
-    sw zero, 0(t0)
-
-    la t0, town_spawn_timer
-    li t1, TOWN_FIRST_SPAWN_DELAY
-    sw t1, 0(t0)
-
-    j end_advance_wave
-
-
-finish_town:
-    la t0, town_exit_unlocked
+unlock_current_level_exit:
+    la t0, level_exit_unlocked
     lw t1, 0(t0)
-    bnez t1, end_advance_wave
+    bnez t1, end_unlock_current_level_exit
     li t1, 1
     sw t1, 0(t0)
-    la t0, town_exit_blink_timer
+    la t0, level_exit_blink_timer
     sw zero, 0(t0)
-    la t0, town_exit_blink_frame
+    la t0, level_exit_blink_frame
     sw zero, 0(t0)
-    j end_advance_wave
+    la t0, level_exit_transitioned
+    sw zero, 0(t0)
+end_unlock_current_level_exit:
+    ret
 
-# Pisca apenas visualmente e dispara Town -> cutscene/Sewer uma vez quando
-# o centro do jogador entra no raio do bueiro.
+# Town preserva o contrato aprovado de proximidade automatica do bueiro.
 update_town_exit:
     addi sp, sp, -4
     sw ra, 0(sp)
-
-    la t0, current_level
-    lw t1, 0(t0)
-    li t2, LEVEL_TOWN
-    bne t1, t2, end_update_town_exit
-    la t0, town_exit_unlocked
+    la t0, level_exit_unlocked
     lw t1, 0(t0)
     beqz t1, end_update_town_exit
-    la t0, town_exit_transitioned
+    la t0, level_exit_transitioned
     lw t1, 0(t0)
     bnez t1, end_update_town_exit
+    call update_level_exit_blink
 
-    la t0, town_exit_blink_timer
-    lw t1, 0(t0)
-    addi t1, t1, 1
-    li t2, TOWN_EXIT_BLINK_FRAMES
-    blt t1, t2, store_town_exit_blink_timer
-    sw zero, 0(t0)
-    la t0, town_exit_blink_frame
-    lw t1, 0(t0)
-    xori t1, t1, 1
-    sw t1, 0(t0)
-    j check_town_exit_trigger
-
-store_town_exit_blink_timer:
-    sw t1, 0(t0)
-
-check_town_exit_trigger:
     la t0, player_x
     lw t1, 0(t0)
     addi t1, t1, 8
@@ -393,215 +408,136 @@ check_town_exit_trigger:
     li t2, TOWN_EXIT_RADIUS_SQUARED
     bgt t1, t2, end_update_town_exit
 
-    la t0, town_exit_transitioned
+    la t0, level_exit_transitioned
     li t1, 1
     sw t1, 0(t0)
-    call clear_input_buffers
+    call reset_transient_level_state
     call set_state_cutscene_level2
-
 end_update_town_exit:
     lw ra, 0(sp)
     addi sp, sp, 4
     ret
 
-
-# ------------------------------------------------------------
-# Progressao do Sewer
-# ------------------------------------------------------------
-
-advance_sewer_wave:
-    la t0, current_wave
+# Sewer e Lab exigem proximidade, C/c e uma unica transicao depois das waves.
+# Town continua usando a interacao automatica ja aprovada.
+update_level_exit:
+    addi sp, sp, -8
+    sw ra, 0(sp)
+    la t0, current_level
     lw t1, 0(t0)
+    sw t1, 4(sp)
+    li t2, LEVEL_TOWN
+    beq t1, t2, update_town_level_exit
+    li t2, LEVEL_SEWER
+    beq t1, t2, check_level_exit_unlocked
+    li t2, LEVEL_LABORATORY
+    bne t1, t2, finish_level_exit_transition
 
+check_level_exit_unlocked:
+    la t0, level_exit_unlocked
+    lw t2, 0(t0)
+    beqz t2, finish_level_exit_transition
+    la t0, level_exit_transitioned
+    lw t2, 0(t0)
+    bnez t2, finish_level_exit_transition
+    call update_level_exit_blink
+    call is_player_in_level_exit_range
+    beqz a0, finish_level_exit_transition
+
+    la t0, key_pressed
+    lw t2, 0(t0)
+    beqz t2, finish_level_exit_transition
+    la t0, last_key
+    lw t2, 0(t0)
+    li t3, 'c'
+    beq t2, t3, activate_level_exit
+    li t3, 'C'
+    bne t2, t3, finish_level_exit_transition
+
+activate_level_exit:
+    la t0, level_exit_transitioned
     li t2, 1
-    beq t1, t2, start_sewer_wave2
-
-    li t2, 2
-    beq t1, t2, start_sewer_wave3
-
-    li t2, 3
-    beq t1, t2, start_sewer_wave4
-
-    li t2, 4
-    beq t1, t2, start_sewer_wave5
-
-    li t2, 5
-    beq t1, t2, finish_sewer
-
-    j end_advance_wave
-
-
-start_sewer_wave2:
-    li t1, 2
-    sw t1, 0(t0)
-
-    la t0, remaining_enemies
-    li t1, SEWER_WAVE2_ENEMIES
-    sw t1, 0(t0)
-
-    la t0, wave_spawned
-    sw zero, 0(t0)
-
-    j end_advance_wave
-
-
-start_sewer_wave3:
-    li t1, 3
-    sw t1, 0(t0)
-
-    la t0, remaining_enemies
-    li t1, SEWER_WAVE3_ENEMIES
-    sw t1, 0(t0)
-
-    la t0, wave_spawned
-    sw zero, 0(t0)
-
-    j end_advance_wave
-
-
-start_sewer_wave4:
-    li t1, 4
-    sw t1, 0(t0)
-
-    la t0, remaining_enemies
-    li t1, SEWER_WAVE4_ENEMIES
-    sw t1, 0(t0)
-
-    la t0, wave_spawned
-    sw zero, 0(t0)
-
-    j end_advance_wave
-
-
-start_sewer_wave5:
-    li t1, 5
-    sw t1, 0(t0)
-
-    la t0, remaining_enemies
-    li t1, SEWER_WAVE5_ENEMIES
-    sw t1, 0(t0)
-
-    la t0, wave_spawned
-    sw zero, 0(t0)
-
-    j end_advance_wave
-
-
-finish_sewer:
+    sw t2, 0(t0)
+    call reset_transient_level_state
+    lw t1, 4(sp)
+    li t2, LEVEL_SEWER
+    beq t1, t2, transition_sewer_to_lab
+    call start_boss_fight
+    j finish_level_exit_transition
+transition_sewer_to_lab:
     call set_state_cutscene_level3
-    j end_advance_wave
+    j finish_level_exit_transition
+update_town_level_exit:
+    call update_town_exit
 
+finish_level_exit_transition:
+    lw ra, 0(sp)
+    addi sp, sp, 8
+    ret
 
-# ------------------------------------------------------------
-# Progressao do Laboratory
-# ------------------------------------------------------------
-
-advance_laboratory_wave:
-    la t0, current_wave
+update_level_exit_blink:
+    la t0, level_exit_blink_timer
     lw t1, 0(t0)
-
-    li t2, 1
-    beq t1, t2, start_laboratory_wave2
-
-    li t2, 2
-    beq t1, t2, start_laboratory_wave3
-
-    li t2, 3
-    beq t1, t2, start_boss_fight
-
-    j end_advance_wave
-
-
-start_laboratory_wave2:
-    la t0, current_wave
-    li t1, 2
-    sw t1, 0(t0)
-
-    la t0, remaining_enemies
-    li t1, LABORATORY_WAVE2_ENEMIES
-    sw t1, 0(t0)
-
-    la t0, wave_spawned
+    addi t1, t1, 1
+    li t2, LEVEL_EXIT_BLINK_FRAMES
+    blt t1, t2, store_level_exit_blink_timer
     sw zero, 0(t0)
-
-    j end_advance_wave
-
-
-start_laboratory_wave3:
-    la t0, current_wave
-    li t1, 3
+    la t0, level_exit_blink_frame
+    lw t1, 0(t0)
+    xori t1, t1, 1
     sw t1, 0(t0)
-
-    la t0, remaining_enemies
-    li t1, LABORATORY_WAVE3_ENEMIES
+    ret
+store_level_exit_blink_timer:
     sw t1, 0(t0)
+    ret
 
-    la t0, wave_spawned
-    sw zero, 0(t0)
-
-    j end_advance_wave
-
-
+# Inicializa o boss uma unica vez, somente depois da interacao do painel.
 start_boss_fight:
+    addi sp, sp, -4
+    sw ra, 0(sp)
     la t0, boss_active
     lw t1, 0(t0)
-    bnez t1, end_advance_wave
-
-    la t0, boss_active
+    bnez t1, end_start_boss_fight
     li t1, 1
     sw t1, 0(t0)
-
     la t0, boss_x
     li t1, BOSS_START_X
     sw t1, 0(t0)
-
     la t0, boss_y
     li t1, BOSS_START_Y
     sw t1, 0(t0)
-
     la t0, boss_hp
     li t1, BOSS_HP_START
     sw t1, 0(t0)
-
     la t0, boss_direction
     li t1, DIR_RIGHT
     sw t1, 0(t0)
-
     la t0, boss_attack_timer
     sw zero, 0(t0)
-
     la t0, boss_melee_timer
     sw zero, 0(t0)
-
     la t0, boss_heavy_timer
     sw zero, 0(t0)
-
     la t0, game_state
     li t1, STATE_BOSS
     sw t1, 0(t0)
-
     la t0, current_level
     li t1, LEVEL_LABORATORY
     sw t1, 0(t0)
-
     la t0, remaining_enemies
     li t1, BOSS_SUPPORT_ENEMIES
     sw t1, 0(t0)
-
     la t0, wave_spawned
     sw zero, 0(t0)
-
+    la t0, level_spawn_timer
+    li t1, LEVEL_FIRST_SPAWN_DELAY
+    sw t1, 0(t0)
+    la t0, level_exit_unlocked
+    sw zero, 0(t0)
+    la t0, level_exit_blink_frame
+    sw zero, 0(t0)
     call clear_input_buffers
-
-    j end_advance_wave
-
-
-# ------------------------------------------------------------
-# Finalizacao da rotina
-# ------------------------------------------------------------
-
-end_advance_wave:
+end_start_boss_fight:
     lw ra, 0(sp)
     addi sp, sp, 4
-
     ret
