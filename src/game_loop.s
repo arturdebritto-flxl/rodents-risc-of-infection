@@ -9,6 +9,8 @@ game_loop:
     sw ra, 0(sp)
 
 loop_frame:
+    call mark_frame_start
+
     la t0, frame_counter
     lw t1, 0(t0)
     addi t1, t1, 1
@@ -94,6 +96,8 @@ loop_playing_level:
     call read_input
     call handle_next_level_cheat
     bnez a0, render_cheat_transition_frame
+    call update_gameplay_music
+    call handle_god_mode_cheat
 
     call update_player
     call update_bullets
@@ -111,10 +115,14 @@ loop_playing_level:
     call check_enemy_player_collisions
     call check_enemy_bullet_player_collisions
     call check_player_powerup_collisions
+    call maintain_god_mode_cheat
 
     call advance_wave
     call update_town_exit
+    call update_sewer_exit
+    call update_laboratory_exit
     call update_animation_frame
+    call update_player_walk_animation
 
     call begin_frame
 
@@ -199,9 +207,27 @@ leave_game_loop:
     ret
 
 frame_delay:
-    li a0, DEBUG_FRAME_DELAY_MS
+    # Mantem todas as fases em aproximadamente 42 FPS sem somar 24 ms ao
+    # tempo que a atualizacao e a renderizacao ja consumiram.
+    li a7, 130
+    ecall
+    la t0, frame_start_time
+    lw t1, 0(t0)
+    sub t2, a0, t1
+    li t3, TARGET_FRAME_TIME_MS
+    bgeu t2, t3, end_frame_delay
+    sub a0, t3, t2
     li a7, 132
     ecall
+
+end_frame_delay:
+    ret
+
+mark_frame_start:
+    li a7, 130
+    ecall
+    la t0, frame_start_time
+    sw a0, 0(t0)
     ret
 
 debug_stop_after_frames:

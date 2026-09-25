@@ -34,14 +34,27 @@ NON_SPRITE_SOURCE_DIRS = {"cutscenes"}
 def build_runtime_sprites() -> dict[str, tuple[str, str, int]]:
     """Return baseline runtime art plus the explicitly approved final sprites."""
     sprites: dict[str, tuple[str, str, int]] = {
-        "sprite_player_down_0": ("_protagonista", "sprite_00.png", 16),
-        "sprite_player_down_1": ("_protagonista", "sprite_01.png", 16),
-        "sprite_player_up_0": ("_protagonista", "sprite_04.png", 16),
-        "sprite_player_up_1": ("_protagonista", "sprite_05.png", 16),
-        "sprite_player_right_0": ("_protagonista", "sprite_08.png", 16),
-        "sprite_player_right_1": ("_protagonista", "sprite_09.png", 16),
-        "sprite_player_left_0": ("_protagonista", "sprite_16.png", 16),
-        "sprite_player_left_1": ("_protagonista", "sprite_17.png", 16),
+        # Protagonista: 00/04/08/16 sao desarmados. Os tres sprites
+        # seguintes de cada direcao correspondem a pistola, escopeta e UZI.
+        # Nas laterais, 12-15 e 20-23 sao os equivalentes em passo.
+        "sprite_player_down_pistol": ("_protagonista", "sprite_01.png", 16),
+        "sprite_player_down_shotgun": ("_protagonista", "sprite_02.png", 16),
+        "sprite_player_down_uzi": ("_protagonista", "sprite_03.png", 16),
+        "sprite_player_up_pistol": ("_protagonista", "sprite_05.png", 16),
+        "sprite_player_up_shotgun": ("_protagonista", "sprite_06.png", 16),
+        "sprite_player_up_uzi": ("_protagonista", "sprite_07.png", 16),
+        "sprite_player_right_pistol_idle": ("_protagonista", "sprite_09.png", 16),
+        "sprite_player_right_shotgun_idle": ("_protagonista", "sprite_10.png", 16),
+        "sprite_player_right_uzi_idle": ("_protagonista", "sprite_11.png", 16),
+        "sprite_player_right_pistol_walk": ("_protagonista", "sprite_13.png", 16),
+        "sprite_player_right_shotgun_walk": ("_protagonista", "sprite_14.png", 16),
+        "sprite_player_right_uzi_walk": ("_protagonista", "sprite_15.png", 16),
+        "sprite_player_left_pistol_idle": ("_protagonista", "sprite_17.png", 16),
+        "sprite_player_left_shotgun_idle": ("_protagonista", "sprite_18.png", 16),
+        "sprite_player_left_uzi_idle": ("_protagonista", "sprite_19.png", 16),
+        "sprite_player_left_pistol_walk": ("_protagonista", "sprite_21.png", 16),
+        "sprite_player_left_shotgun_walk": ("_protagonista", "sprite_22.png", 16),
+        "sprite_player_left_uzi_walk": ("_protagonista", "sprite_23.png", 16),
         "sprite_enemy_common_down_0": ("_sprites_1", "sprites/image-5.png.png", 16),
         "sprite_enemy_common_down_1": ("_sprites_1", "sprites/image-5.png.png", 16),
         "sprite_enemy_common_up_0": ("_sprites_1", "sprites/image-6.png.png", 16),
@@ -74,14 +87,14 @@ def build_runtime_sprites() -> dict[str, tuple[str, str, int]]:
         "sprite_enemy_spitter_right_1": (FINAL_GROUP, "03_INIMIGOS/rat_spitter_16x16/frames/right__walk_2.png", 16),
         "sprite_enemy_spitter_left_0": (FINAL_GROUP, "03_INIMIGOS/rat_spitter_16x16/frames/left__walk_1.png", 16),
         "sprite_enemy_spitter_left_1": (FINAL_GROUP, "03_INIMIGOS/rat_spitter_16x16/frames/left__walk_2.png", 16),
-        "sprite_boss_down_0": ("_rato_boss_new", "descendo.png", 32),
-        "sprite_boss_down_1": ("_rato_boss_new", "descendo_andando.png", 32),
-        "sprite_boss_up_0": ("_rato_boss_new", "subindo.png", 32),
-        "sprite_boss_up_1": ("_rato_boss_new", "subindo_andando.png", 32),
-        "sprite_boss_right_0": ("_rato_boss_new", "direita.png", 32),
-        "sprite_boss_right_1": ("_rato_boss_new", "direita_andando.png", 32),
-        "sprite_boss_left_0": ("_rato_boss_new", "esquerda.png", 32),
-        "sprite_boss_left_1": ("_rato_boss_new", "esquerda_andando.png", 32),
+        "sprite_boss_down_0": ("_rato_boss_new", "descendo.png", 48),
+        "sprite_boss_down_1": ("_rato_boss_new", "descendo_andando.png", 48),
+        "sprite_boss_up_0": ("_rato_boss_new", "subindo.png", 48),
+        "sprite_boss_up_1": ("_rato_boss_new", "subindo_andando.png", 48),
+        "sprite_boss_right_0": ("_rato_boss_new", "direita.png", 48),
+        "sprite_boss_right_1": ("_rato_boss_new", "direita_andando.png", 48),
+        "sprite_boss_left_0": ("_rato_boss_new", "esquerda.png", 48),
+        "sprite_boss_left_1": ("_rato_boss_new", "esquerda_andando.png", 48),
         "sprite_powerup_heal": ("_med_kit", "Med-Kit.png", 16),
         "sprite_powerup_ammo": ("_armas", "sprite_1.png", 16),
         "sprite_powerup_boss_weapon": ("_armas", "sprite_0.png", 16),
@@ -205,6 +218,35 @@ def transform_exact(data: bytes, size: int) -> tuple[int, int, bytes, dict]:
     return size, size, payload, metadata
 
 
+def transform_canvas(data: bytes, size: int) -> tuple[int, int, bytes, dict]:
+    """Reduce a tela inteira de um sprite, sem cortar nem recentralizar."""
+    with Image.open(io.BytesIO(data)) as source:
+        image = source.convert("RGBA")
+    if image.width != image.height or image.width < size:
+        raise ValueError(
+            f"expected square sprite at least {size}px, got {image.width}x{image.height}"
+        )
+
+    resized = image.resize((size, size), Image.Resampling.NEAREST)
+    pixels = (
+        resized.get_flattened_data()
+        if hasattr(resized, "get_flattened_data")
+        else resized.getdata()
+    )
+    payload = bytes(rgba_to_rars8(pixel) for pixel in pixels)
+    metadata = {
+        "source_size": [image.width, image.height],
+        "crop": [0, 0, image.width, image.height],
+        "content_size": [size, size],
+        "output_size": [size, size],
+        "offset": [0, 0],
+        "resampling": "nearest-full-canvas",
+        "transparent_value": TRANSPARENT,
+        "payload_sha256": hashlib.sha256(payload).hexdigest(),
+    }
+    return size, size, payload, metadata
+
+
 def discover(source_dir: Path) -> list[SourceEntry]:
     entries: list[SourceEntry] = []
     for source in sorted(source_dir.iterdir(), key=lambda path: path.name.casefold()):
@@ -303,7 +345,15 @@ def emit(source_dir: Path, output_dir: Path, target: int = 16) -> dict:
     runtime_records = []
     for symbol, (group, source, size) in RUNTIME_SPRITES.items():
         entry = entries_by_key[(group, source)]
-        transform_runtime = transform_exact if group == FINAL_GROUP else transform
+        # Os frames do protagonista ja ocupam uma tela 16x16 e foram
+        # alinhados como uma sequencia. Preservar a tela inteira evita que
+        # o recorte/recentralizacao apague a diferenca entre os passos.
+        if group == FINAL_GROUP:
+            transform_runtime = transform_exact
+        elif group == "_protagonista":
+            transform_runtime = transform_canvas
+        else:
+            transform_runtime = transform
         _, _, payload, metadata = transform_runtime(entry.data, size)
         runtime_asm.append(f"\n# {group}/{source}\n{symbol}:\n")
         for offset in range(0, len(payload), 16):

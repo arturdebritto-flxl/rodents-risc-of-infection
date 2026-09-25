@@ -84,6 +84,16 @@ spawn_wave_state_ok:
     li t2, LEVEL_TOWN
     beq t1, t2, spawn_town_enemy_if_needed
 
+    li t2, LEVEL_LABORATORY
+    bne t1, t2, spawn_full_wave_if_needed
+    # Durante o boss, os cinco inimigos de suporte continuam surgindo juntos.
+    la t0, game_state
+    lw t1, 0(t0)
+    li t2, STATE_LEVEL3
+    beq t1, t2, spawn_laboratory_enemy_if_needed
+
+spawn_full_wave_if_needed:
+
     la t0, wave_spawned
     lw t1, 0(t0)
     bnez t1, end_spawn_wave_if_needed
@@ -132,6 +142,41 @@ try_spawn_one_town_enemy:
     sw t1, 0(t0)
     la t0, town_spawn_timer
     li t1, TOWN_SPAWN_INTERVAL
+    sw t1, 0(t0)
+
+    j end_spawn_wave_if_needed
+
+spawn_laboratory_enemy_if_needed:
+    la t0, laboratory_exit_unlocked
+    lw t1, 0(t0)
+    bnez t1, end_spawn_wave_if_needed
+
+    call get_laboratory_wave_enemy_count
+    mv t2, a0
+    la t0, wave_spawned
+    lw t1, 0(t0)
+    bge t1, t2, end_spawn_wave_if_needed
+
+    la t0, laboratory_spawn_timer
+    lw t1, 0(t0)
+    blez t1, check_laboratory_spawn_slot
+    addi t1, t1, -1
+    sw t1, 0(t0)
+    bgtz t1, end_spawn_wave_if_needed
+
+check_laboratory_spawn_slot:
+    call count_active_enemies
+    li t0, LABORATORY_MAX_ACTIVE_ENEMIES
+    bge a0, t0, end_spawn_wave_if_needed
+
+    call spawn_one_laboratory_enemy
+    beqz a0, end_spawn_wave_if_needed
+    la t0, wave_spawned
+    lw t1, 0(t0)
+    addi t1, t1, 1
+    sw t1, 0(t0)
+    la t0, laboratory_spawn_timer
+    li t1, LABORATORY_SPAWN_INTERVAL
     sw t1, 0(t0)
 
 end_spawn_wave_if_needed:
@@ -389,6 +434,102 @@ spawn_one_town_enemy_failed:
     mv a0, zero
 
 finish_spawn_one_town_enemy:
+    lw s2, 12(sp)
+    lw s1, 8(sp)
+    lw s0, 4(sp)
+    lw ra, 0(sp)
+    addi sp, sp, 16
+    ret
+
+# Cria um inimigo do laboratorio por vez. O indice total ja criado mantem
+# a sequencia Mutant, Echo, Spitter e Common da implementacao original.
+spawn_one_laboratory_enemy:
+    addi sp, sp, -16
+    sw ra, 0(sp)
+    sw s0, 4(sp)
+    sw s1, 8(sp)
+    sw s2, 12(sp)
+
+    li s0, 0
+find_laboratory_enemy_free_slot:
+    li t0, MAX_ENEMIES
+    beq s0, t0, spawn_one_laboratory_enemy_failed
+    slli s1, s0, 2
+    la t0, enemy_active
+    add t0, t0, s1
+    lw t1, 0(t0)
+    beqz t1, configure_one_laboratory_enemy
+    addi s0, s0, 1
+    j find_laboratory_enemy_free_slot
+
+configure_one_laboratory_enemy:
+    la t0, wave_spawned
+    lw s2, 0(t0)
+    andi t0, s2, 3
+    beqz t0, configure_one_laboratory_mutant
+    li t1, 1
+    beq t0, t1, configure_one_laboratory_echo
+    li t1, 2
+    beq t0, t1, configure_one_laboratory_spitter
+    li t1, RAT_COMMON
+    li t2, RAT_COMMON_HP
+    j store_one_laboratory_enemy_type
+
+configure_one_laboratory_mutant:
+    li t1, RAT_MUTANT
+    li t2, RAT_MUTANT_HP
+    j store_one_laboratory_enemy_type
+
+configure_one_laboratory_echo:
+    li t1, RAT_ECHO
+    li t2, RAT_ECHO_HP
+    j store_one_laboratory_enemy_type
+
+configure_one_laboratory_spitter:
+    li t1, RAT_SPITTER
+    li t2, RAT_SPITTER_HP
+
+store_one_laboratory_enemy_type:
+    la t0, enemy_type
+    add t0, t0, s1
+    sw t1, 0(t0)
+    la t0, enemy_hp
+    add t0, t0, s1
+    sw t2, 0(t0)
+    la t0, enemy_attack_timer
+    add t0, t0, s1
+    sw zero, 0(t0)
+    la t0, enemy_avoid_direction
+    add t0, t0, s1
+    li t1, -1
+    sw t1, 0(t0)
+    la t0, enemy_avoid_timer
+    add t0, t0, s1
+    sw zero, 0(t0)
+    la t0, enemy_direction
+    add t0, t0, s1
+    li t1, DIR_DOWN
+    sw t1, 0(t0)
+
+    call select_enemy_spawn_position
+    beqz a0, spawn_one_laboratory_enemy_failed
+    la t0, enemy_x
+    add t0, t0, s1
+    sw a1, 0(t0)
+    la t0, enemy_y
+    add t0, t0, s1
+    sw a2, 0(t0)
+    la t0, enemy_active
+    add t0, t0, s1
+    li t1, 1
+    sw t1, 0(t0)
+    li a0, 1
+    j finish_spawn_one_laboratory_enemy
+
+spawn_one_laboratory_enemy_failed:
+    mv a0, zero
+
+finish_spawn_one_laboratory_enemy:
     lw s2, 12(sp)
     lw s1, 8(sp)
     lw s0, 4(sp)

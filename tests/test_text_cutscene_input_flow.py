@@ -90,10 +90,10 @@ class TextCutsceneAssemblyContractTests(unittest.TestCase):
         routine = self.screens[
             self.screens.index("show_text_cutscene:") : self.screens.index("update_cutscene:")
         ]
-        self.assertIn("addi sp, sp, -4", routine)
+        self.assertIn("addi sp, sp, -8", routine)
         self.assertIn("sw ra, 0(sp)", routine)
         self.assertIn("lw ra, 0(sp)", routine)
-        self.assertIn("addi sp, sp, 4", routine)
+        self.assertIn("addi sp, sp, 8", routine)
         self.assertTrue(routine.rstrip().endswith("ret"))
 
     def test_returns_to_each_original_destination(self):
@@ -117,7 +117,7 @@ class TextCutsceneAssemblyContractTests(unittest.TestCase):
         self.assertRegex(
             self.screens,
             re.compile(
-                r"show_current_text_cutscene:\s+call show_text_cutscene\s+j advance_cutscene",
+                r"show_current_image_cutscene:\s+call show_image_cutscene\s+j advance_cutscene",
                 re.MULTILINE,
             ),
         )

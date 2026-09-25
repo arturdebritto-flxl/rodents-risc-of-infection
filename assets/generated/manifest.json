@@ -4,167 +4,136 @@
   "runtime_sprites": [
     {
       "content_size": [
-        12,
-        16
-      ],
-      "crop": [
-        30,
-        30,
-        130,
-        160
-      ],
-      "group": "_protagonista",
-      "offset": [
-        2,
-        0
-      ],
-      "output_size": [
         16,
         16
       ],
-      "payload_sha256": "ffb02e243569d16eb6b6aa91de9fb311f52e38cdf506322e19464a91650b5425",
-      "resampling": "nearest",
-      "source": "sprite_00.png",
-      "source_sha256": "80b737598333d2c937a38df90476435ad0e0a6532e2aecaf7ba8df35d528b5e5",
-      "source_size": [
+      "crop": [
+        0,
+        0,
         160,
         160
       ],
-      "symbol": "sprite_player_down_0",
-      "transparent_value": 0
-    },
-    {
-      "content_size": [
-        14,
-        16
-      ],
-      "crop": [
-        20,
-        30,
-        130,
-        160
-      ],
       "group": "_protagonista",
       "offset": [
-        1,
+        0,
         0
       ],
       "output_size": [
         16,
         16
       ],
-      "payload_sha256": "6b6e63a4b3ae9d820d85bfd3baf27d24077670378764e48220b4ce250290672c",
-      "resampling": "nearest",
+      "payload_sha256": "d4a022946feae479d730e613dc7893537cbcb21913c7808e233fbea3ecb99460",
+      "resampling": "nearest-full-canvas",
       "source": "sprite_01.png",
       "source_sha256": "e653d6021ef8c7c6246c4b44041a71c7782ff8a5453ca0244e9eaff134447762",
       "source_size": [
         160,
         160
       ],
-      "symbol": "sprite_player_down_1",
+      "symbol": "sprite_player_down_pistol",
       "transparent_value": 0
     },
     {
       "content_size": [
-        12,
+        16,
         16
       ],
       "crop": [
-        30,
-        30,
-        130,
+        0,
+        0,
+        160,
         160
       ],
       "group": "_protagonista",
       "offset": [
-        2,
+        0,
         0
       ],
       "output_size": [
         16,
         16
       ],
-      "payload_sha256": "f78c2ebafdcc18e7245126d12155f757f412cbe4a84e37c253d64484ca9c4bc8",
-      "resampling": "nearest",
-      "source": "sprite_04.png",
-      "source_sha256": "310bd396e403996aa439c6b52064566bf44326dd0bebe3583c73f95837d345a8",
+      "payload_sha256": "a382e3304ef3ec9e09928c55b82956ddfc2ddf41d51740585f023384cb23acf5",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_02.png",
+      "source_sha256": "e628e83316a78ac1e0da3a3f128df62c378159944e243576eeb55e9b18f0c787",
       "source_size": [
         160,
         160
       ],
-      "symbol": "sprite_player_up_0",
+      "symbol": "sprite_player_down_shotgun",
       "transparent_value": 0
     },
     {
       "content_size": [
-        12,
+        16,
         16
       ],
       "crop": [
-        30,
-        30,
-        130,
+        0,
+        0,
+        160,
         160
       ],
       "group": "_protagonista",
       "offset": [
-        2,
+        0,
         0
       ],
       "output_size": [
         16,
         16
       ],
-      "payload_sha256": "af97eb458440b9d8aec3b4514d34f5ae7e1fe969ad257a94fcc28824d1817edb",
-      "resampling": "nearest",
+      "payload_sha256": "d0715a3338238dd22ce5ead2b573d66303363d12778f34149cf4c0ca308b4d87",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_03.png",
+      "source_sha256": "d9887bf0e0617193eb54fc10c0408fd993cb9b7bfde0af14a4ede885913e663b",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_down_uzi",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "c4843b2ab657f68e819dc55efc6a604df23a1904199dcea2c756ace93e39fae9",
+      "resampling": "nearest-full-canvas",
       "source": "sprite_05.png",
       "source_sha256": "cf145f60b55a1f28b01c94a0c6da02e17f601ae934eb2f6ff170db57df786a5d",
       "source_size": [
         160,
         160
       ],
-      "symbol": "sprite_player_up_1",
+      "symbol": "sprite_player_up_pistol",
       "transparent_value": 0
     },
     {
       "content_size": [
-        10,
-        16
-      ],
-      "crop": [
-        40,
-        30,
-        120,
-        160
-      ],
-      "group": "_protagonista",
-      "offset": [
-        3,
-        0
-      ],
-      "output_size": [
         16,
         16
       ],
-      "payload_sha256": "5a4d4311df9d90604417d92876eee20ca6d10ddca20b0d308eaec13053c66f86",
-      "resampling": "nearest",
-      "source": "sprite_08.png",
-      "source_sha256": "ecece14f9af545074b45296278e4dd26e1128289b8da0250930dc57a202da30e",
-      "source_size": [
-        160,
-        160
-      ],
-      "symbol": "sprite_player_right_0",
-      "transparent_value": 0
-    },
-    {
-      "content_size": [
-        15,
-        16
-      ],
       "crop": [
-        40,
-        30,
+        0,
+        0,
         160,
         160
       ],
@@ -177,57 +146,119 @@
         16,
         16
       ],
-      "payload_sha256": "b05eb25b9f1a01e2410276a65d1e2f2e9ccfc83308841db6bd0f9dc6cb3132c5",
-      "resampling": "nearest",
+      "payload_sha256": "85a20f5ba8b0e882b2b6999d4a0c2b78c35c1c0f6464b98b684cc8c8d5dbc913",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_06.png",
+      "source_sha256": "a55667b8dbb574ae92b3bddc499a4ca570cd3eb6c1b89f40a1ee26bf70ed2c46",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_up_shotgun",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "82d87ab9482249d1e2c558bdaf34a9d47f8a510dc49bc1c1855e9d1a42220920",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_07.png",
+      "source_sha256": "f00181e8ec56ad399613e8fb965648facbac112ca15c89d91e317fe7e97bfe93",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_up_uzi",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "0d57684e8a23c622ccf76dcbbc2eacf82d84b4af35e53d76ae7b67f23df48e82",
+      "resampling": "nearest-full-canvas",
       "source": "sprite_09.png",
       "source_sha256": "93ba18b358beda3b93cb399d7fa0ef9b7e0592ce0944adb24b552468e41989ea",
       "source_size": [
         160,
         160
       ],
-      "symbol": "sprite_player_right_1",
+      "symbol": "sprite_player_right_pistol_idle",
       "transparent_value": 0
     },
     {
       "content_size": [
-        10,
+        16,
         16
       ],
       "crop": [
-        40,
-        30,
-        120,
+        0,
+        0,
+        160,
         160
       ],
       "group": "_protagonista",
       "offset": [
-        3,
+        0,
         0
       ],
       "output_size": [
         16,
         16
       ],
-      "payload_sha256": "727fccccb61c3c15705b3f4914b65ce153e6cd06b34cc7c109616b15dbcc07ca",
-      "resampling": "nearest",
-      "source": "sprite_16.png",
-      "source_sha256": "874908b1e8942251f6873920dee5a034f6b7bf17bdd0fe137d4505f198011ad5",
+      "payload_sha256": "66569b1349f79b5c3cd6d4a92a0c40299549eeab82e27cd834abd573c54d6cdc",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_10.png",
+      "source_sha256": "80dbc182c9819f7c8ab28633d5fa356d5c32515eb26cd70ee6d68a431cf2a199",
       "source_size": [
         160,
         160
       ],
-      "symbol": "sprite_player_left_0",
+      "symbol": "sprite_player_right_shotgun_idle",
       "transparent_value": 0
     },
     {
       "content_size": [
-        15,
+        16,
         16
       ],
       "crop": [
         0,
-        30,
-        120,
+        0,
+        160,
         160
       ],
       "group": "_protagonista",
@@ -239,15 +270,294 @@
         16,
         16
       ],
-      "payload_sha256": "4a10d66c716cfbfdb66f2de4d6d1494be6b85061f985c6cec6e2db2b98e46294",
-      "resampling": "nearest",
+      "payload_sha256": "effb42a9c704dd193771f8f894e49aecefb6b5487c54caf189a7b2f0823d8702",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_11.png",
+      "source_sha256": "40ea42518a8ba64404b52abd3a5429e6df55146854469d433f21cdfbe1e0e4e8",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_right_uzi_idle",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "3501892d53cd31a8aa7857b96247558101d5cfc92a57d001e9313deac095eee5",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_13.png",
+      "source_sha256": "ae38ab6a40e8b3b47410dc02cc4f761bede31c7a63033287d95689c555c618a8",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_right_pistol_walk",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "5263e4022fac95093c82d11cccbc979fc6688391f6f58255d3933df877b0f666",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_14.png",
+      "source_sha256": "9b71f7283a64c5708a06a13bc86f3bb6ebf55262c695e7b2c295abc12e53bfae",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_right_shotgun_walk",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "3116f03750740d6bc4f81dd361b9375b5887692dfe7bdc071ea8de027f6d8964",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_15.png",
+      "source_sha256": "c0bfbd7d6931ce70f2e39d554b3f79c6253f342a0c882def69a8aeea5898f205",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_right_uzi_walk",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "8cbfc1ec48bd2ded4d95b1751c6fb3180de8b97b6778c4972327003108394200",
+      "resampling": "nearest-full-canvas",
       "source": "sprite_17.png",
       "source_sha256": "72ebaabafe751f2344d6725b8c383b190aaf39d06b732cd0dc6fa23070ddb317",
       "source_size": [
         160,
         160
       ],
-      "symbol": "sprite_player_left_1",
+      "symbol": "sprite_player_left_pistol_idle",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "9dcd88880da61091baf8911ae3dcdfeee924425136bc59d55400617c9d8d6d11",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_18.png",
+      "source_sha256": "6daf20c22ff72a42f8b3fdad57313355a82ff3115b800b5905bf73c72cb3df64",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_left_shotgun_idle",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "3e77ad8579dcb262f1e1a20411de29f5ce48b0ceb9c9a918d1ad9aa2a28ad32b",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_19.png",
+      "source_sha256": "6da817fc9ad77879091f2839c86d0a9007f027b76e1eab09c7d2a8574046e5f4",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_left_uzi_idle",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "74f7ad789d47b890596aa866a5d3542d74078436b9d1cd1022952811fb01f98b",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_21.png",
+      "source_sha256": "d55ec0a2734403cd3dd8cfbec099bd665248cc32d0bf97fd771a0aa692fa0d90",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_left_pistol_walk",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "14d6ee52e900640a56732e790428fcacd3a2a2c45de04af27dc86f231f77d191",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_22.png",
+      "source_sha256": "ee23f861b323cd9a21c1cf4d1a7cb9da85e4b42ecf313144be9abaa1b32169a8",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_left_shotgun_walk",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        16
+      ],
+      "crop": [
+        0,
+        0,
+        160,
+        160
+      ],
+      "group": "_protagonista",
+      "offset": [
+        0,
+        0
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "c68de879a9a97214d97016f676a0a42be501dd71d8b27565735aebcd5fa3e47b",
+      "resampling": "nearest-full-canvas",
+      "source": "sprite_23.png",
+      "source_sha256": "de01529847bcd785621b5c63a05e40f4029a4ed8f19d32e5d59a4dd71feda3d7",
+      "source_size": [
+        160,
+        160
+      ],
+      "symbol": "sprite_player_left_uzi_walk",
       "transparent_value": 0
     },
     {
@@ -1244,8 +1554,8 @@
     },
     {
       "content_size": [
-        25,
-        32
+        37,
+        48
       ],
       "crop": [
         40,
@@ -1255,14 +1565,14 @@
       ],
       "group": "_rato_boss_new",
       "offset": [
-        3,
+        5,
         0
       ],
       "output_size": [
-        32,
-        32
+        48,
+        48
       ],
-      "payload_sha256": "9085863bc9ca4ec7fd10687a32d3340f05c8e15e4d232742bf20702e0d7947c2",
+      "payload_sha256": "846293ebdb1461879d706eade5c0cbaabcbe2a177336f553438679b8956ff0a7",
       "resampling": "nearest",
       "source": "descendo.png",
       "source_sha256": "3917df7a3c686ee521ce6833782db5c4f186a5d26d66db8654bfeba611cfe453",
@@ -1275,8 +1585,8 @@
     },
     {
       "content_size": [
-        25,
-        32
+        37,
+        48
       ],
       "crop": [
         40,
@@ -1286,14 +1596,14 @@
       ],
       "group": "_rato_boss_new",
       "offset": [
-        3,
+        5,
         0
       ],
       "output_size": [
-        32,
-        32
+        48,
+        48
       ],
-      "payload_sha256": "687a1c93892b556260c63fecc113df54e695fc066f1a51f185eb802d8d8b7029",
+      "payload_sha256": "a910a1645885cf26ba5d1fdd2b60a9f851659ab3058a3c9988e45fabdaf263ac",
       "resampling": "nearest",
       "source": "descendo_andando.png",
       "source_sha256": "ece181256129e55c87f585cf5bad534e5e3319bc48be8e2cb40225a9458c2ef6",
@@ -1306,8 +1616,8 @@
     },
     {
       "content_size": [
-        24,
-        32
+        36,
+        48
       ],
       "crop": [
         40,
@@ -1317,14 +1627,14 @@
       ],
       "group": "_rato_boss_new",
       "offset": [
-        4,
+        6,
         0
       ],
       "output_size": [
-        32,
-        32
+        48,
+        48
       ],
-      "payload_sha256": "5bb69fde8073e0da39325bd4b743c245c06eb6c733a4ca31f1f0ec77bda30322",
+      "payload_sha256": "66ec64d61b868fb5d5d5353f9ccaffaa4d926561cbde2eec68fc5c5155576296",
       "resampling": "nearest",
       "source": "subindo.png",
       "source_sha256": "8bfd6ffbcb8f60e5fd016e288340640bf3e7cdbb7ea32c293d804c331241eab6",
@@ -1337,8 +1647,8 @@
     },
     {
       "content_size": [
-        25,
-        32
+        37,
+        48
       ],
       "crop": [
         40,
@@ -1348,14 +1658,14 @@
       ],
       "group": "_rato_boss_new",
       "offset": [
-        3,
+        5,
         0
       ],
       "output_size": [
-        32,
-        32
+        48,
+        48
       ],
-      "payload_sha256": "1ba73670b12b2c4ddb995dd7b55cb691b3ee51ff619df3445b6488fb573a412b",
+      "payload_sha256": "dd43f024b10c308d9ecee5200a343234b3bbf4a3f6b8fbb74f86c20150578104",
       "resampling": "nearest",
       "source": "subindo_andando.png",
       "source_sha256": "d20903c425fcfd2211634525e8cfaefc626df46178e7846d721e53b03dcc9dae",
@@ -1368,8 +1678,8 @@
     },
     {
       "content_size": [
-        32,
-        32
+        48,
+        48
       ],
       "crop": [
         0,
@@ -1383,10 +1693,10 @@
         0
       ],
       "output_size": [
-        32,
-        32
+        48,
+        48
       ],
-      "payload_sha256": "0c1795dbe192fdb84edc9a7541e9a67902ce59c039a9cc1044560a33b35ebae9",
+      "payload_sha256": "fa0ad4ded273c7d0d4366c9a82e62101fd5c2f3639ce7a7f1ed6bc32fbdbb6ec",
       "resampling": "nearest",
       "source": "direita.png",
       "source_sha256": "d333ce1431b8fa7ec97a101c153af96c86a45069da6901b3b21321a17059f5e8",
@@ -1399,8 +1709,8 @@
     },
     {
       "content_size": [
-        32,
-        32
+        48,
+        48
       ],
       "crop": [
         0,
@@ -1414,10 +1724,10 @@
         0
       ],
       "output_size": [
-        32,
-        32
+        48,
+        48
       ],
-      "payload_sha256": "bd65c7a18bdf5656349363e97c1d8ee578cdb270856e79dae9e35dbdb5a57e90",
+      "payload_sha256": "dd1c773ff72da93ad27bfa07c99a664f8f5c8625ba7113eaae7051099952eb5b",
       "resampling": "nearest",
       "source": "direita_andando.png",
       "source_sha256": "a2f050f7ea1f0928af8ed951068de5fd55a177e0330bf9047396c4b9300668d5",
@@ -1430,8 +1740,8 @@
     },
     {
       "content_size": [
-        32,
-        32
+        48,
+        48
       ],
       "crop": [
         0,
@@ -1445,10 +1755,10 @@
         0
       ],
       "output_size": [
-        32,
-        32
+        48,
+        48
       ],
-      "payload_sha256": "d786523201560aa2cfb416b9e6224812f34915be95d23e7cebcbcb6f0d83709d",
+      "payload_sha256": "5dcb6691b4f83416befeb576436724139ed9b79a545363d9c0a094464739b663",
       "resampling": "nearest",
       "source": "esquerda.png",
       "source_sha256": "665da7d300214da91bfbe9ab9d977b0d9ef554d095d3d7a71522a795b6f2a5cd",
@@ -1461,8 +1771,8 @@
     },
     {
       "content_size": [
-        32,
-        32
+        48,
+        48
       ],
       "crop": [
         0,
@@ -1476,10 +1786,10 @@
         0
       ],
       "output_size": [
-        32,
-        32
+        48,
+        48
       ],
-      "payload_sha256": "d2fc0753905858e82170455d3b74ec5981294cdddbf35d40ef3b244b708a8d2b",
+      "payload_sha256": "55af57a287113f775c3c9b80df87db2694385a5c766aae9352917f086541f58c",
       "resampling": "nearest",
       "source": "esquerda_andando.png",
       "source_sha256": "9a631843743f5064790e09bd613e062b192b64b735de81e633e51ff8986a89bb",
@@ -2173,6 +2483,316 @@
         60
       ],
       "symbol": "asset__armas_sprite_5",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        12
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        240
+      ],
+      "group": "_backgrounds",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "7d680b23e917337b6ad823fde655e2b7d55c5cd38d86a6fe2b6c5f0beb4a21ba",
+      "resampling": "nearest",
+      "source": "laboratory_base.png",
+      "source_sha256": "0c66f4bb3226074c1439cb9dec58bd7f2f57b859dba526f0ed798b225f4ef9f0",
+      "source_size": [
+        320,
+        240
+      ],
+      "symbol": "asset__backgrounds_laboratory_base",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        12
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        240
+      ],
+      "group": "_backgrounds",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "7d680b23e917337b6ad823fde655e2b7d55c5cd38d86a6fe2b6c5f0beb4a21ba",
+      "resampling": "nearest",
+      "source": "laboratory_exit_highlight.png",
+      "source_sha256": "b540126f2126ccf025d57c43a6cdbbe72fe34a05ea795f3910dc566525604fbe",
+      "source_size": [
+        320,
+        240
+      ],
+      "symbol": "asset__backgrounds_laboratory_exit_highlight",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        12
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        240
+      ],
+      "group": "_backgrounds",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "0afa289fd58bc2e8d076dd2c90ce46e74372087931cbf5d99111d6686c72600f",
+      "resampling": "nearest",
+      "source": "sewer_base.png",
+      "source_sha256": "6572f281fd04f75c10c9015af35f840986744d391602e9a687daaf1ae2c4b19d",
+      "source_size": [
+        320,
+        240
+      ],
+      "symbol": "asset__backgrounds_sewer_base",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        12
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        240
+      ],
+      "group": "_backgrounds",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "2fb3baaccc434e89156528b5077ece694c9284def14c2dc79b6a50eb6c664425",
+      "resampling": "nearest",
+      "source": "sewer_exit_highlight.png",
+      "source_sha256": "52e17c3065263ee9598ad1edd7d1ebafe82083a151f3d4d8c44ee688b894f5fb",
+      "source_size": [
+        320,
+        240
+      ],
+      "symbol": "asset__backgrounds_sewer_exit_highlight",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        12
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        240
+      ],
+      "group": "_backgrounds",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "86eab6bba98dd01f22aaee66d3c44eb4085ab0a2323668181a533f0e938739d5",
+      "resampling": "nearest",
+      "source": "town_base.png",
+      "source_sha256": "cf6468c783c178503bf1b13dbd50db58913beea1411f276640a686cc9e3b0a9b",
+      "source_size": [
+        320,
+        240
+      ],
+      "symbol": "asset__backgrounds_town_base",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        12
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        240
+      ],
+      "group": "_backgrounds",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "86eab6bba98dd01f22aaee66d3c44eb4085ab0a2323668181a533f0e938739d5",
+      "resampling": "nearest",
+      "source": "town_exit_highlight.png",
+      "source_sha256": "2844bcdcdcc8b0b866aac77e0846ae353935bfc300ee64f3ef656ea658fbe247",
+      "source_size": [
+        320,
+        240
+      ],
+      "symbol": "asset__backgrounds_town_exit_highlight",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        12
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        240
+      ],
+      "group": "_cutscenes_text",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "f2c867ab23aaa248bd46d621e59c6ef28c2ee83b195491ebbc3ff70b6a9da059",
+      "resampling": "nearest",
+      "source": "pixil-frame-0.png",
+      "source_sha256": "641f7e758afdf192448c576bdc6e4f58f817d492794db3410d8fd79cfc07961d",
+      "source_size": [
+        320,
+        240
+      ],
+      "symbol": "asset__cutscenes_text_pixil_frame_0",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        12
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        240
+      ],
+      "group": "_cutscenes_text",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "d054c154ed32c889933b18f66b16c55792169b38813ecb4d81e251de04027c6c",
+      "resampling": "nearest",
+      "source": "pixil-frame-1.png",
+      "source_sha256": "6b8c91d957d0563d5b9187721fe5d00b6bae32682440c7244fc08b52200e4cf9",
+      "source_size": [
+        320,
+        240
+      ],
+      "symbol": "asset__cutscenes_text_pixil_frame_1",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        12
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        240
+      ],
+      "group": "_cutscenes_text",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "0dc72e91f1ea37d9062cdf0e1c028c7187a52e0ce6e9f707cb07a97909926136",
+      "resampling": "nearest",
+      "source": "pixil-frame-2.png",
+      "source_sha256": "dcf967b55d13215a9bc6ea3187e0a046abfd4cd5bc803f8ca452d9e292852cd0",
+      "source_size": [
+        320,
+        240
+      ],
+      "symbol": "asset__cutscenes_text_pixil_frame_2",
+      "transparent_value": 0
+    },
+    {
+      "content_size": [
+        16,
+        12
+      ],
+      "crop": [
+        0,
+        0,
+        320,
+        240
+      ],
+      "group": "_cutscenes_text",
+      "offset": [
+        0,
+        2
+      ],
+      "output_size": [
+        16,
+        16
+      ],
+      "payload_sha256": "f82c52050ccece34f9fe38c8e3206868e0cbd9a1bb8393afb0d60fb466f11bb3",
+      "resampling": "nearest",
+      "source": "pixil-frame-3.png",
+      "source_sha256": "46e6a6a9712d09fc070af267077c8481f64bd3c6db299c549bbc2f038be91796",
+      "source_size": [
+        320,
+        240
+      ],
+      "symbol": "asset__cutscenes_text_pixil_frame_3",
       "transparent_value": 0
     },
     {

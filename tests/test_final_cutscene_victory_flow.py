@@ -9,26 +9,39 @@ class FinalCutsceneVictoryFlowTests(unittest.TestCase):
     def setUpClass(cls):
         root = build_text_cutscenes_bgr233.ROOT
         cls.collision = (root / "src" / "collision.s").read_text(encoding="utf-8")
+        cls.state = (root / "src" / "game_state.s").read_text(encoding="utf-8")
         cls.screens = (root / "src" / "screens.s").read_text(encoding="utf-8")
         cls.render = (root / "src" / "render.s").read_text(encoding="utf-8")
         cls.game_loop = (root / "src" / "game_loop.s").read_text(encoding="utf-8")
         cls.main = (root / "main.s").read_text(encoding="utf-8")
 
-    def test_boss_defeat_starts_detonator_then_explosion(self):
+    def test_boss_defeat_starts_final_text_then_detonator_then_explosion(self):
         boss_defeated = self.collision[
             self.collision.index("boss_defeated:") : self.collision.index("next_bullet_boss:")
         ]
         self.assertEqual(boss_defeated.count("call set_state_cutscene_detonator"), 1)
+
+        detonator_state = self.state[
+            self.state.index("set_state_cutscene_detonator:") : self.state.index(
+                "set_state_cutscene_explosion:"
+            )
+        ]
+        self.assertIn("j prepare_text_first_cutscene", detonator_state)
 
         detonator = self.screens[
             self.screens.index("update_post_boss_detonator:") : self.screens.index(
                 "update_post_boss_explosion:"
             )
         ]
+        self.assertEqual(detonator.count("call show_image_cutscene"), 1)
         self.assertEqual(detonator.count("call set_state_cutscene_explosion"), 1)
         self.assertNotIn("call show_text_cutscene", detonator)
+        self.assertLess(
+            detonator.index("call show_image_cutscene"),
+            detonator.index("call set_state_cutscene_explosion"),
+        )
 
-    def test_explosion_is_followed_once_by_final_text_then_victory(self):
+    def test_explosion_is_followed_directly_by_victory(self):
         explosion_loop = self.game_loop[
             self.game_loop.index("loop_post_boss_explosion:") : self.game_loop.index(
                 "loop_playing_level:"
@@ -39,7 +52,7 @@ class FinalCutsceneVictoryFlowTests(unittest.TestCase):
 
         explosion = self.screens[
             self.screens.index("update_post_boss_explosion:") : self.screens.index(
-                "game_over_screen:"
+                "end_update_post_boss_explosion:"
             )
         ]
         self.assertEqual(explosion.count("call discard_pending_keyboard_events"), 1)
@@ -47,7 +60,7 @@ class FinalCutsceneVictoryFlowTests(unittest.TestCase):
         self.assertEqual(explosion.count("call draw_cutscene_screen"), 1)
         self.assertEqual(explosion.count("call end_frame"), 1)
         self.assertEqual(explosion.count("call wait_post_boss_explosion_key"), 1)
-        self.assertEqual(explosion.count("jal show_text_cutscene_3"), 1)
+        self.assertNotIn("show_text_cutscene", explosion)
         self.assertEqual(explosion.count("call set_state_victory"), 1)
         self.assertLess(
             explosion.index("call discard_pending_keyboard_events"),
@@ -59,10 +72,6 @@ class FinalCutsceneVictoryFlowTests(unittest.TestCase):
         )
         self.assertLess(
             explosion.index("call wait_post_boss_explosion_key"),
-            explosion.index("jal show_text_cutscene_3"),
-        )
-        self.assertLess(
-            explosion.index("jal show_text_cutscene_3"),
             explosion.index("call set_state_victory"),
         )
 
@@ -71,8 +80,8 @@ class FinalCutsceneVictoryFlowTests(unittest.TestCase):
                 "select_image_cutscene:"
             )
         ]
-        self.assertIn("STATE_CUTSCENE_EXPLOSION", final_text_select)
-        self.assertNotIn("STATE_CUTSCENE_DETONATOR", final_text_select)
+        self.assertIn("STATE_CUTSCENE_DETONATOR", final_text_select)
+        self.assertNotIn("STATE_CUTSCENE_EXPLOSION", final_text_select)
         self.assertEqual(self.render.count("la t0, text_cutscene_3_pixels"), 1)
 
     def test_explosion_wait_accepts_only_new_enter_or_space_event(self):

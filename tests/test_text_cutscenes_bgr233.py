@@ -52,13 +52,14 @@ class TextCutsceneIntegrationTests(unittest.TestCase):
             self.assertIn(f"text_cutscene_{index}_pixels", render)
         self.assertIn("li t2, 76800", render)
 
-    def test_flow_requires_a_fresh_event_between_image_and_text(self):
+    def test_flow_requires_a_fresh_event_between_text_and_image(self):
         screens = (build_text_cutscenes_bgr233.ROOT / "src" / "screens.s").read_text(encoding="utf-8")
         self.assertIn("cutscene_advance_pressed:", screens)
         self.assertIn("cutscene_discard_pending_loop:", screens)
         self.assertIn("cutscene_wait_new_event:", screens)
-        self.assertEqual(len(re.findall(r"^\s*call show_text_cutscene\s*$", screens, re.MULTILINE)), 1)
-        self.assertEqual(len(re.findall(r"^\s*jal show_text_cutscene_3\s*$", screens, re.MULTILINE)), 1)
+        self.assertEqual(len(re.findall(r"^\s*call show_image_cutscene\s*$", screens, re.MULTILINE)), 2)
+        self.assertEqual(len(re.findall(r"^\s*call show_text_cutscene\s*$", screens, re.MULTILINE)), 0)
+        self.assertEqual(len(re.findall(r"^\s*jal show_text_cutscene_3\s*$", screens, re.MULTILINE)), 0)
         self.assertIn("call set_state_cutscene_explosion", screens)
 
 

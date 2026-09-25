@@ -1,75 +1,157 @@
+# ============================================================
 # Python
+# ============================================================
+
 __pycache__/
 *.py[cod]
 *$py.class
+
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .pyright/
 .hypothesis/
+
 .coverage
 .coverage.*
 coverage.xml
 htmlcov/
 
-# Test outputs
-test-results/
-pytest-results/
-reports/
-
-# Graphify
-graphify-out/
-.graphify/
-.graphify-cache/
-.graphifyignore
-
+# ============================================================
 # Virtual environments
+# ============================================================
+
 .venv/
 venv/
 env/
 ENV/
 
-# IDE
+# ============================================================
+# Secrets / credentials / local environment
+# ============================================================
+
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+
+credentials
+credentials.json
+secrets.json
+secrets.yaml
+secrets.yml
+secret.json
+secret.yaml
+secret.yml
+
+.aws/
+.ssh/
+
+# ============================================================
+# Local AI / agent tooling
+# ============================================================
+
+.agents/
+.codex/
+.claude/
+.cursor/
+AGENTS.override.md
+
+# ============================================================
+# IDE / editor
+# ============================================================
+
 .vscode/
 .idea/
 *.code-workspace
 
-# Temporary files
-*.log
-*.tmp
-*.temp
-*.bak
 *.swp
 *.swo
 *.orig
 *.rej
-~$*
+*~
 
+# ============================================================
 # Operating system
+# ============================================================
+
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Java / RARS generated files
+# ============================================================
+# Temporary / logs
+# ============================================================
+
+*.log
+*.tmp
+*.temp
+*.bak
+
+tmp/
+temp/
+
+# ============================================================
+# Java / RARS generated runtime files
+# ============================================================
+
 *.class
 hs_err_pid*
 replay_pid*
 
-# Local environment
-.env
-.env.*
-!.env.example
-# Local AI tooling
-.agents/
-.codex/
-AGENTS.override.md
+# ============================================================
+# Test / analysis outputs
+# ============================================================
 
-# Experimental Indexed8
+test-results/
+pytest-results/
+reports/
+
+# ============================================================
+# Graphify
+# ============================================================
+
+graphify-out/
+.graphify/
+.graphify-cache/
+.graphifyignore
+
+# ============================================================
+# Generated visual diagnostics
+#
+# Keep required game assets versioned.
+# Ignore only disposable previews/diagnostics.
+# ============================================================
+
+/assets/generated/text_cutscene_previews/
+
+/assets/generated/*_preview.png
+/assets/generated/*_highlight_preview.png
+/assets/generated/*_comparison.png
+/assets/generated/*_obstacles_check.png
+/assets/generated/*_metrics.json
+
+# ============================================================
+# Experimental Indexed8 artifacts
+# ============================================================
+
 /test_indexed8_palette.s
 /test_town_indexed8_background.s
 /src/palette.s
 /tools/build_town_indexed8.py
 /tests/test_town_indexed8.py
+
 /assets/generated/backgrounds.s
 /assets/generated/town_base_indexed8.bin
 /assets/generated/town_exit_overlay.bin
@@ -78,11 +160,3 @@ AGENTS.override.md
 /assets/generated/town_preview_base.png
 /assets/generated/town_preview_highlight.png
 /assets/generated/town_comparison.png
-
-# Generated visual diagnostics
-/assets/generated/text_cutscene_previews/
-/assets/generated/town_bgr233_preview.png
-/assets/generated/town_bgr233_highlight_preview.png
-/assets/generated/town_bgr233_comparison.png
-/assets/generated/town_bgr233_obstacles_check.png
-/assets/generated/town_bgr233_metrics.json

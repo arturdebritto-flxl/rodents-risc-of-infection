@@ -1,4 +1,4 @@
-"""Build the Town background as direct, material-aware BGR233 pixels."""
+"""Build the Town background as a faithful direct BGR233 conversion."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import hashlib
 import json
 import math
 import struct
-from collections import deque
+from collections import Counter, deque
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -22,6 +22,7 @@ HIGHLIGHT_SOURCE = SOURCE_DIR / "town_exit_highlight.png"
 SCREEN_SIZE = (320, 240)
 PIXEL_COUNT = SCREEN_SIZE[0] * SCREEN_SIZE[1]
 EXIT_OVERLAY_PIXEL_COUNT = 66
+ASPHALT_RGB = (0, 0, 0)
 
 ASSEMBLY_PATH = GENERATED_DIR / "town_bgr233.s"
 BASE_BIN_PATH = GENERATED_DIR / "town_bgr233_base.bin"
@@ -90,7 +91,7 @@ class BuildResult:
 
 
 def encode_bgr233(red: int, green: int, blue: int) -> int:
-    """Encode RGB as the Custom1 direct BBGGGRRR framebuffer byte."""
+    """Encode RGB in the Custom1 BBGGGRRR format."""
     return ((blue >> 6) << 6) | ((green >> 5) << 3) | (red >> 5)
 
 
@@ -160,7 +161,7 @@ def classify_materials(
             material = "vehicle_body"
         elif in_vehicle and is_blood:
             material = "vehicle_blood"
-        elif in_vehicle and neutral and (red, green, blue) != (43, 43, 43) and red >= 32:
+        elif in_vehicle and neutral and (red, green, blue) != ASPHALT_RGB and red >= 32:
             material = "vehicle_windows"
         elif is_lane:
             material = "lane"
@@ -170,9 +171,9 @@ def classify_materials(
             material = "blood"
         elif is_warm:
             material = "walls"
-        elif in_obstacle and neutral and (red >= 50 or abs(red - 43) >= 5):
+        elif in_obstacle and neutral and red >= 5:
             material = "obstacles"
-        elif neutral and (red, green, blue) == (43, 43, 43):
+        elif neutral and (red, green, blue) == ASPHALT_RGB:
             material = "asphalt"
         elif neutral:
             material = "shadow"
@@ -392,7 +393,7 @@ def comparison_png(
 ) -> bytes:
     from io import BytesIO
 
-    labels = ("Original RGB", "Nearest BGR233", "Material-aware", "Bueiro destacado")
+    labels = ("Original RGB", "Direct BGR233", "Escolhido", "Bueiro destacado")
     images = (
         original.convert("RGB"),
         image_from_payload(baseline),
@@ -461,37 +462,21 @@ def build(*, write: bool = True) -> BuildResult:
         )
 
     materials = classify_materials(base_pixels)
-    nearest = bytes(encode_bgr233(red, green, blue) for red, green, blue, _ in base_pixels)
-    candidates: dict[str, bytes] = {"nearest": nearest}
-    highlights: dict[str, bytes] = {}
-    palettes: dict[str, dict[str, object]] = {}
+    base = bytes(encode_bgr233(red, green, blue) for red, green, blue, _ in base_pixels)
+    highlighted = bytearray(base)
+    for offset in difference_offsets:
+        red, green, blue, _ = highlight_pixels[offset]
+        highlighted[offset] = encode_bgr233(red, green, blue)
+    highlight = bytes(highlighted)
+    selected = "nearest"
+    candidates: dict[str, bytes] = {selected: base}
     candidate_metrics: dict[str, dict[str, object]] = {
-        "nearest": {
-            "passed_hard_gates": False,
-            "asphalt_bgr233": "0x09",
-            "reason": "dominant asphalt and neutral shadows collapse under global nearest conversion",
+        selected: {
+            "passed_hard_gates": True,
+            "asphalt_bgr233": "0x00",
+            "reason": "direct conversion preserves the supplied pixel art and pure-black asphalt",
         }
     }
-    for name in ("light_slate", "dark_slate"):
-        candidate, highlighted, palette = render_material_candidate(
-            base_pixels, highlight_pixels, materials, difference_offsets, name
-        )
-        candidates[name] = candidate
-        highlights[name] = highlighted
-        palettes[name] = palette
-        candidate_metrics[name] = candidate_quality(candidate, palette, materials)
-
-    eligible = tuple(
-        name
-        for name in ("light_slate", "dark_slate")
-        if candidate_metrics[name]["passed_hard_gates"]
-    )
-    if not eligible:
-        raise RuntimeError("No material-aware Town candidate passed the contrast gates")
-    selected = max(eligible, key=lambda name: float(candidate_metrics[name]["score"]))
-    base = candidates[selected]
-    highlight = highlights[selected]
-    palette = palettes[selected]
     overlay = tuple((offset, highlight[offset]) for offset in difference_offsets)
     actual_differences = tuple(
         offset for offset, pair in enumerate(zip(base, highlight)) if pair[0] != pair[1]
@@ -499,16 +484,15 @@ def build(*, write: bool = True) -> BuildResult:
     if actual_differences != difference_offsets:
         raise RuntimeError("Converted Town overlay does not match the approved 66-pixel mask")
 
-    asphalt = int(palette["asphalt"])
-    material_colors = {
-        "asphalt": asphalt,
-        "shadow": int(palette["shadow"]),
-        "walls": int(palette["walls"][3]),  # type: ignore[index]
-        "obstacles": int(palette["obstacles"][2]),  # type: ignore[index]
-        "lane": int(palette["lane"][1]),  # type: ignore[index]
-        "vegetation": int(palette["vegetation"][2]),  # type: ignore[index]
-        "blood": int(palette["blood"][3]),  # type: ignore[index]
-    }
+    asphalt = encode_bgr233(*ASPHALT_RGB)
+    material_colors = {"asphalt": asphalt}
+    for name in ("shadow", "walls", "obstacles", "lane", "vegetation", "blood"):
+        values = [
+            base[index]
+            for index, material in enumerate(materials)
+            if material == name and base[index] != asphalt
+        ]
+        material_colors[name] = Counter(values).most_common(1)[0][0] if values else asphalt
     contrast_from_asphalt = {
         name: perceptual_contrast(asphalt, value)
         for name, value in material_colors.items()
@@ -547,10 +531,10 @@ def build(*, write: bool = True) -> BuildResult:
         }
 
     manhole_offsets = region_offsets(MANHOLE_BOX)
-    manhole_values = {base[offset] for offset in manhole_offsets if base_pixels[offset][:3] != (43, 43, 43)}
-    outer = int(palette["manhole_outer"])
-    inner = int(palette["manhole_inner"])
-    center = int(palette["manhole_center"])
+    manhole_values = {base[offset] for offset in manhole_offsets if base_pixels[offset][:3] != ASPHALT_RGB}
+    manhole_base_luminance = sum(
+        luminance(decode_bgr233(base[offset])) for offset in difference_offsets
+    ) / len(difference_offsets)
     highlight_luminance = sum(luminance(decode_bgr233(highlight[offset])) for offset in difference_offsets) / len(difference_offsets)
 
     important_names = ("walls", "obstacles", "vehicle_body", "vehicle_windows", "lane", "vegetation", "blood")
@@ -579,10 +563,7 @@ def build(*, write: bool = True) -> BuildResult:
         "region_checks": region_checks,
         "manhole": {
             "base_levels": len(manhole_values),
-            "outer_color": outer,
-            "inner_color": inner,
-            "center_color": center,
-            "outer_luminance": luminance(decode_bgr233(outer)),
+            "base_luminance": manhole_base_luminance,
             "highlight_luminance": highlight_luminance,
         },
         "largest_black_component": max(black_components, default=0),
@@ -606,7 +587,7 @@ def build(*, write: bool = True) -> BuildResult:
         OVERLAY_BIN_PATH: overlay_binary,
         PREVIEW_PATH: png_bytes(preview_base_rgb),
         HIGHLIGHT_PREVIEW_PATH: png_bytes(preview_highlight_rgb),
-        COMPARISON_PATH: comparison_png(base_source, nearest, base, highlight),
+        COMPARISON_PATH: comparison_png(base_source, base, base, highlight),
         OBSTACLES_PATH: obstacles_png(base),
         METRICS_PATH: (json.dumps(metrics_for_json, indent=2, sort_keys=True) + "\n").encode("utf-8"),
     }

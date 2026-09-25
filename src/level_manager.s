@@ -44,6 +44,19 @@ init_level1:
 
     ret
 
+get_laboratory_wave_enemy_count:
+    la t0, current_wave
+    lw t1, 0(t0)
+    li a0, LABORATORY_WAVE1_ENEMIES
+    li t2, 1
+    beq t1, t2, finish_get_laboratory_wave_enemy_count
+    li a0, LABORATORY_WAVE2_ENEMIES
+    li t2, 2
+    beq t1, t2, finish_get_laboratory_wave_enemy_count
+    li a0, LABORATORY_WAVE3_ENEMIES
+finish_get_laboratory_wave_enemy_count:
+    ret
+
 get_town_wave_enemy_count:
     la t0, current_wave
     lw t1, 0(t0)
@@ -85,6 +98,15 @@ init_level2:
     la t0, wave_spawned
     sw zero, 0(t0)
 
+    la t0, sewer_exit_unlocked
+    sw zero, 0(t0)
+    la t0, sewer_exit_blink_timer
+    sw zero, 0(t0)
+    la t0, sewer_exit_blink_frame
+    sw zero, 0(t0)
+    la t0, sewer_exit_transitioned
+    sw zero, 0(t0)
+
     ret
 
 # ------------------------------------------------------------
@@ -113,7 +135,20 @@ init_level3:
     la t0, wave_spawned
     sw zero, 0(t0)
 
+    la t0, laboratory_spawn_timer
+    li t1, LABORATORY_FIRST_SPAWN_DELAY
+    sw t1, 0(t0)
+
     la t0, boss_active
+    sw zero, 0(t0)
+
+    la t0, laboratory_exit_unlocked
+    sw zero, 0(t0)
+    la t0, laboratory_exit_blink_timer
+    sw zero, 0(t0)
+    la t0, laboratory_exit_blink_frame
+    sw zero, 0(t0)
+    la t0, laboratory_exit_transitioned
     sw zero, 0(t0)
 
     ret
@@ -488,8 +523,74 @@ start_sewer_wave5:
 
 
 finish_sewer:
-    call set_state_cutscene_level3
+    la t0, sewer_exit_unlocked
+    lw t1, 0(t0)
+    bnez t1, end_advance_wave
+    li t1, 1
+    sw t1, 0(t0)
+    la t0, sewer_exit_blink_timer
+    sw zero, 0(t0)
+    la t0, sewer_exit_blink_frame
+    sw zero, 0(t0)
     j end_advance_wave
+
+# Pisca a saida do esgoto depois da quinta wave e muda para a cutscene
+# do laboratorio quando o centro do jogador se aproxima dela.
+update_sewer_exit:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    la t0, current_level
+    lw t1, 0(t0)
+    li t2, LEVEL_SEWER
+    bne t1, t2, end_update_sewer_exit
+    la t0, sewer_exit_unlocked
+    lw t1, 0(t0)
+    beqz t1, end_update_sewer_exit
+    la t0, sewer_exit_transitioned
+    lw t1, 0(t0)
+    bnez t1, end_update_sewer_exit
+
+    la t0, sewer_exit_blink_timer
+    lw t1, 0(t0)
+    addi t1, t1, 1
+    li t2, SEWER_EXIT_BLINK_FRAMES
+    blt t1, t2, store_sewer_exit_blink_timer
+    sw zero, 0(t0)
+    la t0, sewer_exit_blink_frame
+    lw t1, 0(t0)
+    xori t1, t1, 1
+    sw t1, 0(t0)
+    j check_sewer_exit_trigger
+
+store_sewer_exit_blink_timer:
+    sw t1, 0(t0)
+
+check_sewer_exit_trigger:
+    la t0, player_x
+    lw t1, 0(t0)
+    addi t1, t1, 8
+    addi t1, t1, -SEWER_EXIT_CENTER_X
+    mul t1, t1, t1
+    la t0, player_y
+    lw t2, 0(t0)
+    addi t2, t2, 8
+    addi t2, t2, -SEWER_EXIT_CENTER_Y
+    mul t2, t2, t2
+    add t1, t1, t2
+    li t2, SEWER_EXIT_RADIUS_SQUARED
+    bgt t1, t2, end_update_sewer_exit
+
+    la t0, sewer_exit_transitioned
+    li t1, 1
+    sw t1, 0(t0)
+    call clear_input_buffers
+    call set_state_cutscene_level3
+
+end_update_sewer_exit:
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
 
 
 # ------------------------------------------------------------
@@ -507,7 +608,7 @@ advance_laboratory_wave:
     beq t1, t2, start_laboratory_wave3
 
     li t2, 3
-    beq t1, t2, start_boss_fight
+    beq t1, t2, finish_laboratory
 
     j end_advance_wave
 
@@ -524,6 +625,10 @@ start_laboratory_wave2:
     la t0, wave_spawned
     sw zero, 0(t0)
 
+    la t0, laboratory_spawn_timer
+    li t1, LABORATORY_FIRST_SPAWN_DELAY
+    sw t1, 0(t0)
+
     j end_advance_wave
 
 
@@ -539,13 +644,90 @@ start_laboratory_wave3:
     la t0, wave_spawned
     sw zero, 0(t0)
 
+    la t0, laboratory_spawn_timer
+    li t1, LABORATORY_FIRST_SPAWN_DELAY
+    sw t1, 0(t0)
+
     j end_advance_wave
 
 
-start_boss_fight:
-    la t0, boss_active
+finish_laboratory:
+    la t0, laboratory_exit_unlocked
     lw t1, 0(t0)
     bnez t1, end_advance_wave
+    li t1, 1
+    sw t1, 0(t0)
+    la t0, laboratory_exit_blink_timer
+    sw zero, 0(t0)
+    la t0, laboratory_exit_blink_frame
+    sw zero, 0(t0)
+    j end_advance_wave
+
+# Pisca a porta direita depois da terceira wave. Ao se aproximar dela,
+# inicia a batalha final sem trocar o mapa do laboratorio.
+update_laboratory_exit:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    la t0, game_state
+    lw t1, 0(t0)
+    li t2, STATE_LEVEL3
+    bne t1, t2, end_update_laboratory_exit
+    la t0, laboratory_exit_unlocked
+    lw t1, 0(t0)
+    beqz t1, end_update_laboratory_exit
+    la t0, laboratory_exit_transitioned
+    lw t1, 0(t0)
+    bnez t1, end_update_laboratory_exit
+
+    la t0, laboratory_exit_blink_timer
+    lw t1, 0(t0)
+    addi t1, t1, 1
+    li t2, LABORATORY_EXIT_BLINK_FRAMES
+    blt t1, t2, store_laboratory_exit_blink_timer
+    sw zero, 0(t0)
+    la t0, laboratory_exit_blink_frame
+    lw t1, 0(t0)
+    xori t1, t1, 1
+    sw t1, 0(t0)
+    j check_laboratory_exit_trigger
+
+store_laboratory_exit_blink_timer:
+    sw t1, 0(t0)
+
+check_laboratory_exit_trigger:
+    la t0, player_x
+    lw t1, 0(t0)
+    addi t1, t1, 8
+    addi t1, t1, -LABORATORY_EXIT_CENTER_X
+    mul t1, t1, t1
+    la t0, player_y
+    lw t2, 0(t0)
+    addi t2, t2, 8
+    addi t2, t2, -LABORATORY_EXIT_CENTER_Y
+    mul t2, t2, t2
+    add t1, t1, t2
+    li t2, LABORATORY_EXIT_RADIUS_SQUARED
+    bgt t1, t2, end_update_laboratory_exit
+
+    la t0, laboratory_exit_transitioned
+    li t1, 1
+    sw t1, 0(t0)
+    call start_boss_fight
+
+end_update_laboratory_exit:
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
+
+start_boss_fight:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    la t0, boss_active
+    lw t1, 0(t0)
+    bnez t1, end_start_boss_fight
 
     la t0, boss_active
     li t1, 1
@@ -591,9 +773,17 @@ start_boss_fight:
     la t0, wave_spawned
     sw zero, 0(t0)
 
+    la t0, laboratory_exit_unlocked
+    sw zero, 0(t0)
+    la t0, laboratory_exit_blink_frame
+    sw zero, 0(t0)
+
     call clear_input_buffers
 
-    j end_advance_wave
+end_start_boss_fight:
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
 
 
 # ------------------------------------------------------------

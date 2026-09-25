@@ -71,7 +71,7 @@ move_boss:
     # impedir a tentativa independente no eixo Y.
     la t0, boss_x
     lw t1, 0(t0)
-    addi t1, t1, 16
+    addi t1, t1, BOSS_HALF_SIZE
     la t0, player_x
     lw t2, 0(t0)
     addi t2, t2, 8
@@ -98,7 +98,7 @@ boss_chase_left:
 boss_chase_y:
     la t0, boss_y
     lw t1, 0(t0)
-    addi t1, t1, 16
+    addi t1, t1, BOSS_HALF_SIZE
     la t0, player_y
     lw t2, 0(t0)
     addi t2, t2, 8
@@ -230,6 +230,10 @@ check_boss_melee_range:
 
     bnez t6, boss_melee_in_range_cooldown
 
+    la t0, god_mode_enabled
+    lw t1, 0(t0)
+    bnez t1, boss_melee_invincible
+
     la t0, player_lives
     lw t1, 0(t0)
     li t2, BOSS_MELEE_DAMAGE
@@ -242,6 +246,13 @@ check_boss_melee_range:
     li a0, 1
 
     blez t1, boss_melee_game_over
+    j end_update_boss_melee
+
+boss_melee_invincible:
+    la t0, boss_melee_timer
+    li t2, BOSS_MELEE_COOLDOWN
+    sw t2, 0(t0)
+    li a0, 1
     j end_update_boss_melee
 
 boss_melee_in_range_cooldown:
@@ -258,7 +269,7 @@ end_update_boss_melee:
     ret
 
 update_boss_heavy_attack:
-    addi sp, sp, -4
+    addi sp, sp, -20
     sw ra, 0(sp)
 
     la t0, boss_heavy_timer
@@ -271,11 +282,11 @@ update_boss_heavy_attack:
 
     la t0, boss_x
     lw t5, 0(t0)
-    addi t5, t5, 16
+    addi t5, t5, BOSS_HALF_SIZE
 
     la t0, boss_y
     lw t6, 0(t0)
-    addi t6, t6, 16
+    addi t6, t6, BOSS_HALF_SIZE
 
     la t0, player_x
     lw a2, 0(t0)
@@ -312,12 +323,43 @@ boss_heavy_normalize:
     mul a3, a3, t2
     div a3, a3, t0
 
+    # Salva origem e direcao central; spawn_enemy_bullet_typed usa todos os
+    # temporarios, mas a rajada precisa reutilizar os mesmos valores.
     addi a0, t5, -3
+    sw a0, 4(sp)
     addi a1, t6, -3
+    sw a1, 8(sp)
+    sw a2, 12(sp)
+    sw a3, 16(sp)
 
-boss_heavy_spawn:
+    # Tiro central.
+    lw a0, 4(sp)
+    lw a1, 8(sp)
+    lw a2, 12(sp)
+    lw a3, 16(sp)
     li a4, ENEMY_PROJECTILE_BOSS_HEAVY
     call spawn_enemy_bullet_typed
+
+    # Segundo tiro: abre a rajada para um lado do alvo.
+    lw t0, 12(sp)
+    lw t1, 16(sp)
+    lw a0, 4(sp)
+    lw a1, 8(sp)
+    sub a2, t0, t1
+    add a3, t1, t0
+    li a4, ENEMY_PROJECTILE_BOSS_HEAVY
+    call spawn_enemy_bullet_typed
+
+    # Terceiro tiro: abre a rajada para o outro lado do alvo.
+    lw t0, 12(sp)
+    lw t1, 16(sp)
+    lw a0, 4(sp)
+    lw a1, 8(sp)
+    add a2, t0, t1
+    sub a3, t1, t0
+    li a4, ENEMY_PROJECTILE_BOSS_HEAVY
+    call spawn_enemy_bullet_typed
+
     j end_update_boss_heavy_attack
 
 store_boss_heavy_timer:
@@ -325,5 +367,5 @@ store_boss_heavy_timer:
 
 end_update_boss_heavy_attack:
     lw ra, 0(sp)
-    addi sp, sp, 4
+    addi sp, sp, 20
     ret

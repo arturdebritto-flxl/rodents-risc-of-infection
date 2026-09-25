@@ -39,6 +39,12 @@ init_player:
     la t0, move_y_timer
     sw zero, 0(t0)
 
+    la t0, player_walk_tick
+    sw zero, 0(t0)
+
+    la t0, player_walk_frame
+    sw zero, 0(t0)
+
     ret
 
 update_player:
@@ -218,6 +224,37 @@ finish_player_movement:
 end_update_player:
     lw ra, 0(sp)
     addi sp, sp, 16
+    ret
+
+# Alterna apenas enquanto o personagem realmente se desloca. O relogio
+# separado evita que o ciclo dos inimigos/boss esconda o passo do jogador.
+update_player_walk_animation:
+    la t0, player_moved
+    lw t1, 0(t0)
+    bnez t1, advance_player_walk_animation
+
+    la t0, player_walk_tick
+    sw zero, 0(t0)
+    la t0, player_walk_frame
+    sw zero, 0(t0)
+    ret
+
+advance_player_walk_animation:
+    la t0, player_walk_tick
+    lw t1, 0(t0)
+    addi t1, t1, 1
+    li t2, PLAYER_WALK_FRAME_DELAY
+    blt t1, t2, store_player_walk_tick
+
+    sw zero, 0(t0)
+    la t0, player_walk_frame
+    lw t1, 0(t0)
+    xori t1, t1, 1
+    sw t1, 0(t0)
+    ret
+
+store_player_walk_tick:
+    sw t1, 0(t0)
     ret
 
 # ------------------------------------------------------------
@@ -586,85 +623,96 @@ finish_move_town_projectile_swept:
     ret
 
 check_sewer_player_obstacles:
-    li t0, 96
-    li t1, 44
-    li t2, 12
-    li t3, 76
-    jal zero, check_obstacle_rect
+    addi sp, sp, -16
+    sw a0, 0(sp)
+    sw a1, 4(sp)
+    sw a4, 8(sp)
+    add a2, a0, a4
+    add a3, a1, a4
 
-check_sewer_obstacle_2:
-    li t0, 212
-    li t1, 118
-    li t2, 12
-    li t3, 76
-    jal zero, check_obstacle_rect
+    li t0, 10
+    blt a0, t0, sewer_obstacle_blocked
+    li t0, 310
+    bgt a2, t0, sewer_obstacle_blocked
+    li t0, 230
+    bgt a3, t0, sewer_obstacle_blocked
+
+    la t6, sewer_collision_aabbs
+    li t4, SEWER_COLLISION_AABB_COUNT
+
+check_sewer_obstacle_loop:
+    beqz t4, check_sewer_obstacles_done
+    lw t0, 0(t6)
+    lw t1, 4(t6)
+    lw t2, 8(t6)
+    lw t3, 12(t6)
+    add t5, a0, a4
+    ble t5, t0, next_sewer_obstacle
+    bge a0, t2, next_sewer_obstacle
+    add t5, a1, a4
+    ble t5, t1, next_sewer_obstacle
+    bge a1, t3, next_sewer_obstacle
+
+sewer_obstacle_blocked:
+    li a0, 1
+    j finish_check_sewer_obstacles
+
+next_sewer_obstacle:
+    addi t6, t6, 16
+    addi t4, t4, -1
+    j check_sewer_obstacle_loop
 
 check_sewer_obstacles_done:
     mv a0, zero
+finish_check_sewer_obstacles:
+    addi sp, sp, 16
     ret
 
 check_laboratory_player_obstacles:
-    li t0, 144
-    li t1, 88
-    li t2, 40
-    li t3, 36
-    jal zero, check_obstacle_rect
+    addi sp, sp, -16
+    sw a0, 0(sp)
+    sw a1, 4(sp)
+    sw a4, 8(sp)
+    add a2, a0, a4
+    add a3, a1, a4
 
-check_laboratory_obstacle_2:
-    li t0, 40
-    li t1, 58
-    li t2, 72
-    li t3, 10
-    jal zero, check_obstacle_rect
+    li t0, 10
+    blt a0, t0, laboratory_obstacle_blocked
+    li t0, 310
+    bgt a2, t0, laboratory_obstacle_blocked
+    li t0, 20
+    blt a1, t0, laboratory_obstacle_blocked
+    li t0, 216
+    bgt a3, t0, laboratory_obstacle_blocked
 
-check_laboratory_obstacle_3:
-    li t0, 208
-    li t1, 172
-    li t2, 72
-    li t3, 10
-    jal zero, check_obstacle_rect
+    la t6, laboratory_collision_aabbs
+    li t4, LABORATORY_COLLISION_AABB_COUNT
+
+check_laboratory_obstacle_loop:
+    beqz t4, check_laboratory_obstacles_done
+    lw t0, 0(t6)
+    lw t1, 4(t6)
+    lw t2, 8(t6)
+    lw t3, 12(t6)
+    add t5, a0, a4
+    ble t5, t0, next_laboratory_obstacle
+    bge a0, t2, next_laboratory_obstacle
+    add t5, a1, a4
+    ble t5, t1, next_laboratory_obstacle
+    bge a1, t3, next_laboratory_obstacle
+
+laboratory_obstacle_blocked:
+    li a0, 1
+    j finish_check_laboratory_obstacles
+
+next_laboratory_obstacle:
+    addi t6, t6, 16
+    addi t4, t4, -1
+    j check_laboratory_obstacle_loop
 
 check_laboratory_obstacles_done:
     mv a0, zero
+
+finish_check_laboratory_obstacles:
+    addi sp, sp, 16
     ret
-
-check_obstacle_rect:
-    add t5, a0, a4
-    ble t5, t0, next_obstacle_rect
-
-    add t5, t0, t2
-    bge a0, t5, next_obstacle_rect
-
-    add t5, a1, a4
-    ble t5, t1, next_obstacle_rect
-
-    add t5, t1, t3
-    bge a1, t5, next_obstacle_rect
-
-    li a0, 1
-    ret
-
-next_obstacle_rect:
-    la t4, current_level
-    lw t5, 0(t4)
-
-    li t4, LEVEL_SEWER
-    beq t5, t4, route_next_sewer_obstacle
-
-    li t4, LEVEL_LABORATORY
-    beq t5, t4, route_next_laboratory_obstacle
-
-    mv a0, zero
-    ret
-
-route_next_sewer_obstacle:
-    li t4, 96
-    beq t0, t4, check_sewer_obstacle_2
-    j check_sewer_obstacles_done
-
-route_next_laboratory_obstacle:
-    li t4, 144
-    beq t0, t4, check_laboratory_obstacle_2
-    li t4, 40
-    beq t0, t4, check_laboratory_obstacle_3
-    j check_laboratory_obstacles_done

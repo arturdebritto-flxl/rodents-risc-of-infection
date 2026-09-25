@@ -30,7 +30,7 @@ Depois, monte e execute o programa. O jogo inicia no menu principal.
 
 ## Fluxo Do Jogo
 
-O jogo comeca no menu principal. Ao pressionar `SPACE` ou `ENTER`, a primeira cutscene e exibida antes da fase da cidade.
+O jogo comeca no menu principal. Ao pressionar `SPACE` ou `ENTER`, aparece primeiro o texto da introducao e depois a imagem da cutscene antes da fase da cidade. As transicoes para as fases 2 e 3 seguem a mesma ordem.
 
 A progressao principal e:
 
@@ -41,7 +41,7 @@ A progressao principal e:
 - Fase 2: esgoto.
 - Cutscene para o laboratorio.
 - Fase 3: laboratorio e batalha final.
-- Cutscene do detonador e cutscene da explosao.
+- Texto final, cutscene do detonador e cutscene da explosao.
 - Tela de victory ou game over.
 
 Durante menu, cutscenes, game over e victory, o gameplay fica pausado. Nessas telas, `R/r` nao reinicia a partida.
@@ -61,6 +61,9 @@ O objetivo e sobreviver as hordas, coletar recursos no mapa e derrotar o boss fi
 - Inimigos com comportamentos variados.
 - Boss final com ataques proprios.
 - Pontuacao exibida nas telas finais.
+- Trilha MIDI em loop exclusiva do menu, controlada pela opcao `MUSIC`.
+- Trilha MIDI propria na tela de game over, encerrada ao escolher `RETRY` ou `LEAVE`.
+- Trilha MIDI de gameplay nas fases 1, 2, 3 e na batalha do boss; ela para antes das cutscenes e telas finais.
 
 ## Arquitetura Do Codigo
 

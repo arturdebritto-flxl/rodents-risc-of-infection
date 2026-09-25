@@ -46,6 +46,74 @@ init_inventory:
 
     ret
 
+# G ativa, ate o fim da partida atual: imortalidade, todas as armas e
+# municao infinita. O estado nao alterna para evitar desligamento acidental.
+handle_god_mode_cheat:
+    la t0, game_state
+    lw t1, 0(t0)
+    li t2, STATE_LEVEL1
+    beq t1, t2, check_god_mode_cheat_key
+    li t2, STATE_LEVEL2
+    beq t1, t2, check_god_mode_cheat_key
+    li t2, STATE_LEVEL3
+    beq t1, t2, check_god_mode_cheat_key
+    li t2, STATE_BOSS
+    bne t1, t2, end_handle_god_mode_cheat
+
+check_god_mode_cheat_key:
+    la t0, key_pressed
+    lw t1, 0(t0)
+    beqz t1, maintain_god_mode_cheat
+    la t0, last_key
+    lw t1, 0(t0)
+    li t2, 'g'
+    beq t1, t2, activate_god_mode_cheat
+    li t2, 'G'
+    bne t1, t2, maintain_god_mode_cheat
+
+activate_god_mode_cheat:
+    la t0, god_mode_enabled
+    li t1, 1
+    sw t1, 0(t0)
+
+maintain_god_mode_cheat:
+    la t0, god_mode_enabled
+    lw t1, 0(t0)
+    beqz t1, end_handle_god_mode_cheat
+
+    la t0, player_lives
+    li t1, PLAYER_MAX_LIVES
+    sw t1, 0(t0)
+
+    la t0, shotgun_owned
+    li t1, 1
+    sw t1, 0(t0)
+    la t0, boss_weapon_owned
+    sw t1, 0(t0)
+
+    la t0, normal_ammo_count
+    li t1, CHEAT_INFINITE_AMMO_COUNT
+    sw t1, 0(t0)
+    la t0, shotgun_ammo_count
+    sw t1, 0(t0)
+    la t0, boss_ammo_count
+    sw t1, 0(t0)
+
+    la t0, rifle_mag_count
+    li t1, RIFLE_MAG_SIZE
+    sw t1, 0(t0)
+    la t0, shotgun_mag_count
+    li t1, SHOTGUN_MAG_SIZE
+    sw t1, 0(t0)
+
+    la t0, rifle_reload_timer
+    sw zero, 0(t0)
+    la t0, shotgun_reload_timer
+    sw zero, 0(t0)
+
+end_handle_god_mode_cheat:
+    ret
+
 update_inventory:
     addi sp, sp, -4
     sw ra, 0(sp)
@@ -501,6 +569,10 @@ draw_inventory_weapon_label:
     lw a4, 4(sp)
     call draw_small_text
 
+    la t0, god_mode_enabled
+    lw t1, 0(t0)
+    bnez t1, draw_infinite_ammo_value
+
     la t0, weapon_type
     lw t1, 0(t0)
     li t2, WEAPON_SHOTGUN
@@ -569,7 +641,17 @@ draw_total_ammo_value:
     li a3, COLOR_WHITE
     lw a4, 4(sp)
     call draw_small_number
+    j draw_inventory_cure
 
+draw_infinite_ammo_value:
+    la a0, label_ammo_infinite
+    li a1, 106
+    li a2, 216
+    li a3, COLOR_WHITE
+    lw a4, 4(sp)
+    call draw_small_text
+
+draw_inventory_cure:
     la a0, label_cura
     li a1, 8
     li a2, 224
@@ -603,10 +685,10 @@ draw_reload_timer_value:
     lw a0, 0(t0)
     blez a0, end_draw_inventory
 
-    # ceil((frames * 16 ms) / 1000) nunca exibe 0 enquanto a recarga
+    # ceil((frames * 24 ms) / 1000) nunca exibe 0 enquanto a recarga
     # estiver ativa. A area fica limpa pelo background do Town ou pelo
     # clear do frame nos demais mapas.
-    li t0, DEBUG_FRAME_DELAY_MS
+    li t0, TARGET_FRAME_TIME_MS
     mul a0, a0, t0
     addi a0, a0, 999
     li t0, 1000

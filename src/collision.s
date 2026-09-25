@@ -290,6 +290,10 @@ enemy_player_loop:
     addi t5, t5, -1
     sw t5, 0(t0)
 
+    la t0, god_mode_enabled
+    lw t6, 0(t0)
+    bnez t6, end_enemy_player_collisions
+
     # player_lives -= 1
     la t0, player_lives
     lw t5, 0(t0)
@@ -410,6 +414,10 @@ enemy_bullet_size_y_ok:
     add t4, t0, t3
     sw zero, 0(t4)
 
+    la t0, god_mode_enabled
+    lw t5, 0(t0)
+    bnez t5, next_enemy_bullet_player
+
     la t0, enemy_bullet_damage
     add t4, t0, t3
     lw t6, 0(t4)
@@ -447,7 +455,7 @@ end_enemy_bullet_player_collisions:
 # Verifica colisao entre tiros do jogador e boss.
 #
 # Regra:
-#   bullet 3x3 contra boss 16x16
+#   bullet contra a hitbox BOSS_SIZE x BOSS_SIZE
 #
 # Se colidir:
 #   bullet_active = 0
@@ -501,7 +509,7 @@ bullet_boss_loop:
     lw a1, 0(t4)
 
     # --------------------------------------------------------
-    # AABB bullet 3x3 contra boss 16x16
+    # AABB do projetil contra a hitbox atual do boss
     # --------------------------------------------------------
 
     # bullet_right = bullet_x + BULLET_SIZE

@@ -324,9 +324,13 @@ spawn_uzi_bullet:
     la t0, boss_ammo_count
     lw t1, 0(t0)
     blez t1, end_spawn_bullet
+    la t2, god_mode_enabled
+    lw t2, 0(t2)
+    bnez t2, arm_uzi_cooldown
     addi t1, t1, -1
     sw t1, 0(t0)
 
+arm_uzi_cooldown:
     la t0, rifle_fire_cooldown
     li t1, UZI_FIRE_DELAY
     sw t1, 0(t0)
@@ -343,6 +347,9 @@ prepare_pistol_shot:
     la t0, rifle_mag_count
     lw t1, 0(t0)
     blez t1, try_start_reload_from_shot
+    la t2, god_mode_enabled
+    lw t2, 0(t2)
+    bnez t2, arm_pistol_cooldown
     addi t1, t1, -1
     sw t1, 0(t0)
     j arm_pistol_cooldown
@@ -378,9 +385,13 @@ spawn_shotgun_blast:
     la t0, shotgun_mag_count
     lw t1, 0(t0)
     blez t1, try_start_shotgun_reload_from_shot
+    la t2, god_mode_enabled
+    lw t2, 0(t2)
+    bnez t2, arm_shotgun_cooldown
     addi t1, t1, -1
     sw t1, 0(t0)
 
+arm_shotgun_cooldown:
     la t0, rifle_fire_cooldown
     li t1, SHOTGUN_FIRE_DELAY
     sw t1, 0(t0)

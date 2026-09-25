@@ -61,6 +61,7 @@
 .eqv COLOR_ENEMY_BULLET           0x27
 .eqv COLOR_BOSS_FALLBACK          0x5B
 .eqv COLOR_POWERUP_FALLBACK       0x3F
+.eqv COLOR_DETONATOR_TIMER        0x07
 
 # ------------------------------------------------------------
 # Limites iniciais de entidades simultâneas
@@ -99,6 +100,7 @@
 .eqv WEAPON_UZI                3
 
 .eqv PLAYER_MAX_LIVES          3
+.eqv CHEAT_INFINITE_AMMO_COUNT 999
 .eqv NORMAL_AMMO_GAIN          5
 .eqv BOSS_AMMO_GAIN            10  # ganho de munição da UZI (nome legado)
 .eqv SHOTGUN_AMMO_GAIN         5
@@ -136,6 +138,11 @@
 .eqv SEWER_WAVE3_ENEMIES        7
 .eqv SEWER_WAVE4_ENEMIES        8
 .eqv SEWER_WAVE5_ENEMIES        9
+.eqv SEWER_EXIT_BLINK_FRAMES    6
+.eqv SEWER_EXIT_CENTER_X        37
+.eqv SEWER_EXIT_CENTER_Y        10
+.eqv SEWER_EXIT_RADIUS_SQUARED  625
+.eqv SEWER_COLLISION_AABB_COUNT 4
 
 # Ciclo de drops preservado do baseline: 7 resultados em 15 mortes.
 .eqv DROP_CYCLE_LENGTH           15
@@ -160,6 +167,14 @@
 .eqv LABORATORY_WAVE1_ENEMIES   13
 .eqv LABORATORY_WAVE2_ENEMIES   14
 .eqv LABORATORY_WAVE3_ENEMIES   15
+.eqv LABORATORY_FIRST_SPAWN_DELAY 8
+.eqv LABORATORY_SPAWN_INTERVAL  10
+.eqv LABORATORY_MAX_ACTIVE_ENEMIES 6
+.eqv LABORATORY_EXIT_BLINK_FRAMES 6
+.eqv LABORATORY_EXIT_CENTER_X   304
+.eqv LABORATORY_EXIT_CENTER_Y   34
+.eqv LABORATORY_EXIT_RADIUS_SQUARED 324
+.eqv LABORATORY_COLLISION_AABB_COUNT 5
 
 # ------------------------------------------------------------
 # Configuracao da batalha final
@@ -172,11 +187,46 @@
 # ------------------------------------------------------------
 
 .eqv DEBUG_LOOP_FRAMES          120
-.eqv DEBUG_FRAME_DELAY_MS       16
+.eqv TARGET_FRAME_TIME_MS       24
 .eqv POST_BOSS_EXPLOSION_FRAMES 125
 .eqv ANIMATION_FRAME_DELAY      8
+.eqv PLAYER_WALK_FRAME_DELAY    4
 .eqv SPRITE_FRAME_0             0
 .eqv SPRITE_FRAME_1             1
+
+# ------------------------------------------------------------
+# Trilha MIDI exclusiva do menu
+# ------------------------------------------------------------
+
+.eqv MENU_MUSIC_ENABLED         1
+.eqv MENU_MUSIC_LENGTH          96
+.eqv MENU_MUSIC_STEP_MS         20
+.eqv MENU_MUSIC_NOTE_MS         24
+.eqv MENU_MUSIC_INSTRUMENT      88
+.eqv MENU_MUSIC_VOLUME          78
+.eqv MENU_DRONE_LENGTH          4
+.eqv MENU_DRONE_STEP_MS         20
+.eqv MENU_DRONE_NOTE_MS         36
+.eqv MENU_DRONE_INSTRUMENT      88
+.eqv MENU_DRONE_VOLUME          58
+.eqv MENU_MUSIC_STOP_PITCH_COUNT 12
+
+# ------------------------------------------------------------
+# Trilha MIDI exclusiva do gameplay
+# ------------------------------------------------------------
+
+.eqv GAME_MUSIC_ENABLED       1
+.eqv GAME_BASS_LENGTH         12
+.eqv GAME_BASS_STEP_MS        42
+.eqv GAME_BASS_NOTE_MS        150
+.eqv GAME_BASS_INSTRUMENT     48
+.eqv GAME_BASS_VOLUME         42
+.eqv GAME_STAB_LENGTH         24
+.eqv GAME_STAB_STEP_MS        36
+.eqv GAME_STAB_NOTE_MS        82
+.eqv GAME_STAB_INSTRUMENT     0
+.eqv GAME_STAB_VOLUME         48
+.eqv GAME_MUSIC_STOP_PITCH_COUNT 13
 
 # ------------------------------------------------------------
 # Fallbacks de renderizacao com sprites
@@ -305,22 +355,23 @@
 # Boss Final
 # ------------------------------------------------------------
 
-.eqv BOSS_SIZE                 32
-.eqv BOSS_START_X              152
-.eqv BOSS_START_Y              32
+.eqv BOSS_SIZE                 48
+.eqv BOSS_HALF_SIZE            24
+.eqv BOSS_START_X              144
+.eqv BOSS_START_Y              24
 .eqv BOSS_HP_START             50
 .eqv BOSS_SPEED                2
 
 .eqv BOSS_MIN_X                24
-.eqv BOSS_MAX_X                272
+.eqv BOSS_MAX_X                262
 .eqv BOSS_MIN_Y                20
-.eqv BOSS_MAX_Y                200
+.eqv BOSS_MAX_Y                168
 
 .eqv BOSS_SHOOT_DELAY          50
 .eqv BOSS_MELEE_RANGE          10
 .eqv BOSS_MELEE_DAMAGE         1
 .eqv BOSS_MELEE_COOLDOWN       60
-.eqv BOSS_HEAVY_SHOOT_DELAY    60
+.eqv BOSS_HEAVY_SHOOT_DELAY    28
 .eqv BOSS_HEAVY_PROJECTILE_DX  0
 .eqv BOSS_HEAVY_PROJECTILE_DY  2
 .eqv SCORE_BOSS                1000

@@ -28,6 +28,9 @@ init_game:
     la t0, boss_active
     sw zero, 0(t0)
 
+    la t0, god_mode_enabled
+    sw zero, 0(t0)
+
     la t0, score
     sw zero, 0(t0)
 
@@ -38,6 +41,12 @@ init_game:
     sw zero, 0(t0)
 
     la t0, animation_frame
+    sw zero, 0(t0)
+
+    la t0, player_walk_tick
+    sw zero, 0(t0)
+
+    la t0, player_walk_frame
     sw zero, 0(t0)
 
     la t0, post_boss_explosion_timer
@@ -75,6 +84,13 @@ init_game:
 
 # Limpa eventos e buffers que nao podem atravessar mudancas de estado.
 clear_input_buffers:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    # Todas as mudancas de estado passam por aqui. Interrompe a trilha de
+    # gameplay para ela nunca continuar em menus, cutscenes ou telas finais.
+    call stop_gameplay_music
+
     la t0, last_key
     sw zero, 0(t0)
 
@@ -82,6 +98,11 @@ clear_input_buffers:
     sw zero, 0(t0)
 
     la t0, cutscene_text_visible
+    sw zero, 0(t0)
+
+    # A nova cutscene precisa receber ao menos um frame sem evento antes de
+    # aceitar SPACE/ENTER. Isso impede o START anterior de pular a imagem.
+    la t0, cutscene_input_armed
     sw zero, 0(t0)
 
     la t0, shoot_request_pending
@@ -108,6 +129,8 @@ clear_input_buffers:
     la t0, player_burst_interval_timer
     sw zero, 0(t0)
 
+    lw ra, 0(sp)
+    addi sp, sp, 4
     ret
 
 # ------------------------------------------------------------
@@ -141,6 +164,7 @@ set_state_level1:
 
     call init_level1
     call clear_input_buffers
+    call reset_gameplay_music
 
     lw ra,0(sp)
     addi sp, sp, 4
@@ -178,6 +202,7 @@ set_state_level2:
 
     call init_level2
     call clear_input_buffers
+    call reset_gameplay_music
 
     lw ra, 0(sp)
     addi sp, sp, 4
@@ -216,6 +241,7 @@ set_state_level3:
 
     call init_level3
     call clear_input_buffers
+    call reset_gameplay_music
 
     lw ra, 0(sp)
     addi sp, sp, 4
@@ -223,40 +249,46 @@ set_state_level3:
     ret
 
 # ------------------------------------------------------------
-# Estados de cutscene. A fase de destino e inicializada somente
-# quando o jogador avanca a tela com SPACE ou ENTER.
+# Estados de cutscene. Nas transicoes das fases 1, 2 e 3, o texto
+# aparece primeiro e a imagem vem depois. A fase de destino e
+# inicializada somente apos o segundo SPACE ou ENTER.
 # ------------------------------------------------------------
 
 set_state_cutscene_intro:
     la t0, game_state
     li t1, STATE_CUTSCENE_INTRO
     sw t1, 0(t0)
-    j clear_input_buffers
+    j prepare_text_first_cutscene
 
 set_state_cutscene_level2:
-    addi sp, sp, -4
-    sw ra, 0(sp)
-
     la t0, game_state
     li t1, STATE_CUTSCENE_LEVEL2
     sw t1, 0(t0)
-
-    call clear_input_buffers
-
-    lw ra, 0(sp)
-    addi sp, sp, 4
-    ret
+    j prepare_text_first_cutscene
 
 set_state_cutscene_level3:
     la t0, game_state
     li t1, STATE_CUTSCENE_LEVEL3
     sw t1, 0(t0)
-    j clear_input_buffers
+    j prepare_text_first_cutscene
 
-set_state_cutscene_detonator:
+# Compartilhado pelas tres entradas de fase. O helper preserva o endereco de
+# retorno porque clear_input_buffers e chamado antes de ativar o painel textual.
+prepare_text_first_cutscene:
     addi sp, sp, -4
     sw ra, 0(sp)
 
+    call clear_input_buffers
+
+    la t0, cutscene_text_visible
+    li t1, 1
+    sw t1, 0(t0)
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
+set_state_cutscene_detonator:
     la t0, game_state
     li t1, STATE_CUTSCENE_DETONATOR
     sw t1, 0(t0)
@@ -264,11 +296,8 @@ set_state_cutscene_detonator:
     la t0, post_boss_explosion_timer
     sw zero, 0(t0)
 
-    call clear_input_buffers
-
-    lw ra, 0(sp)
-    addi sp, sp, 4
-    ret
+    # O texto final abre a sequencia; depois vem o botao/detonador.
+    j prepare_text_first_cutscene
 
 set_state_cutscene_explosion:
     addi sp, sp, -4
@@ -321,6 +350,17 @@ set_state_game_over:
     addi sp, sp, -4
     sw ra, 0(sp)
 
+    # Protecao defensiva: nenhum caminho de dano futuro pode encerrar a
+    # partida enquanto o cheat estiver ativo.
+    la t0, god_mode_enabled
+    lw t1, 0(t0)
+    beqz t1, apply_game_over_state
+    la t0, player_lives
+    li t1, PLAYER_MAX_LIVES
+    sw t1, 0(t0)
+    j end_set_state_game_over
+
+apply_game_over_state:
     la t0, game_state
     li t1, STATE_GAME_OVER
     sw t1, 0(t0)
@@ -332,7 +372,9 @@ set_state_game_over:
     call play_music_note
 
     call clear_input_buffers
+    call reset_game_over_music
 
+end_set_state_game_over:
     lw ra, 0(sp)
     addi sp, sp, 4
     ret
@@ -370,6 +412,7 @@ set_state_menu:
     sw zero, 0(t0)
 
     call clear_input_buffers
+    call reset_menu_music
 
     lw ra, 0(sp)
     addi sp, sp, 4

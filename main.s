@@ -13,6 +13,9 @@
 .include "data/boss_data.s"
 .include "data/powerup_data.s"
 .include "data/inventory_data.s"
+.include "data/music_data.s"
+.include "data/game_over_music_data.s"
+.include "data/gameplay_music_data.s"
 
 .text
 .globl main
@@ -35,6 +38,7 @@ main:
     ecall
 
 
+.include "src/music.s"
 .include "src/game_state.s"
 .include "src/level_manager.s"
 .include "src/input.s"
